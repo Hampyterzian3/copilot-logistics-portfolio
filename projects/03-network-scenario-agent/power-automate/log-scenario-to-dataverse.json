@@ -1,0 +1,98 @@
+{
+  "_note": "Definition sketch, not an export. Connection references and ids are placeholders.",
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "triggers": {
+      "When_an_agent_calls_the_flow": {
+        "type": "Request",
+        "kind": "Skills",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "number": { "title": "FuelIndex", "type": "number" },
+              "number_1": { "title": "Co2Price", "type": "number" },
+              "number_2": { "title": "Handling", "type": "number" },
+              "number_3": { "title": "MaxStops", "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "Run_a_scenario": {
+        "type": "OpenApiConnection",
+        "inputs": {
+          "host": { "connectionName": "shared_cr-contoso-network-scenarios", "operationId": "RunScenario" },
+          "parameters": {
+            "body/fuel_index": "@triggerBody()?['number']",
+            "body/co2_price_t": "@triggerBody()?['number_1']",
+            "body/handling_ldm": "@triggerBody()?['number_2']",
+            "body/max_stops": "@triggerBody()?['number_3']"
+          }
+        }
+      },
+      "Add_scenario": {
+        "type": "OpenApiConnection",
+        "runAfter": { "Run_a_scenario": ["Succeeded"] },
+        "inputs": {
+          "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "CreateRecord" },
+          "parameters": {
+            "entityName": "cr_networkscenarios",
+            "item/cr_fuelindex": "@body('Run_a_scenario')?['params']?['fuel_index']",
+            "item/cr_co2price": "@body('Run_a_scenario')?['params']?['co2_price_t']",
+            "item/cr_savingpct": "@body('Run_a_scenario')?['recommendation']?['saving_vs_best_pure_pct']",
+            "item/cr_recommendationtext": "@body('Run_a_scenario')?['recommendation']?['text']"
+          }
+        }
+      },
+      "Each_design": {
+        "type": "Foreach",
+        "runAfter": { "Add_scenario": ["Succeeded"] },
+        "foreach": "@createArray('direct','milkrun','crossdock','bestmix')",
+        "actions": {
+          "Add_design_result": {
+            "type": "OpenApiConnection",
+            "inputs": {
+              "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "CreateRecord" },
+              "parameters": {
+                "entityName": "cr_scenariodesignresults",
+                "item/cr_name": "@{outputs('Add_scenario')?['body/cr_name']} @{item()}",
+                "item/cr_costweek": "@body('Run_a_scenario')?['designs']?[item()]?['cost_week']",
+                "item/cr_co2tweek": "@body('Run_a_scenario')?['designs']?[item()]?['co2_t_week']",
+                "item/cr_truckstweek": "@body('Run_a_scenario')?['designs']?[item()]?['trucks_week']",
+                "item/cr_scenario@odata.bind": "cr_networkscenarios(@{outputs('Add_scenario')?['body/cr_networkscenarioid']})"
+              }
+            }
+          }
+        }
+      },
+      "Each_supplier": {
+        "type": "Foreach",
+        "runAfter": { "Each_design": ["Succeeded"] },
+        "foreach": "@body('Run_a_scenario')?['supplier_modes']",
+        "runtimeConfiguration": { "concurrency": { "repetitions": 20 } },
+        "actions": {
+          "Add_supplier_mode": {
+            "type": "OpenApiConnection",
+            "inputs": {
+              "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "CreateRecord" },
+              "parameters": {
+                "entityName": "cr_suppliermodes",
+                "item/cr_name": "@item()?['supplier_id']",
+                "item/cr_hubid": "@coalesce(item()?['hub_id'], '')",
+                "item/cr_scenario@odata.bind": "cr_networkscenarios(@{outputs('Add_scenario')?['body/cr_networkscenarioid']})"
+              }
+            }
+          }
+        }
+      },
+      "Respond_to_the_agent": {
+        "type": "Response",
+        "kind": "Skills",
+        "runAfter": { "Each_supplier": ["Succeeded"] },
+        "inputs": { "statusCode": 200, "body": { "scenarioname": "@{outputs('Add_scenario')?['body/cr_name']}" } }
+      }
+    }
+  }
+}

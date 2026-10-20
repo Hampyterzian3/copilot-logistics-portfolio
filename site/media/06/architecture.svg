@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="t d">
+  <title id="t">Brand theme pipeline</title>
+  <desc id="d">Two design-token files feed a Node build that writes CSS, Tailwind, Power Apps and Office themes plus a contrast report; a logo script draws the wordmark and agent icon. Outputs reach web apps, Power Apps, Word and PowerPoint templates used by Microsoft 365 Copilot, and Copilot Studio agents.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff6b35"/></marker>
+    <style>
+      .h{font:600 20px 'Space Grotesk',Arial,sans-serif;fill:#fffdf8}
+      .b{font:600 16px 'Space Grotesk',Arial,sans-serif;fill:#fffdf8}
+      .s{font:400 13px Inter,Arial,sans-serif;fill:#fffdf8;fill-opacity:.82}
+      .k{font:600 13px 'Space Grotesk',Arial,sans-serif;fill:#0c2c23}
+      .m{font:500 14px Consolas,monospace;fill:#fffdf8}
+      .box{fill:#244139;stroke:#fffdf8;stroke-opacity:.18}
+      .ln{stroke:#ff6b35;stroke-width:2;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1200" height="675" fill="#0c2c23"/>
+  <text x="40" y="52" class="h" style="font-size:26px">One token source, every brand surface</text>
+  <text x="40" y="78" class="s">Design tokens in Git, built by a Node script written with GitHub Copilot, checked by tests and a WCAG contrast gate.</text>
+
+  <!-- sources -->
+  <text x="40" y="128" class="s">SOURCE OF TRUTH</text>
+  <rect x="40" y="140" width="250" height="96" rx="12" class="box"/>
+  <rect x="56" y="156" width="56" height="22" rx="11" fill="#81cfb3"/><text x="70" y="172" class="k">hampy</text>
+  <text x="56" y="204" class="m">hampy.tokens.json</text>
+  <text x="56" y="224" class="s">personal brand, mttn palette origin</text>
+  <rect x="40" y="252" width="250" height="96" rx="12" class="box"/>
+  <rect x="56" y="268" width="96" height="22" rx="11" fill="#b0c6e8"/><text x="66" y="284" class="k">corporate</text>
+  <text x="56" y="316" class="m">corporate-dpworld</text>
+  <text x="56" y="336" class="s">DP World colours used in DPark</text>
+  <rect x="40" y="364" width="250" height="84" rx="12" class="box"/>
+  <text x="56" y="394" class="m">build_logo.js</text>
+  <text x="56" y="416" class="s">pixel wordmark and mark drawn</text>
+  <text x="56" y="434" class="s">as rectangles on a unit grid</text>
+
+  <!-- build -->
+  <text x="370" y="128" class="s">BUILD (GITHUB ACTIONS)</text>
+  <rect x="370" y="140" width="290" height="208" rx="12" class="box" style="stroke:#ff6b35;stroke-opacity:1"/>
+  <text x="390" y="176" class="m">build_themes.mjs</text>
+  <text x="390" y="200" class="s">resolve aliases {color.green}</text>
+  <text x="390" y="220" class="s">generate 5 files per brand</text>
+  <text x="390" y="240" class="s">WCAG ratio for every text pair</text>
+  <rect x="390" y="262" width="118" height="24" rx="12" fill="#e8d67d"/><text x="402" y="279" class="k">node --test</text>
+  <rect x="516" y="262" width="126" height="24" rx="12" fill="#da81a7"/><text x="528" y="279" class="k">contrast gate</text>
+  <text x="390" y="318" class="s">fails block the pull request</text>
+  <rect x="370" y="364" width="290" height="84" rx="12" class="box"/>
+  <text x="390" y="394" class="b">SVG and PNG exports</text>
+  <text x="390" y="418" class="s">logo, mark tile, favicon, 512px icon</text>
+  <text x="390" y="436" class="s">via headless browser render</text>
+
+  <path d="M290 188 H360" class="ln"/>
+  <path d="M290 300 H360" class="ln"/>
+  <path d="M290 406 H360" class="ln"/>
+
+  <!-- outputs -->
+  <text x="740" y="128" class="s">GENERATED OUTPUTS AND WHERE THEY LAND</text>
+  <g>
+    <rect x="740" y="140" width="420" height="58" rx="12" class="box"/>
+    <text x="758" y="166" class="m">tokens.css + tailwind.theme.js</text>
+    <text x="758" y="186" class="s">Web apps: DPark (React, Tailwind, Netlify), this site</text>
+    <rect x="740" y="208" width="420" height="58" rx="12" class="box"/>
+    <text x="758" y="234" class="m">powerapps-theme.json</text>
+    <text x="758" y="254" class="s">Power Apps modern theme (Fluent 2 brand ramp)</text>
+    <rect x="740" y="276" width="420" height="58" rx="12" class="box"/>
+    <text x="758" y="302" class="m">office-theme1.xml</text>
+    <text x="758" y="322" class="s">Word and PowerPoint templates, SharePoint org assets</text>
+    <rect x="740" y="344" width="420" height="58" rx="12" class="box"/>
+    <text x="758" y="370" class="m">contrast.md</text>
+    <text x="758" y="390" class="s">WCAG AA report per brand, attached to the PR</text>
+    <rect x="740" y="412" width="420" height="58" rx="12" class="box"/>
+    <text x="758" y="438" class="m">hampy-agent-icon.png</text>
+    <text x="758" y="458" class="s">Copilot Studio agent icon, favicon, video intros</text>
+  </g>
+  <path d="M660 200 C700 200 700 169 732 169" class="ln"/>
+  <path d="M660 230 C700 230 700 237 732 237" class="ln"/>
+  <path d="M660 260 C700 260 700 305 732 305" class="ln"/>
+  <path d="M660 300 C700 300 700 373 732 373" class="ln"/>
+  <path d="M660 406 C700 406 700 441 732 441" class="ln"/>
+
+  <!-- consumers -->
+  <text x="40" y="510" class="s">MICROSOFT 365 AND POWER PLATFORM</text>
+  <rect x="40" y="522" width="262" height="92" rx="12" fill="#81cfb3"/>
+  <text x="58" y="552" class="k" style="font-size:16px">Microsoft 365 Copilot</text>
+  <text x="58" y="574" class="k" style="font-weight:400">drafts decks and documents</text>
+  <text x="58" y="592" class="k" style="font-weight:400">from the branded templates</text>
+  <rect x="318" y="522" width="262" height="92" rx="12" fill="#81a3da"/>
+  <text x="336" y="552" class="k" style="font-size:16px">Power Apps</text>
+  <text x="336" y="574" class="k" style="font-weight:400">canvas apps read the modern</text>
+  <text x="336" y="592" class="k" style="font-weight:400">theme, no per-app colours</text>
+  <rect x="596" y="522" width="262" height="92" rx="12" fill="#e8d67d"/>
+  <text x="614" y="552" class="k" style="font-size:16px">Copilot Studio</text>
+  <text x="614" y="574" class="k" style="font-weight:400">agent icon and accent colour</text>
+  <text x="614" y="592" class="k" style="font-weight:400">from the same palette</text>
+  <rect x="874" y="522" width="286" height="92" rx="12" fill="#da81a7"/>
+  <text x="892" y="552" class="k" style="font-size:16px">GitHub Copilot</text>
+  <text x="892" y="574" class="k" style="font-weight:400">drafted the build, tests and</text>
+  <text x="892" y="592" class="k" style="font-weight:400">Office XML; reviewed by hand</text>
+  <text x="40" y="648" class="s">hampy-styled diagram. Corporate theme shown as colour values only; no corporate logo or font files are used.</text>
+</svg>

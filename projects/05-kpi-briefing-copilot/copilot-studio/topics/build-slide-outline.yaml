@@ -1,0 +1,57 @@
+kind: AdaptiveDialog
+modelDescription: Builds the five-slide PowerPoint outline for the weekly account review from the generated brief. Use when the user asks for slides, a deck or a presentation outline.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Build slide outline
+    triggerQueries:
+      - Build slide outline
+      - Make the deck for the weekly review
+      - Turn the brief into slides
+      - PowerPoint outline for leadership
+
+  actions:
+    - kind: SetVariable
+      id: defaultWeek
+      variable: Topic.WeekLabel
+      value: =If(IsBlank(Global.LastBriefWeek), "latest", Global.LastBriefWeek)
+
+    - kind: InvokeFlowAction
+      id: buildOutline
+      flowId: 00000000-0000-0000-0000-000000000503
+      input:
+        binding:
+          weekLabel: =Topic.WeekLabel
+      output:
+        binding:
+          slidesJson: Topic.SlidesJson
+          deckOutlineUrl: Topic.DeckOutlineUrl
+
+    - kind: ParseValue
+      id: parseSlides
+      variable: Topic.Slides
+      valueType:
+        kind: Table
+        properties:
+          n: Number
+          title: String
+          visual: String
+      value: =Topic.SlidesJson
+
+    - kind: SendActivity
+      id: sendOutline
+      activity: |-
+        Five-slide outline for {Topic.WeekLabel}:
+        {Concat(Topic.Slides, Text(n) & ". " & title & " (" & visual & ")", Char(10))}
+        Open it in PowerPoint and ask Microsoft 365 Copilot to design the slides from the outline. Bullets keep their source tags in the speaker notes.
+
+    - kind: SendActivity
+      id: link
+      activity:
+        attachments:
+          - kind: AdaptiveCardTemplate
+            cardContent: |-
+              ={ type: "AdaptiveCard", version: "1.5",
+                 body: [ { type: "TextBlock", text: "Deck outline ready (draft)", weight: "Bolder" } ],
+                 actions: [ { type: "Action.OpenUrl", title: "Open in PowerPoint", url: Topic.DeckOutlineUrl } ] }

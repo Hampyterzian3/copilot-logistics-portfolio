@@ -1,0 +1,93 @@
+{
+  "id": "07",
+  "slug": "document-extraction",
+  "title": "Document Data-Extraction Models",
+  "outcome": "50 invoices checked in 1.4 s: 8 of 8 seeded errors caught, 0 false approvals.",
+  "summary": "Accounts payable teams key supplier invoices by hand at about three minutes each. I built a Python agent that reads PDF invoices, checks them against vendor and PO master data, and only sends exceptions to a person, then mapped it to AI Builder, Power Automate, Dataverse and Copilot Studio.",
+  "stack": [
+    "Python",
+    "Anthropic SDK",
+    "pdfplumber",
+    "SQLite",
+    "Streamlit",
+    "AI Builder",
+    "Power Automate",
+    "Dataverse",
+    "Copilot Studio"
+  ],
+  "cv": "Inspired by: P&O integration analytics into governed single-source datasets.",
+  "demo": "demos/07-document-extraction.html",
+  "repo": "projects/07-document-extraction",
+  "source": "Source available on request.",
+  "cards": [
+    {
+      "type": "image",
+      "title": "One click, 50 invoices",
+      "caption": "The built Streamlit app after a run: 42 auto-approved, 8 sent for review, and why each one needed a person.",
+      "src": "media/07/run-intake.png",
+      "alt": "Invoice intake app showing 50 processed invoices, outcome chart and reasons chart"
+    },
+    {
+      "type": "image",
+      "title": "Exception queue with reasons",
+      "caption": "Reviewers only see exceptions, each with the reason in plain words and approve or reject with a comment.",
+      "src": "media/07/exception-queue.png",
+      "alt": "Exception queue listing an unknown vendor, a PO that does not exist and an amount that differs from the PO"
+    },
+    {
+      "type": "diagram",
+      "title": "Architecture",
+      "caption": "Top: the built Python pipeline. Bottom: the same steps mapped to SharePoint, AI Builder, Power Automate, Dataverse, Teams and Copilot Studio (design, not deployed).",
+      "src": "media/07/architecture.svg",
+      "alt": "Architecture diagram of the Python invoice intake pipeline and its Power Platform mapping"
+    },
+    {
+      "type": "code",
+      "title": "Deterministic PO controls",
+      "caption": "Real excerpt from intake/validate.py. Extraction can use AI; approval decisions stay rule-based and explainable.",
+      "lang": "python",
+      "code": "    if not f.po_number:\n        reasons.append((\"MISSING_PO\", \"No purchase order reference on the invoice\"))\n    elif f.po_number not in md.pos:\n        reasons.append((\"PO_NOT_FOUND\", f\"{f.po_number} does not exist\"))\n    else:\n        po = md.pos[f.po_number]\n        if vid and po[\"vendor_id\"] != vid:\n            reasons.append((\"PO_VENDOR_MISMATCH\", f\"{f.po_number} belongs to vendor {po['vendor_id']}, not {vid}\"))\n        if f.net_amount is not None:\n            diff = (f.net_amount - po[\"net_amount\"]) / po[\"net_amount\"]\n            if abs(diff) > rules.amount_tolerance:\n                reasons.append((\"AMOUNT_MISMATCH\", f\"Net {f.net_amount:,.2f} vs PO {po['net_amount']:,.2f} ({diff:+.1%})\"))"
+    },
+    {
+      "type": "metric",
+      "title": "Benchmark on 50 synthetic invoices",
+      "caption": "Re-run offline with the rule-based reader across three layouts. Synthetic data; real supplier documents will differ.",
+      "metrics": [
+        {
+          "value": "8/8",
+          "label": "seeded errors caught"
+        },
+        {
+          "value": "0",
+          "label": "false approvals"
+        },
+        {
+          "value": "50/50",
+          "label": "key fields exact"
+        },
+        {
+          "value": "142 min",
+          "label": "keying saved of 150"
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "title": "Watch the run",
+      "caption": "28 seconds from the demo video: the inbox, one click, and the results with reasons.",
+      "src": "media/07/clip.mp4",
+      "poster": "media/07/clip-poster.jpg"
+    },
+    {
+      "type": "text",
+      "title": "AI pair programming",
+      "caption": "Developed with AI pair programming, not GitHub Copilot. The benchmark figures come from a fresh run of the original build. The Power Platform version is a written design and has not been deployed."
+    },
+    {
+      "type": "demo",
+      "title": "Try it",
+      "caption": "Run a simulated intake on 12 of the app's invoices, see field confidence and every check, release an exception through the assistant and watch the audit trail.",
+      "href": "demos/07-document-extraction.html"
+    }
+  ]
+}

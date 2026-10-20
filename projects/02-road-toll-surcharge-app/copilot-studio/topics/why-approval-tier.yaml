@@ -1,0 +1,42 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Why approval tier
+    triggerQueries:
+      - Why does this need the steering committee
+      - Why this approval tier
+      - Who approves this surcharge
+      - What are the approval thresholds
+
+  actions:
+    - kind: Question
+      id: askCustomer
+      variable: Topic.CustomerCode
+      prompt: Which customer code?
+      entity: StringPrebuiltEntity
+      skipQuestionMode: SkipOnFirstExecutionIfVariableHasValue
+
+    - kind: InvokeFlowAction
+      id: getProposal
+      flowId: 00000000-0000-0000-0000-000000000202
+      input:
+        binding:
+          customerCode: =Topic.CustomerCode
+      output:
+        binding:
+          increasePct: Topic.IncreasePct
+          surchargeEur: Topic.SurchargeEur
+          tier: Topic.Tier
+          status: Topic.Status
+
+    - kind: SendActivity
+      id: sayTier
+      activity: |-
+        The latest proposal for **{Topic.CustomerCode}** is **{Topic.Tier}** ({Topic.Status}):
+        price increase {Text(Topic.IncreasePct, "0.00")}% and surcharge EUR {Text(Topic.SurchargeEur, "#,##0")}.
+        - Auto-approved: up to 3.5% and up to EUR 200
+        - Commercial manager: up to 5.0% and up to EUR 500
+        - Above either limit: Commercial Steering Committee, after the commercial manager
+        Lower recovery or phasing the surcharge in can move a proposal to a lower tier.

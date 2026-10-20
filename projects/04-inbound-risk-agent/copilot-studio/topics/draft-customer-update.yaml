@@ -1,0 +1,72 @@
+kind: AdaptiveDialog
+modelDescription: Drafts a short customer email about a shipment at risk using only customer-safe causes, and saves it for planner approval.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Draft customer update
+    triggerQueries:
+      - draft a customer update
+      - write to the customer about this shipment
+      - prepare a delay email
+      - tell the customer it will be late
+      - draft customer update for CTL-261556
+
+  actions:
+    - kind: Question
+      id: askShipment
+      variable: Topic.ShipmentId
+      prompt: Which shipment should the update be about?
+      entity: StringPrebuiltEntity
+      alwaysPrompt: false
+
+    - kind: InvokeFlowAction
+      id: getFacts
+      flowId: 00000000-0000-0000-0000-000000000000  # "Inbound Risk - Get shipment reasons" (customer-safe view)
+      input:
+        binding:
+          shipmentId: =Upper(Trim(Topic.ShipmentId))
+          customerSafe: =true
+      output:
+        binding:
+          found: Topic.Found
+          customer: Topic.Customer
+          poRef: Topic.PoRef
+          pieces: Topic.Pieces
+          promised: Topic.Promised
+          carrier: Topic.Carrier
+          isOverdue: Topic.IsOverdue
+          customerCauses: Topic.CustomerCauses
+
+    - kind: SearchAndSummarizeContent
+      id: draft
+      variable: Topic.Draft
+      userInput: |-
+        Write a customer email in British English, under 160 words, calm and specific.
+        Customer: {Topic.Customer}. Shipment {Topic.ShipmentId}, order {Topic.PoRef}, {Topic.Pieces} pieces, promised {Topic.Promised}.
+        Already past promised time: {Topic.IsOverdue}. Causes you may mention: {Topic.CustomerCauses}.
+        Say we have asked {Topic.Carrier} to confirm location and a new delivery time and will update within four hours.
+        Do not mention scores, carrier performance, area loss rates or a new date.
+        Sign off: Kind regards, Customer Service, Contoso Logistics.
+      additionalInstructions: Follow the SharePoint page "Customer update guidelines".
+
+    - kind: InvokeFlowAction
+      id: saveDraft
+      flowId: 00000000-0000-0000-0000-000000000000  # "Inbound Risk - Save draft for approval"
+      input:
+        binding:
+          shipmentId: =Topic.ShipmentId
+          draftType: ="customer_update"
+          body: =Topic.Draft
+      output:
+        binding:
+          approvalLink: Topic.ApprovalLink
+
+    - kind: SendActivity
+      id: showDraft
+      activity: |-
+        Draft for planner approval:
+
+        {Topic.Draft}
+
+        Approve or edit it here: {Topic.ApprovalLink}

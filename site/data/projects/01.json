@@ -1,0 +1,91 @@
+{
+  "id": "01",
+  "slug": "tender-desk-copilot",
+  "title": "Tender Desk Copilot",
+  "outcome": "RFQ gaps found in seconds, clarification letter drafted the same day.",
+  "summary": "Solution designers lose days finding gaps in RFQ lane files and requirements before pricing can start. A Python checker with nine rules, a Power Automate flow and a Copilot Studio agent list every gap, draft the questions and propose a mode per lane.",
+  "stack": [
+    "Copilot Studio",
+    "Microsoft 365 Copilot",
+    "Power Automate",
+    "SharePoint",
+    "Dataverse",
+    "Azure Functions",
+    "Microsoft Teams",
+    "GitHub Copilot"
+  ],
+  "cv": "Inspired by: tender and RFQ solution design for large multinational accounts, from data discovery through to customer presentation.",
+  "demo": "demos/01-tender-desk-copilot.html",
+  "repo": "projects/01-tender-desk-copilot",
+  "cards": [
+    {
+      "type": "image",
+      "title": "Every gap, with a rule and a severity",
+      "caption": "A 40-lane RFQ from a fictional shipper is checked against nine rules. The agent lists the high-severity gaps to fix before pricing.",
+      "src": "media/01/rfq-check-result.png",
+      "alt": "Tender Desk demo showing KPI tiles, a gap list with severity tags and the agent panel listing high-severity gaps"
+    },
+    {
+      "type": "diagram",
+      "title": "Architecture",
+      "caption": "A new RFQ folder in SharePoint triggers a flow that runs the checker as an Azure Function, writes Dataverse rows, posts a Teams card and saves a summary file that grounds Copilot in Word and PowerPoint.",
+      "src": "media/01/architecture.svg",
+      "alt": "Architecture diagram: SharePoint, Power Automate, Azure Function, Dataverse, Teams, Copilot Studio, Microsoft 365 Copilot in Word and PowerPoint"
+    },
+    {
+      "type": "code",
+      "title": "Copilot Studio topic: Check new RFQ",
+      "caption": "The agent never computes gaps itself. It calls the checker flow and reports the counts it returns.",
+      "lang": "yaml",
+      "code": "    - kind: InvokeFlowAction\n      id: runChecker\n      flowId: 00000000-0000-0000-0000-000000000000  # \"Tender Desk - Run RFQ check\" (see power-automate/run-rfq-check.md)\n      input:\n        binding:\n          rfqFolder: =Topic.RfqFolder\n      output:\n        binding:\n          tenderId: Topic.TenderId\n          lanes: Topic.LaneCount\n          gapsHigh: Topic.GapsHigh\n          gapsMedium: Topic.GapsMedium\n          gapsLow: Topic.GapsLow\n          readinessPct: Topic.ReadinessPct\n          topGaps: Topic.TopGaps"
+    },
+    {
+      "type": "code",
+      "title": "Rule R06: transit times no truck can meet",
+      "caption": "Each rule is a few readable lines with a pytest case. The same rule runs in the demo page in JavaScript and is checked for identical output.",
+      "lang": "python",
+      "code": "    # R06 unrealistic transit time\n    km = to_int(row.get(\"distance_km\"))\n    days = to_int(row.get(\"required_transit_days\"))\n    if km is not None and days is not None and days < min_transit_days(km):\n        gaps.append(make_gap(\"R06\", lid, \"required_transit_days\",\n                             f\"{days} day(s) requested for {km} km; road minimum is about \"\n                             f\"{min_transit_days(km)} day(s) at {ROAD_KM_PER_DAY} km per day.\"))"
+    },
+    {
+      "type": "metric",
+      "title": "Result on the sample RFQ",
+      "caption": "Computed by the checker on the synthetic Northwind Components pack: all 25 seeded gaps found, 10 clarification questions drafted in 7 themes.",
+      "metrics": [
+        {
+          "value": "40",
+          "label": "lanes checked"
+        },
+        {
+          "value": "25",
+          "label": "gaps found"
+        },
+        {
+          "value": "9",
+          "label": "high severity"
+        },
+        {
+          "value": "10",
+          "label": "questions drafted"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "title": "Clarification letter, ready for Word",
+      "caption": "Questions are grouped by theme with the affected lane ids, so Copilot in Word only has to adjust tone before the letter goes to the customer.",
+      "src": "media/01/clarification-letter.png",
+      "alt": "Word-style draft letter with clarification questions grouped by theme next to the agent panel"
+    },
+    {
+      "type": "text",
+      "title": "GitHub Copilot ready",
+      "caption": "Code drafted with AI pair programming and verified by 50 pytest tests and a Python to JavaScript parity check. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
+    },
+    {
+      "type": "demo",
+      "title": "Try it",
+      "caption": "Pick a sample RFQ, run the check, then click through What is missing, Draft clarification email and Suggest mode per lane. Under a minute.",
+      "href": "demos/01-tender-desk-copilot.html"
+    }
+  ]
+}

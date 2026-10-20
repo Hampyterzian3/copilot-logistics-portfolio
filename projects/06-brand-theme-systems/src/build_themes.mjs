@@ -1,0 +1,293 @@
+// Brand theme builder: one W3C-style tokens file in, every platform theme out.
+// Usage: node src/build_themes.mjs [path/to/brand.tokens.json ...]   (no args = all files in src/tokens)
+// Writes dist/<brand>/{tokens.css, tailwind.theme.js, powerapps-theme.json, office-theme1.xml, contrast.md},
+// dist/specimen.html and ../../site/demos/data/06-themes.js. No dependencies.
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const PROJECT = path.resolve(HERE, "..");
+const SITE_DATA = path.resolve(PROJECT, "..", "..", "site", "demos", "data", "06-themes.js");
+
+// ---------- tokens ----------
+export function flatten(node, prefix = "", type = undefined, out = {}) {
+  const t = node.$type ?? type;
+  if (Object.prototype.hasOwnProperty.call(node, "$value")) {
+    out[prefix] = { value: node.$value, type: t, description: node.$description };
+    return out;
+  }
+  for (const [k, v] of Object.entries(node)) {
+    if (k.startsWith("$") || typeof v !== "object" || v === null) continue;
+    flatten(v, prefix ? `${prefix}.${k}` : k, t, out);
+  }
+  return out;
+}
+
+const REF = /^\{([^}]+)\}$/;
+export function resolveValue(value, flat, seen = []) {
+  if (typeof value !== "string") return value;
+  const m = value.match(REF);
+  if (!m) return value;
+  const ref = m[1];
+  if (seen.includes(ref)) throw new Error(`Circular token reference: ${[...seen, ref].join(" -> ")}`);
+  if (!flat[ref]) throw new Error(`Unknown token reference {${ref}}`);
+  return resolveValue(flat[ref].value, flat, [...seen, ref]);
+}
+
+export function loadTokens(file) {
+  const raw = JSON.parse(fs.readFileSync(file, "utf8"));
+  const ext = raw.$extensions ?? {};
+  const flat = flatten(raw);
+  const brand = ext.brand ?? { id: path.basename(file).replace(/\.tokens\.json$/, ""), name: "" };
+  const modes = {};
+  for (const [mode, overrides] of Object.entries(ext.modes ?? {})) {
+    const f = structuredClone(flat);
+    for (const [k, v] of Object.entries(overrides)) {
+      if (!f[k]) throw new Error(`Mode ${mode} overrides unknown token ${k}`);
+      f[k].value = v;
+    }
+    modes[mode] = f;
+  }
+  return { raw, ext, flat, brand, modes };
+}
+
+const group = (flat, g) => Object.entries(flat).filter(([k]) => k.startsWith(g + ".")).map(([k, t]) => [k.slice(g.length + 1), t]);
+const kebab = (s) => s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+const fontStack = (arr) => (Array.isArray(arr) ? arr : [arr]).map((f) => (/\s/.test(f) ? `"${f}"` : f)).join(", ");
+
+// ---------- colour maths (WCAG 2.x) ----------
+export function hexToRgb(hex) {
+  let h = hex.replace("#", "").trim();
+  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  if (!/^[0-9a-fA-F]{6}$/.test(h)) throw new Error(`Not a hex colour: ${hex}`);
+  return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+}
+const toHex = (rgb) => "#" + rgb.map((c) => Math.round(Math.min(255, Math.max(0, c))).toString(16).padStart(2, "0")).join("");
+
+export function relativeLuminance(hex) {
+  const [r, g, b] = hexToRgb(hex).map((c) => {
+    const s = c / 255;
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+export function contrastRatio(fg, bg) {
+  const a = relativeLuminance(fg), b = relativeLuminance(bg);
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+}
+
+export function grade(ratio, large = false) {
+  const aa = large ? 3 : 4.5, aaa = large ? 4.5 : 7;
+  return { pass: ratio >= aa, level: ratio >= aaa ? "AAA" : ratio >= aa ? "AA" : large ? "fail" : ratio >= 3 ? "AA large only" : "fail" };
+}
+
+export function mix(hexA, hexB, t) {
+  const a = hexToRgb(hexA), b = hexToRgb(hexB);
+  return toHex(a.map((c, i) => c + (b[i] - c) * t));
+}
+
+// Fluent 2 BrandVariants ramp: shade 80 is the brand base, 10 to 70 darken, 90 to 160 lighten.
+export function brandRamp(base) {
+  const out = {};
+  for (let i = 1; i <= 16; i++) {
+    const shade = String(i * 10);
+    if (i === 8) out[shade] = base.toLowerCase();
+    else if (i < 8) out[shade] = mix(base, "#000000", ((8 - i) / 7) * 0.8);
+    else out[shade] = mix(base, "#ffffff", ((i - 8) / 8) * 0.94);
+  }
+  return out;
+}
+
+// ---------- contrast ----------
+export function contrastPairs(t) {
+  return (t.ext.contrastPairs ?? []).map((p) => {
+    const fg = resolveValue(p.fg, t.flat), bg = resolveValue(p.bg, t.flat);
+    const ratio = contrastRatio(fg, bg);
+    const g = grade(ratio, !!p.large);
+    let status;
+    if (p.expectFail) status = g.pass ? "CHECK: banned pair passes" : "OK: banned pair, fails as documented";
+    else status = g.pass ? "PASS" : "FAIL";
+    return { label: p.label, fg, bg, ratio: Math.round(ratio * 100) / 100, large: !!p.large, level: g.level, status, expectFail: !!p.expectFail };
+  });
+}
+
+// ---------- generators ----------
+export function genCss(t) {
+  const lines = [`/* Generated by build_themes.mjs from ${t.brand.id}.tokens.json. Do not edit by hand. */`, ":root {"];
+  const varFor = (v) => {
+    const m = typeof v === "string" && v.match(REF);
+    return m ? `var(--${m[1].split(".").map(kebab).join("-")})` : v;
+  };
+  for (const [k, tok] of group(t.flat, "color")) lines.push(`  --color-${kebab(k)}: ${tok.value};`);
+  for (const [k, tok] of group(t.flat, "role")) lines.push(`  --role-${kebab(k)}: ${varFor(tok.value)};`);
+  for (const [k, tok] of group(t.flat, "chart")) lines.push(`  --chart-${k}: ${varFor(tok.value)};`);
+  for (const [k, tok] of group(t.flat, "font")) lines.push(`  --font-${kebab(k)}: ${fontStack(tok.value)};`);
+  for (const [k, tok] of group(t.flat, "radius")) lines.push(`  --radius-${kebab(k)}: ${tok.value};`);
+  lines.push("}");
+  if (t.modes.dark) {
+    const body = Object.entries(t.ext.modes.dark).map(([k, v]) => `  --${k.split(".").map(kebab).join("-")}: ${v};`);
+    lines.push("", "@media (prefers-color-scheme: dark) {", '  :root:not([data-theme="light"]) {', ...body.map((l) => "  " + l), "  }", "}");
+    lines.push('', ':root[data-theme="dark"] {', ...body, "}");
+  }
+  return lines.join("\n") + "\n";
+}
+
+export function themeObject(t) {
+  const colors = {};
+  for (const [k, tok] of group(t.flat, "color")) colors[kebab(k)] = resolveValue(tok.value, t.flat);
+  const role = Object.fromEntries(group(t.flat, "role").map(([k, tok]) => [kebab(k), resolveValue(tok.value, t.flat)]));
+  const chart = Object.fromEntries(group(t.flat, "chart").map(([k, tok]) => [k, resolveValue(tok.value, t.flat)]));
+  const fontFamily = Object.fromEntries(group(t.flat, "font").map(([k, tok]) => [k, tok.value]));
+  const borderRadius = Object.fromEntries(group(t.flat, "radius").map(([k, tok]) => [k, tok.value]));
+  return { colors: { ...colors, role, chart }, fontFamily, borderRadius };
+}
+
+export function genTailwind(t) {
+  return `// Generated by build_themes.mjs from ${t.brand.id}.tokens.json. Do not edit by hand.
+// Use: const brand = require("./tailwind.theme.js"); module.exports = { presets: [brand], content: [...] };
+module.exports = {
+  theme: {
+    extend: ${JSON.stringify(themeObject(t), null, 2).replace(/\n/g, "\n    ")}
+  }
+};
+`;
+}
+
+export function genPowerApps(t) {
+  const r = (k) => resolveValue(`{role.${k}}`, t.flat);
+  const base = resolveValue(t.ext.powerapps?.brandBase ?? "{role.accent}", t.flat);
+  const fonts = Object.fromEntries(group(t.flat, "font").map(([k, tok]) => [k, tok.value]));
+  return JSON.stringify({
+    name: t.brand.name || t.brand.id,
+    format: "Fluent 2 BrandVariants palette (10 to 160) with token overrides, for Power Apps modern controls",
+    brandBase: base,
+    palette: brandRamp(base),
+    overrides: {
+      colorNeutralBackground1: r("card"),
+      colorNeutralForeground1: r("cardText"),
+      colorNeutralBackground2: r("canvas"),
+      colorBrandBackground: base,
+      colorCompoundBrandBackground: r("accent"),
+      colorNeutralForegroundOnBrand: contrastRatio("#ffffff", base) >= 4.5 ? "#ffffff" : r("cardText"),
+      colorPaletteGreenBackground3: r("success"),
+      colorPaletteYellowBackground3: r("warning"),
+      colorPaletteRedBackground3: r("danger"),
+      colorPaletteBerryBackground3: r("info"),
+    },
+    fontFamilyBase: fontStack(fonts.body ?? ["Segoe UI"]),
+  }, null, 2) + "\n";
+}
+
+const xmlEsc = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+export function genOfficeTheme(t) {
+  const o = t.ext.office;
+  if (!o) throw new Error(`${t.brand.id}: $extensions.office is missing`);
+  const slot = (k) => resolveValue(o[k], t.flat).replace("#", "").toUpperCase();
+  const name = xmlEsc(t.brand.name || t.brand.id);
+  const clr = ["dk1", "lt1", "dk2", "lt2", "accent1", "accent2", "accent3", "accent4", "accent5", "accent6", "hlink", "folHlink"]
+    .map((k) => `      <a:${k}><a:srgbClr val="${slot(k)}"/></a:${k}>`).join("\n");
+  const font = (f) => `<a:latin typeface="${xmlEsc(f)}"/><a:ea typeface=""/><a:cs typeface=""/>`;
+  const solid = `<a:solidFill><a:schemeClr val="phClr"/></a:solidFill>`;
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Generated by build_themes.mjs from ${t.brand.id}.tokens.json. Replace ppt/theme/theme1.xml (PowerPoint) or word/theme/theme1.xml (Word) in a template. -->
+<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="${name}">
+  <a:themeElements>
+    <a:clrScheme name="${name}">
+${clr}
+    </a:clrScheme>
+    <a:fontScheme name="${name}">
+      <a:majorFont>${font(o.majorFont)}</a:majorFont>
+      <a:minorFont>${font(o.minorFont)}</a:minorFont>
+    </a:fontScheme>
+    <a:fmtScheme name="${name}">
+      <a:fillStyleLst>${solid}${solid}${solid}</a:fillStyleLst>
+      <a:lnStyleLst><a:ln w="6350">${solid}</a:ln><a:ln w="12700">${solid}</a:ln><a:ln w="19050">${solid}</a:ln></a:lnStyleLst>
+      <a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst>
+      <a:bgFillStyleLst>${solid}${solid}${solid}</a:bgFillStyleLst>
+    </a:fmtScheme>
+  </a:themeElements>
+  <a:objectDefaults/>
+  <a:extraClrSchemeLst/>
+</a:theme>
+`;
+}
+
+export function genContrastMd(t, pairs) {
+  const fails = pairs.filter((p) => p.status === "FAIL" || p.status.startsWith("CHECK"));
+  const rows = pairs.map((p) => `| ${p.label} | \`${p.fg}\` | \`${p.bg}\` | ${p.ratio.toFixed(2)}:1 | ${p.large ? "large" : "normal"} | ${p.level} | ${p.status} |`);
+  return `# Contrast report: ${t.brand.name || t.brand.id}
+
+Generated by build_themes.mjs. WCAG 2.x relative luminance; AA needs 4.5:1 for normal text and 3:1 for large text (AAA 7:1 and 4.5:1).
+
+| Pair | Text | Background | Ratio | Size | Level | Status |
+|---|---|---|---|---|---|---|
+${rows.join("\n")}
+
+**Pairs checked:** ${pairs.length}. **Unexpected fails:** ${fails.length}.
+${fails.length ? "\nFlagged:\n" + fails.map((p) => `- ${p.label}: ${p.ratio.toFixed(2)}:1 (${p.level}). Use for large text only, or change the pairing.`).join("\n") + "\n" : ""}`;
+}
+
+// ---------- specimen ----------
+function genSpecimen(brands) {
+  const col = (b) => {
+    const sw = Object.entries(b.palette).map(([k, v]) =>
+      `<div class="sw"><span style="background:${v}"></span><b>${k}</b><code>${v}</code></div>`).join("");
+    const roles = Object.entries(b.roles).map(([k, v]) => `<div class="role"><i style="background:${v}"></i>${k}</div>`).join("");
+    const pairs = b.contrast.map((p) =>
+      `<div class="pair" style="background:${p.bg};color:${p.fg}"><span>${p.label}</span><b>${p.ratio.toFixed(2)}</b><em class="${p.status === "FAIL" ? "f" : p.expectFail ? "x" : "p"}">${p.status === "FAIL" ? "FAIL" : p.expectFail ? "BANNED" : p.level}</em></div>`).join("");
+    return `<section><h2>${b.name}</h2><p class="font">Heading: ${b.fonts.heading[0]} &middot; Body: ${b.fonts.body[0]} &middot; Radius ${b.radius.sm} / ${b.radius.card}</p>
+<h3>Palette</h3><div class="grid">${sw}</div><h3>Roles</h3><div class="roles">${roles}</div><h3>Contrast pairs</h3><div class="pairs">${pairs}</div></section>`;
+  };
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Token specimen</title>
+<link rel="stylesheet" href="../../../site/assets/css/tokens.css">
+<style>body{padding:28px}h1{font-size:28px}h1 small{color:var(--orange)}.wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+section{background:var(--surface);border-radius:12px;padding:18px}h2{font-size:20px}h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;opacity:.8;margin:14px 0 8px}
+.font{font-size:13px;opacity:.85;margin:0}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.sw{font-size:11px}.sw span{display:block;height:40px;border-radius:6px;border:1px solid rgba(255,253,248,.2)}.sw b{display:block;margin-top:4px}.sw code{font-size:11px;opacity:.8}
+.roles{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px}.role i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px;border:1px solid rgba(255,253,248,.3)}
+.pairs{display:grid;gap:5px}.pair{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;font-size:12px}.pair span{flex:1}
+.pair em{font:600 10px var(--font-heading);font-style:normal;padding:1px 6px;border-radius:8px;background:#fffdf8;color:#0c2c23}.pair em.f{background:#0c2c23;color:#fffdf8}.pair em.x{background:#e8d67d}
+</style></head><body><h1>Design tokens <small>one source, every surface</small></h1><div class="wrap">${brands.map(col).join("")}</div></body></html>
+`;
+}
+
+// ---------- build ----------
+export function buildBrand(file, distRoot = path.join(PROJECT, "dist")) {
+  const t = loadTokens(file);
+  const out = path.join(distRoot, t.brand.id);
+  fs.mkdirSync(out, { recursive: true });
+  const pairs = contrastPairs(t);
+  const outputs = {
+    "tokens.css": genCss(t),
+    "tailwind.theme.js": genTailwind(t),
+    "powerapps-theme.json": genPowerApps(t),
+    "office-theme1.xml": genOfficeTheme(t),
+    "contrast.md": genContrastMd(t, pairs),
+  };
+  for (const [f, s] of Object.entries(outputs)) fs.writeFileSync(path.join(out, f), s);
+  const obj = themeObject(t);
+  const { role, chart, ...palette } = obj.colors;
+  return {
+    id: t.brand.id, name: t.brand.name, mode: t.brand.mode, dir: out, outputs, contrast: pairs,
+    roles: role, chart, palette, fonts: obj.fontFamily, radius: obj.borderRadius,
+    fails: pairs.filter((p) => p.status === "FAIL").length,
+  };
+}
+
+function main() {
+  const args = process.argv.slice(2);
+  const files = args.length ? args : fs.readdirSync(path.join(HERE, "tokens")).filter((f) => f.endsWith(".tokens.json")).sort().reverse()
+    .map((f) => path.join(HERE, "tokens", f));
+  const built = files.map((f) => buildBrand(path.resolve(f)));
+  fs.writeFileSync(path.join(PROJECT, "dist", "specimen.html"), genSpecimen(built));
+  const site = Object.fromEntries(built.map(({ dir, ...b }) => [b.id, b]));
+  fs.mkdirSync(path.dirname(SITE_DATA), { recursive: true });
+  fs.writeFileSync(SITE_DATA, "// Generated by projects/06-brand-theme-systems/src/build_themes.mjs. Do not edit.\nwindow.THEMES06 = " + JSON.stringify(site, null, 1) + ";\n");
+  for (const b of built) {
+    console.log(`${b.id}: ${Object.keys(b.outputs).length} files -> ${path.relative(PROJECT, b.dir)} | contrast pairs ${b.contrast.length}, fails ${b.fails}`);
+  }
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

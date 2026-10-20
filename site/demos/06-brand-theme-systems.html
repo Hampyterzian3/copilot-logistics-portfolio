@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand Theme Systems</title>
+<meta name="description" content="Switch one design-token file between the hampy brand and a corporate theme, watch a sample UI restyle, check WCAG contrast live and inspect the generated CSS, Tailwind, Power Apps and Office theme files.">
+<link rel="icon" href="../assets/brand/hampy-favicon-64.png">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/demo.css">
+<style>
+  .switch { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+  .switch button { cursor: pointer; border: 1px solid var(--line); background: transparent; color: var(--offwhite); border-radius: var(--r-xl); padding: 7px 14px; font: 600 14px var(--font-heading); }
+  .switch button[aria-pressed="true"] { background: var(--lime); color: var(--green); border-color: var(--lime); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px 0; background: var(--offwhite); border-bottom: 1px solid rgba(12,44,35,.12); }
+  .tabs button { cursor: pointer; border: 0; background: transparent; color: var(--green); padding: 8px 10px; font: 600 13px var(--font-heading); border-bottom: 3px solid transparent; }
+  .tabs button[aria-selected="true"] { border-bottom-color: var(--orange); }
+  .pane[hidden] { display: none; }
+
+  /* Themed sample UI: every value comes from the selected brand's generated tokens */
+  .themed { background: var(--t-canvas); color: var(--t-text); font-family: var(--t-font-body); border-radius: var(--r-xl); padding: 16px; display: grid; gap: 14px; transition: background .2s, color .2s; }
+  .themed h3 { font-family: var(--t-font-heading); margin: 0 0 6px; font-size: 15px; }
+  .t-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  .t-card { background: var(--t-card); color: var(--t-card-text); border-radius: var(--t-r-card); padding: 14px; border: 1px solid var(--t-line); min-width: 0; }
+  .t-card .lbl { font: 600 11px var(--t-font-heading); text-transform: uppercase; letter-spacing: .06em; opacity: .75; margin: 8px 0 2px; }
+  .t-card .bay { font: 700 40px/1 var(--t-font-heading); }
+  .t-btn { cursor: pointer; border-radius: var(--t-r-sm); padding: 9px 14px; font: 600 13px var(--t-font-heading); border: 1px solid transparent; }
+  .t-btn.primary { background: var(--t-accent); color: var(--t-on-accent); }
+  .t-btn.secondary { background: transparent; color: var(--t-card-text); border-color: var(--t-card-text); }
+  .t-btn.surface { background: var(--t-surface); color: var(--t-on-surface); }
+  .t-chip { display: inline-block; padding: 3px 10px; border-radius: var(--t-r-card); font: 600 12px var(--t-font-heading); }
+  .btnset { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  .ratio { font: 600 11px var(--font-mono); padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,.06); }
+  .ratio.bad { background: #0c2c23; color: #fffdf8; }
+  .bars { display: flex; align-items: flex-end; gap: 10px; height: 130px; padding-top: 6px; }
+  .bars div { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; font-size: 11px; }
+  .bars i { display: block; width: 100%; border-radius: var(--t-r-sm) var(--t-r-sm) 0 0; }
+  .bars b { font: 600 12px var(--t-font-heading); }
+  .t-chat { display: flex; gap: 10px; align-items: flex-start; }
+  .t-chat .ava { flex: none; width: 30px; height: 30px; border-radius: 8px; background: var(--t-surface); color: var(--t-on-surface); display: grid; place-items: center; font: 700 13px var(--t-font-heading); }
+  .t-chat .bubble { background: var(--t-card); color: var(--t-card-text); border-radius: var(--t-r-card); padding: 10px 12px; font-size: 14px; border-left: 4px solid var(--t-accent); }
+  .t-chat .bubble.me { background: var(--t-info); color: var(--t-on-info); border-left: 0; margin-left: auto; }
+
+  .pairs { display: grid; gap: 6px; }
+  .pairrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; font-size: 13px; }
+  .pairrow span { flex: 1 1 160px; }
+  .pairrow .tag { box-shadow: 0 0 0 1px rgba(12,44,35,.45); }
+  .checker { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: end; }
+  .checker input[type="color"] { height: 38px; padding: 2px; }
+  .sample { margin-top: 12px; border-radius: var(--r-xl); padding: 16px; border: 1px solid rgba(12,44,35,.15); }
+  .sample .big { font: 600 24px var(--font-heading); }
+  .out-files { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .out-files button { cursor: pointer; border: 1px solid rgba(12,44,35,.3); background: #fff; color: var(--green); border-radius: var(--r-xl); padding: 4px 10px; font: 500 12px var(--font-mono); }
+  .out-files button[aria-pressed="true"] { background: var(--green); color: var(--offwhite); }
+  pre.code { margin: 0; background: var(--green); color: var(--offwhite); padding: 12px; border-radius: var(--r-xl); overflow: auto; max-height: 420px; font-size: 12px; line-height: 1.5; }
+  .muted-ink { color: rgba(12,44,35,.75); font-size: 13px; }
+</style>
+</head>
+<body>
+<header class="demo-top">
+  <a class="back" href="../index.html#p06">&larr; Portfolio</a>
+  <img src="../assets/brand/hampy-logo-offwhite.svg" alt="hampy">
+  <span class="demo-badge">Simulated demo</span>
+  <span class="title">AI Brand Theme Systems</span>
+</header>
+
+<main class="demo-wrap">
+  <section class="demo-intro">
+    <h1>One token file, every brand surface</h1>
+    <p>Pick a brand. The sample UI below is styled only from the values that <code>build_themes.mjs</code> generated from that brand's tokens file. Contrast is computed live with the WCAG formula, and the Outputs tab shows the exact CSS, Tailwind, Power Apps and Office theme files the build wrote.</p>
+  </section>
+
+  <div class="switch" role="group" aria-label="Brand">
+    <button type="button" data-brand="hampy" aria-pressed="true">hampy</button>
+    <button type="button" data-brand="corporate-dpworld" aria-pressed="false">Corporate theme: DP World</button>
+  </div>
+
+  <div class="demo-grid">
+    <section class="app" aria-label="Theme studio">
+      <div class="app-bar"><span class="dot"></span><span id="appTitle">Theme studio</span></div>
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tab-preview" aria-controls="pane-preview" aria-selected="true" data-tab="preview">Live preview</button>
+        <button role="tab" id="tab-contrast" aria-controls="pane-contrast" aria-selected="false" data-tab="contrast">Contrast</button>
+        <button role="tab" id="tab-outputs" aria-controls="pane-outputs" aria-selected="false" data-tab="outputs">Generated outputs</button>
+      </div>
+      <div class="app-body">
+        <div class="pane" id="pane-preview" role="tabpanel" aria-labelledby="tab-preview">
+          <div class="themed" id="themed">
+            <div class="t-row">
+              <div class="t-card">
+                <h3>Book a bay</h3>
+                <div class="lbl">Bay</div><div class="bay">105</div>
+                <div class="lbl">Date</div><div>Tue 29 Sep 2026</div>
+                <div class="lbl">Status</div><span class="t-chip" data-fill="success">Available</span>
+                <div class="btnset">
+                  <button class="t-btn secondary" type="button">Back</button>
+                  <button class="t-btn primary" type="button">Confirm booking</button>
+                  <span class="ratio" id="btnRatio"></span>
+                </div>
+              </div>
+              <div class="t-card">
+                <h3>Buttons and states</h3>
+                <div class="btnset">
+                  <button class="t-btn primary" type="button">Primary</button>
+                  <button class="t-btn surface" type="button">Surface</button>
+                  <button class="t-btn secondary" type="button">Secondary</button>
+                </div>
+                <div class="btnset">
+                  <span class="t-chip" data-fill="success">Success</span>
+                  <span class="t-chip" data-fill="warning">Warning</span>
+                  <span class="t-chip" data-fill="danger">Danger</span>
+                  <span class="t-chip" data-fill="info">Info</span>
+                </div>
+                <p class="lbl" style="margin-top:12px">Chip ink is picked by contrast</p>
+                <div id="chipInk" style="font-size:12px"></div>
+              </div>
+            </div>
+            <div class="t-row">
+              <div class="t-card">
+                <h3>Bays booked per weekday</h3>
+                <div class="bars" id="bars" aria-label="Sample bar chart, synthetic values"></div>
+              </div>
+              <div class="t-card">
+                <h3>Copilot chat</h3>
+                <div class="t-chat"><div class="bubble me">Is there a bay free on Tuesday?</div></div>
+                <div class="t-chat" style="margin-top:8px"><div class="ava">C</div><div class="bubble">Bay 105 is free on Tue 29 Sep. Shall I book it for you?</div></div>
+              </div>
+            </div>
+          </div>
+          <p class="muted-ink" id="fontNote"></p>
+        </div>
+
+        <div class="pane" id="pane-contrast" role="tabpanel" aria-labelledby="tab-contrast" hidden>
+          <div class="kpis" id="contrastKpis"></div>
+          <div class="pairs" id="pairs"></div>
+          <h4 style="margin:18px 0 6px">Live contrast checker</h4>
+          <div class="checker">
+            <div><label for="preset">Brand pair</label><select id="preset"></select></div>
+            <div><label for="fgPick">Text</label><input type="color" id="fgPick"></div>
+            <div><label for="fgHex">Text hex</label><input id="fgHex" maxlength="7" spellcheck="false"></div>
+            <div><label for="bgPick">Background</label><input type="color" id="bgPick"></div>
+            <div><label for="bgHex">Background hex</label><input id="bgHex" maxlength="7" spellcheck="false"></div>
+          </div>
+          <div class="sample" id="sample"><div class="big">Confirm booking</div><div>Body text at 14px reads like this.</div></div>
+          <p id="checkOut" style="margin:10px 0 0;font-size:14px"></p>
+        </div>
+
+        <div class="pane" id="pane-outputs" role="tabpanel" aria-labelledby="tab-outputs" hidden>
+          <div class="out-files" id="outFiles" role="group" aria-label="Generated file"></div>
+          <pre class="code" id="outCode" tabindex="0"></pre>
+          <p class="muted-ink" id="outNote"></p>
+        </div>
+      </div>
+    </section>
+
+    <aside class="copilot" aria-label="Brand assistant">
+      <div class="copilot-head"><img src="../assets/brand/hampy-agent-icon.png" alt="">Brand assistant <span class="chip ghost" style="margin-left:auto">Simulated agent</span></div>
+      <div class="copilot-log" id="log" aria-live="polite"></div>
+      <div class="suggest" id="suggest"></div>
+      <form class="copilot-input" id="ask">
+        <label class="sr-only" for="q">Ask the brand assistant</label>
+        <input id="q" placeholder="Ask about contrast, Word, Power Apps..." autocomplete="off">
+        <button class="btn" type="submit">Send</button>
+      </form>
+    </aside>
+  </div>
+
+  <div class="stack-note">
+    <strong>In production:</strong> the tokens files live in a GitHub repo and <strong>GitHub Copilot</strong> helped write the build script and tests; a GitHub Action runs <code>node src/build_themes.mjs</code> on every change.
+    <strong>tokens.css / tailwind.theme.js</strong> style web apps (DPark is React + Tailwind on Netlify).
+    <strong>powerapps-theme.json</strong> feeds the modern theme of <strong>Power Apps</strong> canvas apps.
+    <strong>office-theme1.xml</strong> goes into the organisation's Word and PowerPoint templates in a <strong>SharePoint organisation assets library</strong>, which <strong>Microsoft 365 Copilot</strong> uses when it drafts a document or deck.
+    The <strong>Copilot Studio</strong> agent icon and colour are set from the same palette. The assistant on this page is a deterministic simulation of a Copilot Studio agent.
+  </div>
+</main>
+
+<script src="data/06-themes.js"></script>
+<script>
+(function () {
+  "use strict";
+  var T = window.THEMES06;
+  var state = { brand: "hampy", tab: "preview", file: "tokens.css" };
+  var WEEK = [["Mon", 42], ["Tue", 55], ["Wed", 61], ["Thu", 48], ["Fri", 27]]; // synthetic
+
+  // WCAG 2.x maths, same as build_themes.mjs
+  function rgb(h) { h = h.replace("#", ""); if (h.length === 3) h = h.replace(/./g, "$&$&"); return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16); }); }
+  function lum(h) { var c = rgb(h).map(function (v) { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+  function ratio(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  function level(r, large) { var aa = large ? 3 : 4.5, aaa = large ? 4.5 : 7; return r >= aaa ? "AAA" : r >= aa ? "AA" : (!large && r >= 3) ? "AA large only" : "Fail"; }
+  function okHex(s) { return /^#[0-9a-fA-F]{6}$/.test(s); }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function $(id) { return document.getElementById(id); }
+  function B() { return T[state.brand]; }
+  function stack(a) { return a.map(function (f) { return /\s/.test(f) ? '"' + f + '"' : f; }).join(", "); }
+  function bestInk(bg) { var b = B(); var c = [b.roles["card-text"], "#ffffff"]; return ratio(c[0], bg) >= ratio(c[1], bg) ? c[0] : c[1]; }
+
+  function applyTheme() {
+    var b = B(), r = b.roles, el = $("themed"), s = el.style;
+    var line = b.palette.line || "rgba(12,44,35,.15)";
+    var vars = { canvas: r.canvas, surface: r.surface, text: r.text, card: r.card, "card-text": r["card-text"], accent: r.accent, "on-accent": r["on-accent"], info: r.info, line: line };
+    Object.keys(vars).forEach(function (k) { s.setProperty("--t-" + k, vars[k]); });
+    s.setProperty("--t-on-surface", ratio("#ffffff", r.surface) >= ratio(r["card-text"], r.surface) ? (b.palette.offwhite || b.palette["txt-l"] || "#ffffff") : r["card-text"]);
+    s.setProperty("--t-on-info", bestInk(r.info));
+    s.setProperty("--t-font-heading", stack(b.fonts.heading));
+    s.setProperty("--t-font-body", stack(b.fonts.body));
+    s.setProperty("--t-r-sm", b.radius.sm); s.setProperty("--t-r-card", b.radius.card);
+    var chips = [];
+    el.querySelectorAll("[data-fill]").forEach(function (c) {
+      var bg = r[c.getAttribute("data-fill")], ink = bestInk(bg);
+      c.style.background = bg; c.style.color = ink;
+    });
+    ["success", "warning", "danger", "info"].forEach(function (k) {
+      var bg = r[k], ink = bestInk(bg), q = ratio(ink, bg);
+      chips.push(k + ": " + (ink === "#ffffff" ? "white" : "ink") + " " + q.toFixed(2) + ":1");
+    });
+    $("chipInk").textContent = chips.join(" | ");
+    var br = ratio(r["on-accent"], r.accent), lv = level(br, false);
+    $("btnRatio").textContent = br.toFixed(2) + ":1 " + lv;
+    $("btnRatio").className = "ratio" + (lv === "AA" || lv === "AAA" ? "" : " bad");
+    var max = 70;
+    $("bars").innerHTML = WEEK.map(function (d, i) {
+      return '<div><b>' + d[1] + '</b><i style="height:' + Math.round(d[1] / max * 100) + '%;background:' + b.chart[String(i + 1)] + '"></i>' + d[0] + "</div>";
+    }).join("");
+    $("fontNote").textContent = state.brand === "hampy"
+      ? "Fonts: Space Grotesk headings, Inter body (open licence, loaded from Google Fonts)."
+      : "Fonts: the token names Pilat Wide / Pilat. The licensed font files are not shipped here, so your browser shows the Segoe UI or Arial fallback from the same stack. No corporate logo is used.";
+    $("appTitle").textContent = "Theme studio: " + b.name;
+    document.querySelectorAll(".switch button").forEach(function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-brand") === state.brand)); });
+    renderContrast(); renderOutputs();
+  }
+
+  function renderContrast() {
+    var b = B(), unexpected = b.contrast.filter(function (p) { return p.status === "FAIL"; }).length;
+    var banned = b.contrast.filter(function (p) { return p.expectFail; }).length;
+    $("contrastKpis").innerHTML = '<div class="kpi"><div class="v">' + b.contrast.length + '</div><div class="l">pairs checked</div></div>' +
+      '<div class="kpi"><div class="v">' + unexpected + '</div><div class="l">flagged fails</div></div>' +
+      '<div class="kpi"><div class="v">' + banned + '</div><div class="l">banned pairs proven to fail</div></div>';
+    $("pairs").innerHTML = b.contrast.map(function (p) {
+      var tag = p.status === "FAIL" ? "bad" : p.expectFail ? "warn" : "ok";
+      var txt = p.status === "FAIL" ? "Flag: " + p.level : p.expectFail ? "Banned, fails" : p.level;
+      return '<div class="pairrow" style="background:' + p.bg + ';color:' + p.fg + '"><span>' + esc(p.label) + '</span><code>' + p.ratio.toFixed(2) + ':1</code><span class="tag ' + tag + '" style="flex:none">' + txt + "</span></div>";
+    }).join("");
+    $("preset").innerHTML = b.contrast.map(function (p, i) { return '<option value="' + i + '">' + esc(p.label) + "</option>"; }).join("");
+    setPair(b.contrast[0].fg, b.contrast[0].bg);
+  }
+
+  function setPair(fg, bg) { $("fgPick").value = fg; $("fgHex").value = fg; $("bgPick").value = bg; $("bgHex").value = bg; check(); }
+  function check() {
+    var fg = $("fgHex").value.trim(), bg = $("bgHex").value.trim();
+    if (!okHex(fg) || !okHex(bg)) { $("checkOut").textContent = "Enter colours as #rrggbb."; return; }
+    var r = ratio(fg, bg);
+    $("sample").style.background = bg; $("sample").style.color = fg;
+    $("checkOut").innerHTML = "<strong>" + r.toFixed(2) + ":1</strong>. Normal text: " + level(r, false) + ". Large text (24px, or 19px bold): " + level(r, true) + ".";
+  }
+  $("preset").addEventListener("change", function () { var p = B().contrast[+this.value]; setPair(p.fg, p.bg); });
+  $("fgPick").addEventListener("input", function () { $("fgHex").value = this.value; check(); });
+  $("bgPick").addEventListener("input", function () { $("bgHex").value = this.value; check(); });
+  $("fgHex").addEventListener("input", function () { if (okHex(this.value)) $("fgPick").value = this.value; check(); });
+  $("bgHex").addEventListener("input", function () { if (okHex(this.value)) $("bgPick").value = this.value; check(); });
+
+  var NOTES = {
+    "tokens.css": "CSS custom properties. Roles point at palette variables, so one override re-themes an app.",
+    "tailwind.theme.js": "Tailwind preset. Add it to presets in tailwind.config and use classes such as bg-role-accent.",
+    "powerapps-theme.json": "Fluent 2 brand ramp (10 to 160) plus token overrides for Power Apps modern controls.",
+    "office-theme1.xml": "DrawingML theme: 12 colour slots and a heading/body font pair. Drop into a Word or PowerPoint template.",
+    "contrast.md": "WCAG report written by the same build. In CI an unexpected fail in the hampy brand blocks the pull request; corporate fails are reported for review."
+  };
+  function renderOutputs() {
+    var files = Object.keys(B().outputs);
+    $("outFiles").innerHTML = files.map(function (f) { return '<button type="button" data-file="' + f + '" aria-pressed="' + (f === state.file) + '">' + f + "</button>"; }).join("");
+    $("outCode").textContent = B().outputs[state.file];
+    $("outNote").textContent = NOTES[state.file] + " Source: dist/" + state.brand + "/" + state.file;
+  }
+  $("outFiles").addEventListener("click", function (e) { var f = e.target.getAttribute("data-file"); if (f) { state.file = f; renderOutputs(); } });
+
+  function showTab(t) {
+    state.tab = t;
+    document.querySelectorAll('[role="tab"]').forEach(function (b) { var on = b.getAttribute("data-tab") === t; b.setAttribute("aria-selected", String(on)); $("pane-" + b.getAttribute("data-tab")).hidden = !on; });
+  }
+  document.querySelectorAll('[role="tab"]').forEach(function (b) { b.addEventListener("click", function () { showTab(b.getAttribute("data-tab")); }); });
+  document.querySelectorAll(".switch button").forEach(function (b) { b.addEventListener("click", function () { setBrand(b.getAttribute("data-brand")); }); });
+  function setBrand(id) { state.brand = id; applyTheme(); }
+
+  // ---- simulated agent: keyword intents ----
+  function say(html, who) { var d = document.createElement("div"); d.className = "msg " + (who || "bot"); d.innerHTML = html; $("log").appendChild(d); $("log").scrollTop = $("log").scrollHeight; }
+  var INTENTS = [
+    { k: /corporate|dp ?world|switch|dpark/i, run: function () { setBrand("corporate-dpworld"); showTab("preview"); var b = B(); return "Switched to <strong>Corporate theme: DP World</strong>. Same components, new tokens: indigo surface " + b.roles.surface + ", accent " + b.roles.accent + ", radius " + b.radius.card + ". Nothing in the UI code changed."; } },
+    { k: /hampy|personal/i, run: function () { setBrand("hampy"); showTab("preview"); return "Back to <strong>hampy</strong>: green canvas, offwhite text, one orange accent, green ink on every bright fill."; } },
+    { k: /fail|contrast|accessib|wcag/i, run: function () { showTab("contrast"); var f = B().contrast.filter(function (p) { return p.status === "FAIL"; }); return f.length ? "<strong>" + f.length + " pairs flagged</strong> in " + esc(B().name) + ":<ul>" + f.map(function (p) { return "<li>" + esc(p.label) + ": " + p.ratio.toFixed(2) + ":1</li>"; }).join("") + "</ul>Fix: keep white-on-accent for large buttons only, or use the indigo ink on light accents." : "No unexpected fails in " + esc(B().name) + ". The two banned pairs in the guide (offwhite on orange or lime) are proven to fail, which is why the rule exists."; } },
+    { k: /power ?apps|fluent/i, run: function () { showTab("outputs"); state.file = "powerapps-theme.json"; renderOutputs(); return "Here is <code>powerapps-theme.json</code>: a 16-step Fluent 2 brand ramp built from " + JSON.parse(B().outputs["powerapps-theme.json"]).brandBase + ", plus overrides for neutral, brand and status colours. Modern controls in a canvas app pick it up as the app theme."; } },
+    { k: /word|powerpoint|office|deck|template|m365/i, run: function () { showTab("outputs"); state.file = "office-theme1.xml"; renderOutputs(); return "<code>office-theme1.xml</code> sets the 12 theme colours and the heading/body fonts. It goes into the Word and PowerPoint templates in the organisation assets library, so when Microsoft 365 Copilot drafts a deck from the branded template, charts and headings use these colours."; } },
+    { k: /tailwind|css|web|react/i, run: function () { showTab("outputs"); state.file = "tailwind.theme.js"; renderOutputs(); return "Web apps import <code>tailwind.theme.js</code> as a preset (DPark is React + Tailwind) or link <code>tokens.css</code>."; } },
+    { k: /icon|agent|copilot studio|logo/i, run: function () { return "The hampy agent icon is drawn in code (<code>build_logo.js</code>) from the same palette: pixel h in offwhite on green, orange cursor. It is exported at 512px for Copilot Studio, and the agent's accent colour uses the brand accent. The corporate theme uses colours only; no corporate logo is reproduced here."; } }
+  ];
+  function answer(q) {
+    say(esc(q), "user");
+    for (var i = 0; i < INTENTS.length; i++) if (INTENTS[i].k.test(q)) { say(INTENTS[i].run()); return; }
+    say("I can switch brands, list contrast fails, or show the Power Apps, Office or Tailwind output. Try a suggestion below.");
+  }
+  var SUG = ["Switch to the corporate theme", "Which contrast pairs fail?", "How does Word and PowerPoint pick this up?", "Show the Power Apps theme", "Where does the agent icon come from?", "Back to hampy"];
+  $("suggest").innerHTML = SUG.map(function (s) { return '<button type="button">' + s + "</button>"; }).join("");
+  $("suggest").addEventListener("click", function (e) { if (e.target.tagName === "BUTTON") answer(e.target.textContent); });
+  $("ask").addEventListener("submit", function (e) { e.preventDefault(); var v = $("q").value.trim(); if (v) { answer(v); $("q").value = ""; } });
+
+  // ---- hash state: #theme=hampy|dpworld&tab=preview|contrast|outputs&file=... ----
+  var h = {}; location.hash.replace(/^#/, "").split("&").forEach(function (kv) { var p = kv.split("="); if (p[0]) h[p[0]] = decodeURIComponent(p[1] || ""); });
+  if (h.theme === "dpworld" || h.theme === "corporate-dpworld") state.brand = "corporate-dpworld";
+  if (h.file && B().outputs[h.file]) state.file = h.file;
+  say("Hi, I am the brand assistant (simulated). Every colour on the left comes from one tokens file. Pick a suggestion to walk through it.");
+  applyTheme();
+  showTab(["preview", "contrast", "outputs"].indexOf(h.tab) >= 0 ? h.tab : "preview");
+  if (h.chat === "1") { answer(SUG[0]); answer(SUG[2]); showTab("preview"); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+# GitHub Actions workflow. Copy to .github/workflows/theme-build.yml in the repo that holds the tokens.
+# Rebuilds every theme on a tokens change, runs the tests and fails the pull request on an unexpected contrast fail.
+name: theme-build
+on:
+  pull_request:
+    paths: ["projects/06-brand-theme-systems/src/**"]
+  push:
+    branches: [main]
+    paths: ["projects/06-brand-theme-systems/src/**"]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/06-brand-theme-systems
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node --test
+      - run: node src/build_themes.mjs
+      - name: Fail on unexpected contrast fails
+        run: |
+          if grep -q "| FAIL |" dist/hampy/contrast.md; then echo "hampy has contrast fails"; exit 1; fi
+      - name: Generated files must be committed
+        run: git diff --exit-code -- dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: themes
+          path: projects/06-brand-theme-systems/dist

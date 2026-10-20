@@ -1,0 +1,101 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "style": "attention",
+      "bleed": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Critical inbound risk: CTL-261556",
+          "weight": "Bolder",
+          "size": "Medium",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "Risk score 70/100 | Adventure Works",
+          "isSubtle": true,
+          "spacing": "None",
+          "wrap": true
+        }
+      ]
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "Customer",
+          "value": "Adventure Works"
+        },
+        {
+          "title": "Order",
+          "value": "PO-75042"
+        },
+        {
+          "title": "Carrier",
+          "value": "Tailspin Haulage"
+        },
+        {
+          "title": "Lane",
+          "value": "IT-MIL > BE"
+        },
+        {
+          "title": "Destination area",
+          "value": "BE-Z03"
+        },
+        {
+          "title": "Last scan",
+          "value": "cross-dock departure at Liege cross-dock, 79 h ago"
+        },
+        {
+          "title": "Promised",
+          "value": "Sun 08 Nov 2026, 07:04"
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Why it is flagged",
+      "weight": "Bolder",
+      "spacing": "Medium"
+    },
+    {
+      "type": "TextBlock",
+      "text": "- No scan for 79 h since the cross-dock departure scan at Liege cross-dock, 3.9x the usual 20 h\n- Already 1.0 days past the promised date, about 0.9 days of transit left\n- Destination area BE-Z03 lost 3.9% of shipments, against 0.6% across the network",
+      "wrap": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Acknowledge",
+      "style": "positive",
+      "data": {
+        "action": "acknowledge",
+        "shipmentId": "CTL-261556"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Draft customer update",
+      "data": {
+        "action": "draft_customer_update",
+        "shipmentId": "CTL-261556"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Escalate to carrier",
+      "style": "destructive",
+      "data": {
+        "action": "escalate_to_carrier",
+        "shipmentId": "CTL-261556",
+        "carrier": "Tailspin Haulage"
+      }
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "id": "03",
+  "slug": "network-scenario-agent",
+  "title": "Network Scenario Agent",
+  "outcome": "Per-supplier mix of direct, milk-run and cross-dock: 7.1% below the best single design.",
+  "summary": "An automotive plant's 60 inbound suppliers can ship direct, by regional milk-run or via a cross-dock, and the best choice moves with diesel, handling and stop limits. A Copilot Studio agent calls a Python network engine through a custom connector, compares cost, CO2 and truck movements, and explains the recommended mix.",
+  "stack": [
+    "Copilot Studio",
+    "Azure Functions",
+    "Power Platform custom connector",
+    "Power Automate",
+    "Dataverse",
+    "Power BI",
+    "GitHub Copilot"
+  ],
+  "cv": "Inspired by: designed a pan-European inbound network for an automotive OEM plant, comparing direct full-load, regional milk-run and cross-dock designs across 180+ supplier lanes on cost, CO2 and vehicle movements; built an optimisation engine (KNIME and Log-Hub) that routes 40,000 orders across six facilities in around two hours.",
+  "demo": "demos/03-network-scenario-agent.html",
+  "repo": "projects/03-network-scenario-agent",
+  "cards": [
+    {
+      "type": "image",
+      "title": "Four designs, one answer",
+      "caption": "Sliders for diesel, CO2 price, handling and milk-run stops drive the engine; the agent explains why the best mix wins.",
+      "src": "media/03/03-result.png",
+      "alt": "Demo showing results per design, a flow map and the agent explaining the recommendation"
+    },
+    {
+      "type": "diagram",
+      "title": "Architecture",
+      "caption": "Copilot Studio calls an Azure Function through a custom connector; runs are logged to Dataverse by Power Automate and mapped in Power BI.",
+      "src": "media/03/architecture.svg",
+      "alt": "Architecture diagram: planner, Copilot Studio, custom connector, Azure Function, Power Automate, Dataverse, Power BI"
+    },
+    {
+      "type": "code",
+      "title": "Best mix never loses to a single design",
+      "caption": "The search seeds from the best pure design and only accepts single-supplier moves that cut cost plus CO2 price.",
+      "lang": "python",
+      "code": "    for _ in range(max_passes):\n        improved = False\n        for s in suppliers:\n            current = best[\"assign\"][s[\"id\"]]\n            for m in MODES:\n                if m == current:\n                    continue\n                trial_assign = dict(best[\"assign\"])\n                trial_assign[s[\"id\"]] = m\n                trial = evaluate(suppliers, plant, hubs, trial_assign, p)\n                if trial[\"objective\"] < best[\"objective\"] - 0.01:\n                    best = trial\n                    current = m\n                    improved = True\n        if not improved:\n            break"
+    },
+    {
+      "type": "image",
+      "title": "What if the stop limit drops?",
+      "caption": "With only two stops per milk-run, cross-dock consolidation becomes the better route for 21 of 60 suppliers.",
+      "src": "media/03/03-crossdock.png",
+      "alt": "Cross-dock design drawn on the map with collection runs and hub line-hauls"
+    },
+    {
+      "type": "metric",
+      "title": "Baseline week, synthetic network",
+      "caption": "Computed by the engine on 60 suppliers and 3 hubs. The JS demo matches the Python baseline within 0.001%.",
+      "metrics": [
+        {
+          "value": "7.1%",
+          "label": "cheaper than best single design"
+        },
+        {
+          "value": "137",
+          "label": "truck trips vs 209 all-direct"
+        },
+        {
+          "value": "66.2 t",
+          "label": "CO2 a week vs 89.5 t direct"
+        },
+        {
+          "value": "22",
+          "label": "pytest checks passing"
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "title": "Agent topic: Run a scenario",
+      "caption": "The topic calls the connector action and logs the run before answering.",
+      "lang": "yaml",
+      "code": "    - kind: InvokeConnectorAction\n      id: callRunScenario\n      connectionReference: cr_contosonetworkscenarios\n      connectionProperties:\n        mode: Invoker\n      operationId: RunScenario\n      input:\n        binding:\n          body: |-\n            ={\n              fuel_index: Topic.FuelIndex,\n              co2_price_t: Topic.Co2Price,\n              handling_ldm: If(IsBlank(Topic.Handling), 6, Topic.Handling),\n              max_stops: If(IsBlank(Topic.MaxStops), 4, Topic.MaxStops)\n            }"
+    },
+    {
+      "type": "text",
+      "title": "GitHub Copilot ready",
+      "caption": "Code drafted with AI pair programming and verified by 22 pytest tests and a Python to JavaScript parity check on 80 values. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
+    },
+    {
+      "type": "demo",
+      "title": "Try it",
+      "caption": "Move the sliders, switch designs on the map and click through the agent's four topics in under a minute.",
+      "href": "demos/03-network-scenario-agent.html"
+    }
+  ]
+}

@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toll Surcharge Recovery</title>
+<meta name="description" content="Simulated Power Apps demo: per-customer impact of a per-kilometre HGV road toll, surcharge recovery options, margin effect and tiered approval. Synthetic data, illustrative rates.">
+<link rel="icon" type="image/png" href="../assets/brand/hampy-favicon-64.png">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/demo.css">
+<style>
+  .tabs { display: flex; gap: 4px; margin-left: auto; }
+  .tabs button { border: 0; background: transparent; color: var(--green); font: 600 13px var(--font-heading); padding: 6px 10px; border-radius: var(--r-sm); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--green); color: var(--offwhite); }
+  .app .row-sel td { background: rgba(255,107,53,.14); }
+  .app tbody tr { cursor: pointer; }
+  .app tbody tr:hover td { background: rgba(12,44,35,.05); }
+  .toolbar { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; margin-bottom: 8px; }
+  .toolbar > div { flex: 1; min-width: 140px; }
+  .list-wrap { max-height: 300px; overflow-y: auto; border: 1px solid rgba(12,44,35,.12); border-radius: var(--r-sm); }
+  .list-wrap th { position: sticky; top: 0; background: #eef0ec; }
+  .detail { margin-top: 16px; padding-top: 12px; border-top: 2px solid rgba(12,44,35,.12); }
+  .detail h3 { font-size: 18px; margin-bottom: 2px; }
+  .sub { font-size: 13px; opacity: .8; margin: 0 0 8px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg button { border: 1px solid rgba(12,44,35,.3); background: #fff; color: var(--green); border-radius: var(--r-xl); padding: 6px 12px; font: 600 12px var(--font-heading); cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--green); color: var(--offwhite); border-color: var(--green); }
+  .app input[type="range"] { padding: 0; accent-color: var(--orange); }
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
+  .mbar { display: grid; grid-template-columns: 112px 1fr 64px; gap: 8px; align-items: center; font-size: 12px; margin: 6px 0; }
+  .mbar .track { height: 12px; background: rgba(12,44,35,.08); border-radius: 6px; overflow: hidden; }
+  .mbar .fill { height: 100%; background: var(--green); }
+  .mbar .fill.toll { background: var(--pink); }
+  .mbar .fill.rec { background: var(--lime); }
+  .mbar .val { text-align: right; font-variant-numeric: tabular-nums; }
+  .facts { width: 100%; font-size: 13px; }
+  .facts td { padding: 3px 0; border: 0 !important; }
+  .facts td:last-child { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .card-ac { border: 1px solid rgba(12,44,35,.2); margin-top: 12px; }
+  .card-ac .ac-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .card-ac .ac-head img { width: 22px; height: 22px; border-radius: 5px; }
+  .card-ac ol { margin: 6px 0; padding-left: 20px; }
+  .card-ac .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .card-ac .actions .btn.secondary { color: var(--green); border-color: rgba(12,44,35,.3); }
+  .chart-box { border: 1px solid rgba(12,44,35,.12); border-radius: var(--r-xl); padding: 10px; margin-top: 8px; }
+  .chart-box svg { width: 100%; height: auto; display: block; }
+  .muted-s { font-size: 12px; opacity: .75; }
+  .disclaimer { background: var(--yellow); color: var(--green); border-radius: var(--r-sm); padding: 6px 10px; font-size: 12px; margin-bottom: 10px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header class="demo-top">
+  <a class="back" href="../index.html#p02">&larr; Portfolio</a>
+  <img src="../assets/brand/hampy-logo-offwhite.svg" alt="hampy">
+  <span class="demo-badge">Simulated demo</span>
+  <span class="title">Road-Toll Surcharge Recovery App</span>
+</header>
+
+<main class="demo-wrap">
+  <section class="demo-intro">
+    <h1>Road-toll surcharge recovery</h1>
+    <p>A new per-kilometre toll for heavy goods vehicles lands on every customer contract at once. This Power Apps style screen shows the toll impact per customer, lets a commercial manager pick a recovery method, shows the margin effect and routes the proposal to the right approver. Contoso Logistics, 2,000 synthetic shipments, 40 customers, 18 lanes.</p>
+    <p><strong>Toll rates are ILLUSTRATIVE</strong>, invented for this demo by CO2 emission class and weight class. They are not an official tariff.</p>
+  </section>
+
+  <div class="demo-grid">
+    <section class="app" aria-label="Simulated Power Apps canvas app">
+      <div class="app-bar"><span class="dot"></span><span>Toll Surcharge Recovery</span>
+        <div class="tabs" role="tablist">
+          <button role="tab" id="tab-cust" aria-selected="true" aria-controls="pane-cust">Customers</button>
+          <button role="tab" id="tab-dash" aria-selected="false" aria-controls="pane-dash">Dashboard</button>
+        </div>
+      </div>
+      <div class="app-body">
+        <div class="disclaimer">Illustrative toll rates. Synthetic data. Not an official tariff.</div>
+
+        <div id="pane-cust" role="tabpanel" aria-labelledby="tab-cust">
+          <div class="toolbar">
+            <div><label for="q">Search customers</label><input id="q" type="search" placeholder="Name, ID or industry"></div>
+            <div><label for="sort">Sort by</label>
+              <select id="sort"><option value="toll">Toll impact (EUR)</option><option value="pct">Toll as % of freight</option><option value="name">Customer ID</option></select></div>
+          </div>
+          <div class="list-wrap table-scroll">
+            <table aria-label="Customers with toll impact">
+              <thead><tr><th>Customer</th><th>Industry</th><th class="num">Shipm.</th><th class="num">Toll EUR</th><th class="num">% freight</th></tr></thead>
+              <tbody id="custBody"></tbody>
+            </table>
+          </div>
+
+          <div class="detail" id="detail" aria-live="polite">
+            <h3 id="dName">Select a customer</h3>
+            <p class="sub" id="dSub"></p>
+            <label>Recovery method</label>
+            <div class="seg" id="methodSeg">
+              <button data-m="flat" aria-pressed="false">Flat per shipment</button>
+              <button data-m="pct" aria-pressed="true">% of freight</button>
+              <button data-m="km" aria-pressed="false">Per km</button>
+            </div>
+            <label for="rec">Recovery of toll cost: <span id="recVal">100</span>%</label>
+            <input id="rec" type="range" min="0" max="120" step="5" value="100">
+            <div class="two">
+              <div>
+                <table class="facts" aria-label="Surcharge proposal">
+                  <tr><td>Toll cost</td><td id="fToll"></td></tr>
+                  <tr><td>Surcharge rate</td><td id="fUnit"></td></tr>
+                  <tr><td>Surcharge billed</td><td id="fSur"></td></tr>
+                  <tr><td>Price increase</td><td id="fInc"></td></tr>
+                  <tr><td>Approval tier</td><td id="fTier"></td></tr>
+                </table>
+              </div>
+              <div>
+                <div class="muted-s">Margin effect (EUR, sample period)</div>
+                <div id="mbars"></div>
+              </div>
+            </div>
+            <p style="margin:12px 0 0"><button class="btn" id="submit">Submit for approval</button></p>
+            <div id="cardSlot"></div>
+          </div>
+        </div>
+
+        <div id="pane-dash" role="tabpanel" aria-labelledby="tab-dash" hidden>
+          <div class="kpis" id="kpis"></div>
+          <div class="muted-s">Default proposal per customer: 100% recovery as % of freight. Selected customer highlighted in orange.</div>
+          <div class="chart-box"><svg id="chart" viewBox="0 0 600 340" role="img" aria-labelledby="chartTitle"><title id="chartTitle">Top 10 customers by toll impact</title></svg></div>
+          <div class="table-scroll" style="margin-top:12px">
+            <table aria-label="Proposals by approval tier"><thead><tr><th>Approval tier</th><th class="num">Customers</th><th class="num">Surcharge EUR</th><th>Approver</th></tr></thead><tbody id="tierBody"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="copilot" aria-label="Simulated Copilot in Power Apps">
+      <div class="copilot-head"><img src="../assets/brand/hampy-agent-icon.png" alt=""><span>Copilot: explain my toll surcharge</span><span class="tag info" style="margin-left:auto">Simulated</span></div>
+      <div class="copilot-log" id="log" aria-live="polite"></div>
+      <div class="suggest" id="suggest"></div>
+      <form class="copilot-input" id="chatForm">
+        <input id="chatIn" type="text" placeholder="Ask about a customer, method or tier" aria-label="Message">
+        <button class="btn" type="submit">Send</button>
+      </form>
+    </aside>
+  </div>
+
+  <div class="stack-note">
+    <strong>How this maps to Microsoft in production.</strong>
+    Customer list, method picker and margin view: <strong>Power Apps canvas app</strong> with Power Fx over <strong>Dataverse</strong> tables Customers, Shipments, TollRates and SurchargeProposals.
+    Toll and surcharge maths: Power Fx formulas (and the Python model for bulk recalculation of all contracts).
+    Submit for approval and the card: <strong>Power Automate</strong> approval flow with tiered approvers, posted as an adaptive card in <strong>Teams</strong>.
+    Dashboard tab: <strong>Power BI</strong> steering dashboard with DAX measures, embedded in the app.
+    Chat panel: <strong>Copilot in Power Apps</strong> plus an optional <strong>Copilot Studio</strong> topic "Explain my toll surcharge"; here it is a deterministic rules-based simulation.
+    Code and documentation drafted with <strong>GitHub Copilot</strong> and reviewed by hand.
+  </div>
+</main>
+
+<script src="data/02-road-toll.js"></script>
+<script>
+// CALC-START
+const Calc = (() => {
+  const rhu = (x, nd) => { const f = Math.pow(10, nd); return Math.floor(x * f + 0.5) / f; };
+  const TIER = { autoPct: 3.5, autoEur: 200, cmPct: 5.0, cmEur: 500 };
+  function share(pallets, weightKg, basis, D) {
+    let s;
+    if (basis === "pallet") s = pallets / D.truck.pallets;
+    else if (basis === "weight") s = weightKg / D.truck.payloadKg;
+    else throw new Error("Unknown basis " + basis);
+    return Math.min(Math.max(s, 0), 1);
+  }
+  function rate(D, co2, wc) {
+    const r = D.rates[co2 + "|" + wc];
+    if (r === undefined) throw new Error("No rate " + co2 + "|" + wc);
+    return r;
+  }
+  function customerImpact(D) {
+    const byId = {}, list = [];
+    for (const [id, name, industry, basis] of D.customers) {
+      const c = { id, name, industry, basis, shipments: 0, revenue: 0, cost: 0, toll: 0, km: 0, tolledKm: 0, lanes: {}, dirty: 0 };
+      byId[id] = c; list.push(c);
+    }
+    const lanes = {};
+    for (const [id, name, km, tkm] of D.lanes) lanes[id] = { id, name, km, tkm };
+    for (const [cid, lid, co2, wc, pal, kg, rev, cost] of D.shipments) {
+      const c = byId[cid], l = lanes[lid];
+      const t = l.tkm * rate(D, co2, wc) * share(pal, kg, c.basis, D);
+      c.shipments += 1; c.revenue += rev; c.cost += cost; c.km += l.km; c.tolledKm += l.tkm; c.toll += t;
+      c.lanes[lid] = (c.lanes[lid] || 0) + t;
+      if (co2 <= 2) c.dirty += t;
+    }
+    return list;
+  }
+  function tier(incPct, eur) {
+    if (incPct <= TIER.autoPct && eur <= TIER.autoEur) return "Auto-approved";
+    if (incPct <= TIER.cmPct && eur <= TIER.cmEur) return "Commercial manager";
+    return "Steering committee";
+  }
+  function propose(c, method, pct) {
+    const target = c.toll * pct / 100.0, rev = c.revenue;
+    let unit, sur;
+    if (method === "flat") { unit = c.shipments ? rhu(target / c.shipments, 2) : 0; sur = unit * c.shipments; }
+    else if (method === "pct") { unit = rev ? rhu(target / rev * 100.0, 2) : 0; sur = rev * unit / 100.0; }
+    else if (method === "km") { unit = c.km ? rhu(target / c.km, 3) : 0; sur = unit * c.km; }
+    else throw new Error("Unknown method " + method);
+    const m0 = rev - c.cost, m1 = m0 - c.toll, m2 = m1 + sur;
+    const inc = rev ? sur / rev * 100.0 : 0;
+    return { method, pct, unit, surcharge: sur, toll: c.toll, m0, m1, m2,
+      m0pct: rev ? m0 / rev * 100 : 0, m2pct: rev + sur ? m2 / (rev + sur) * 100 : 0, inc, tier: tier(inc, sur) };
+  }
+  return { rhu, TIER, share, rate, customerImpact, propose, tier };
+})();
+// CALC-END
+
+(function () {
+  const D = window.TOLL_DATA;
+  const IMP = Calc.customerImpact(D);
+  const byId = Object.fromEntries(IMP.map(c => [c.id, c]));
+  const laneName = Object.fromEntries(D.lanes.map(l => [l[0], l[1]]));
+  const eur = (x, d = 0) => "EUR " + x.toLocaleString("en-GB", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const pc = (x, d = 1) => x.toFixed(d) + "%";
+  const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+  const tierTag = t => `<span class="tag ${t === "Auto-approved" ? "ok" : t === "Commercial manager" ? "warn" : "bad"}">${t}</span>`;
+  const APPROVERS = {
+    "Auto-approved": ["Policy rule (no approver), logged to Dataverse"],
+    "Commercial manager": ["Commercial manager for the account"],
+    "Steering committee": ["Commercial manager for the account", "Commercial Steering Committee chair"]
+  };
+  const METHOD_LABEL = { flat: "flat per shipment", pct: "% of freight", km: "per km" };
+  const unitText = p => p.method === "flat" ? eur(p.unit, 2) + " per shipment" : p.method === "pct" ? p.unit.toFixed(2) + "% of freight" : eur(p.unit, 3) + " per km";
+
+  const S = { sel: null, method: "pct", rec: 100, submitted: {} };
+  const $ = id => document.getElementById(id);
+
+  // ---------- Customer list ----------
+  function renderList() {
+    const q = $("q").value.trim().toLowerCase();
+    const sort = $("sort").value;
+    let rows = IMP.filter(c => !q || (c.id + " " + c.name + " " + c.industry).toLowerCase().includes(q));
+    rows.sort((a, b) => sort === "toll" ? b.toll - a.toll : sort === "pct" ? b.toll / b.revenue - a.toll / a.revenue : a.id.localeCompare(b.id));
+    $("custBody").innerHTML = rows.map(c => `<tr data-id="${c.id}" tabindex="0" class="${S.sel === c.id ? "row-sel" : ""}">
+      <td>${c.id}</td><td>${esc(c.industry)}</td><td class="num">${c.shipments}</td><td class="num">${Math.round(c.toll).toLocaleString("en-GB")}</td><td class="num">${pc(c.toll / c.revenue * 100)}</td></tr>`).join("");
+  }
+  $("custBody").addEventListener("click", e => { const tr = e.target.closest("tr"); if (tr) select(tr.dataset.id); });
+  $("custBody").addEventListener("keydown", e => { if (e.key === "Enter") { const tr = e.target.closest("tr"); if (tr) select(tr.dataset.id); } });
+  $("q").addEventListener("input", renderList);
+  $("sort").addEventListener("change", renderList);
+
+  function select(id) {
+    S.sel = id; $("cardSlot").innerHTML = "";
+    renderList(); renderDetail(); renderDash(); renderSuggest();
+  }
+
+  // ---------- Detail ----------
+  function current() { return S.sel ? Calc.propose(byId[S.sel], S.method, S.rec) : null; }
+  function renderDetail() {
+    const c = byId[S.sel];
+    document.querySelectorAll("#methodSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.m === S.method));
+    $("recVal").textContent = S.rec;
+    if (!c) return;
+    const p = current();
+    $("dName").textContent = c.id + " " + c.name;
+    $("dSub").textContent = `${c.industry}, ${c.shipments} shipments, ${Math.round(c.tolledKm).toLocaleString("en-GB")} of ${Math.round(c.km).toLocaleString("en-GB")} km tolled, toll allocated by ${c.basis === "pallet" ? "pallet places" : "weight"}`;
+    $("fToll").textContent = eur(p.toll, 2);
+    $("fUnit").textContent = unitText(p);
+    $("fSur").textContent = eur(p.surcharge, 2);
+    $("fInc").textContent = pc(p.inc, 2);
+    $("fTier").innerHTML = tierTag(p.tier);
+    const max = Math.max(p.m0, p.m2, 1);
+    const bar = (label, v, cls) => `<div class="mbar"><span>${label}</span><span class="track"><span class="fill ${cls}" style="width:${Math.max(0, v / max * 100).toFixed(1)}%;display:block"></span></span><span class="val">${Math.round(v).toLocaleString("en-GB")}</span></div>`;
+    $("mbars").innerHTML = bar("Before toll " + pc(p.m0pct), p.m0, "") + bar("Toll absorbed", p.m1, "toll") + bar("With surcharge " + pc(p.m2pct), p.m2, "rec");
+  }
+  $("methodSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.method = b.dataset.m; $("cardSlot").innerHTML = ""; renderDetail(); });
+  $("rec").addEventListener("input", e => { S.rec = +e.target.value; $("cardSlot").innerHTML = ""; renderDetail(); });
+
+  // ---------- Approval card ----------
+  function submit() {
+    const c = byId[S.sel]; if (!c) { bot("Select a customer first, then choose a method."); return; }
+    const p = current();
+    S.submitted[c.id] = p;
+    const steps = APPROVERS[p.tier];
+    const auto = p.tier === "Auto-approved";
+    $("cardSlot").innerHTML = `<div class="card-ac" role="region" aria-label="Approval request preview">
+      <div class="ac-head"><img src="../assets/brand/hampy-agent-icon.png" alt=""><h4>Toll surcharge approval: ${c.id}</h4></div>
+      <div class="muted-s">Adaptive card preview, as posted to Teams by the Power Automate approval flow</div>
+      <table class="facts">
+        <tr><td>Customer</td><td>${c.id} ${esc(c.name)} (${esc(c.industry)})</td></tr>
+        <tr><td>Method</td><td>${METHOD_LABEL[p.method]}, ${p.pct}% recovery</td></tr>
+        <tr><td>Surcharge rate</td><td>${unitText(p)}</td></tr>
+        <tr><td>Surcharge (sample period)</td><td>${eur(p.surcharge, 2)}</td></tr>
+        <tr><td>Price increase</td><td>${pc(p.inc, 2)}</td></tr>
+        <tr><td>Margin</td><td>${pc(p.m0pct)} before toll, ${pc(p.m2pct)} after</td></tr>
+        <tr><td>Tier</td><td>${tierTag(p.tier)}</td></tr>
+      </table>
+      <div class="muted-s">Approval route</div>
+      <ol>${steps.map(s => `<li>${s}</li>`).join("")}</ol>
+      <div class="actions">${auto ? `<span class="tag ok">Approved by policy: under ${Calc.TIER.autoPct}% and EUR ${Calc.TIER.autoEur}</span>` :
+        `<button class="btn" data-act="Approved">Approve</button><button class="btn secondary" data-act="Rejected">Reject</button>`}</div>
+      <div id="acStatus" class="muted-s" style="margin-top:6px"></div></div>`;
+    renderDash();
+    bot(`Proposal for ${c.id} submitted. Tier: <strong>${p.tier}</strong>. ${auto ? "No approver needed; the record is written to SurchargeProposals with status Approved." : "Approval request sent to " + steps.join(", then ") + "."}`);
+  }
+  $("submit").addEventListener("click", submit);
+  $("cardSlot").addEventListener("click", e => {
+    const b = e.target.closest("button[data-act]"); if (!b) return;
+    $("acStatus").textContent = b.dataset.act + " (simulated). Power Automate would patch SurchargeProposals.Status and notify the account owner.";
+    b.parentElement.querySelectorAll("button").forEach(x => x.disabled = true);
+  });
+
+  // ---------- Dashboard ----------
+  function renderDash() {
+    const defaults = IMP.map(c => Calc.propose(c, "pct", 100));
+    const tollT = IMP.reduce((a, c) => a + c.toll, 0), revT = IMP.reduce((a, c) => a + c.revenue, 0), costT = IMP.reduce((a, c) => a + c.cost, 0);
+    const surT = defaults.reduce((a, p) => a + p.surcharge, 0);
+    const m0 = (revT - costT) / revT * 100, m1 = (revT - costT - tollT) / revT * 100;
+    const kpi = (v, l) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+    $("kpis").innerHTML = kpi(eur(tollT), "Toll cost, all customers") + kpi(pc(tollT / revT * 100), "Toll as % of freight") +
+      kpi(pc(m0) + " to " + pc(m1), "Margin if toll absorbed") + kpi(pc((revT - costT - tollT + surT) / (revT + surT) * 100), "Margin with 100% recovery") +
+      kpi(Object.keys(S.submitted).length + " / " + IMP.length, "Proposals submitted");
+    const tiers = {};
+    defaults.forEach(p => { const t = tiers[p.tier] || (tiers[p.tier] = { n: 0, eur: 0 }); t.n++; t.eur += p.surcharge; });
+    $("tierBody").innerHTML = ["Auto-approved", "Commercial manager", "Steering committee"].map(t =>
+      `<tr><td>${tierTag(t)}</td><td class="num">${tiers[t] ? tiers[t].n : 0}</td><td class="num">${Math.round(tiers[t] ? tiers[t].eur : 0).toLocaleString("en-GB")}</td><td>${APPROVERS[t].join(", then ")}</td></tr>`).join("");
+    // Hand-built SVG bar chart: top 10 by toll
+    const top = [...IMP].sort((a, b) => b.toll - a.toll).slice(0, 10);
+    const W = 600, L = 120, R = 70, T = 14, rowH = 31, max = top[0].toll;
+    const x = v => L + v / max * (W - L - R);
+    let g = `<title id="chartTitle">Top 10 customers by toll impact</title>`;
+    for (let i = 0; i <= 4; i++) {
+      const v = max * i / 4, xx = x(v);
+      g += `<line x1="${xx}" y1="${T - 4}" x2="${xx}" y2="${T + rowH * 10}" stroke="#0c2c23" stroke-opacity=".12"/>`;
+      g += `<text x="${xx}" y="${T + rowH * 10 + 16}" font-size="11" fill="#0c2c23" text-anchor="middle">${Math.round(v).toLocaleString("en-GB")}</text>`;
+    }
+    top.forEach((c, i) => {
+      const y = T + i * rowH, sel = c.id === S.sel;
+      g += `<g class="bar" data-id="${c.id}" style="cursor:pointer"><text x="${L - 8}" y="${y + 18}" font-size="12" fill="#0c2c23" text-anchor="end" font-weight="${sel ? 700 : 400}">${c.id} ${esc(c.industry.split(" ")[0])}</text>
+        <rect x="${L}" y="${y + 5}" width="${(x(c.toll) - L).toFixed(1)}" height="${rowH - 10}" rx="3" fill="${sel ? "#ff6b35" : "#0c2c23"}"/>
+        <text x="${x(c.toll) + 6}" y="${y + 18}" font-size="12" fill="#0c2c23">${Math.round(c.toll).toLocaleString("en-GB")}</text></g>`;
+    });
+    g += `<text x="${L}" y="${T + rowH * 10 + 32}" font-size="11" fill="#0c2c23" opacity=".75">Toll impact, EUR (sample period). Click a bar to open the customer.</text>`;
+    $("chart").setAttribute("viewBox", `0 0 ${W} ${T + rowH * 10 + 40}`);
+    $("chart").innerHTML = g;
+  }
+  $("chart").addEventListener("click", e => { const b = e.target.closest(".bar"); if (b) { select(b.dataset.id); showTab("cust"); } });
+
+  function showTab(t) {
+    $("tab-cust").setAttribute("aria-selected", t === "cust"); $("tab-dash").setAttribute("aria-selected", t === "dash");
+    $("pane-cust").hidden = t !== "cust"; $("pane-dash").hidden = t !== "dash";
+  }
+  $("tab-cust").addEventListener("click", () => showTab("cust"));
+  $("tab-dash").addEventListener("click", () => showTab("dash"));
+
+  // ---------- Simulated Copilot ----------
+  const log = $("log");
+  function bot(html) { const d = document.createElement("div"); d.className = "msg bot"; d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; }
+  function user(t) { const d = document.createElement("div"); d.className = "msg user"; d.textContent = t; log.appendChild(d); }
+
+  function explain(c) {
+    const p = Calc.propose(c, S.method, S.rec);
+    const lanes = Object.entries(c.lanes).sort((a, b) => b[1] - a[1]).slice(0, 2);
+    return `<strong>${c.id} ${esc(c.name)}</strong> (${esc(c.industry)}) has ${c.shipments} shipments; ${pc(c.tolledKm / c.km * 100, 0)} of their kilometres run on tolled roads.
+      <ul><li>Toll allocated to them: ${eur(c.toll, 2)}, ${pc(c.toll / c.revenue * 100, 2)} of freight revenue (allocated by ${c.basis === "pallet" ? "pallet places" : "weight"}).</li>
+      <li>Biggest lanes: ${lanes.map(([l, v]) => `${esc(laneName[l])} (${eur(v)})`).join(", ")}.</li>
+      <li>${pc(c.dirty / c.toll * 100, 0)} of the toll comes from CO2 class 1 and 2 trucks; moving those loads to cleaner trucks lowers it.</li>
+      <li>Absorbing the toll cuts margin from ${pc(p.m0pct)} to ${pc((p.m1) / c.revenue * 100)}. With ${p.pct}% recovery ${METHOD_LABEL[p.method]} (${unitText(p)}) margin is ${pc(p.m2pct)}.</li>
+      <li>Approval: ${tierTag(p.tier)}</li></ul><span class="cite">Source: Dataverse Shipments, TollRates (illustrative rates)</span>`;
+  }
+  function compare(c) {
+    const rows = ["flat", "pct", "km"].map(m => Calc.propose(c, m, S.rec));
+    return `Recovery options for <strong>${c.id}</strong> at ${S.rec}%:<ul>${rows.map(p => `<li>${METHOD_LABEL[p.method]}: ${unitText(p)}, billed ${eur(p.surcharge, 2)}, ${tierTag(p.tier)}</li>`).join("")}</ul>
+      All three recover about the same total; they differ in who pays more. Flat favours large loads, % of freight follows price, per km follows distance but ignores the tolled share.`;
+  }
+  function whyTier(c) {
+    const p = Calc.propose(c, S.method, S.rec), T = Calc.TIER;
+    return `${c.id} is <strong>${p.tier}</strong> because the increase is ${pc(p.inc, 2)} and the surcharge is ${eur(p.surcharge)}.
+      <ul><li>Auto-approved: up to ${T.autoPct}% and up to EUR ${T.autoEur}.</li><li>Commercial manager: up to ${T.cmPct}% and up to EUR ${T.cmEur}.</li><li>Above either limit: Commercial Steering Committee.</li></ul>
+      Thresholds are an example policy stored as Dataverse environment variables.`;
+  }
+  function topN() {
+    const top = [...IMP].sort((a, b) => b.toll - a.toll).slice(0, 5);
+    return `Top 5 customers by toll impact:<ul>${top.map(c => `<li>${c.id} ${esc(c.industry)}: ${eur(c.toll)} (${pc(c.toll / c.revenue * 100, 2)} of freight)</li>`).join("")}</ul>Open the Dashboard tab for the top 10.`;
+  }
+  function steering() {
+    const list = IMP.map(c => [c, Calc.propose(c, "pct", 100)]).filter(([, p]) => p.tier === "Steering committee");
+    return `${list.length} of ${IMP.length} customers need the Steering Committee at 100% recovery as % of freight: ${list.slice(0, 8).map(([c]) => c.id).join(", ")}${list.length > 8 ? " and more" : ""}. Lowering recovery or phasing it in moves some into a lower tier.`;
+  }
+  const RATES_TXT = () => `These toll rates are <strong>illustrative</strong>, invented for the demo. They vary by CO2 emission class (1 highest emitting, 5 zero emission) and weight class, from ${eur(Math.min(...Object.values(D.rates)), 3)} to ${eur(Math.max(...Object.values(D.rates)), 3)} per tolled km. They are not an official tariff.`;
+
+  function findCustomer(t) {
+    const m = t.match(/c\s?0*(\d{1,3})/i);
+    if (m) { const id = "C" + String(+m[1]).padStart(3, "0"); if (byId[id]) return byId[id]; }
+    return S.sel ? byId[S.sel] : null;
+  }
+  function answer(t) {
+    const s = t.toLowerCase();
+    const c = findCustomer(t);
+    if (/rate|official|tariff/.test(s)) return RATES_TXT();
+    if (/steering|committee|which customers/.test(s)) return steering();
+    if (/top|biggest|most/.test(s)) return topN();
+    if (!c) return "Select a customer in the list (or name one, for example C001) and I can explain its impact.";
+    if (c.id !== S.sel && /c\s?0*\d/i.test(t)) select(c.id);
+    if (/compare|method|option/.test(s)) return compare(c);
+    if (/tier|approv|why/.test(s)) return whyTier(c);
+    if (/explain|impact|surcharge|toll/.test(s)) return explain(c);
+    return "I can explain a customer's toll impact, compare recovery methods, explain the approval tier, list the top customers or the Steering Committee cases.";
+  }
+  function ask(t) { user(t); bot(answer(t)); log.scrollTop = log.scrollHeight; renderSuggest(); }
+  function renderSuggest() {
+    const id = S.sel || "C001";
+    const items = [`Explain ${id}'s toll impact`, "Compare recovery methods", "Why this approval tier?", "Top 5 impacted customers", "Which customers need the steering committee?", "Are these official toll rates?"];
+    $("suggest").innerHTML = items.map(i => `<button type="button">${i}</button>`).join("");
+  }
+  $("suggest").addEventListener("click", e => { const b = e.target.closest("button"); if (b) ask(b.textContent); });
+  $("chatForm").addEventListener("submit", e => { e.preventDefault(); const v = $("chatIn").value.trim(); if (v) { ask(v); $("chatIn").value = ""; } });
+
+  // ---------- Init + hash states ----------
+  const topId = [...IMP].sort((a, b) => b.toll - a.toll)[0].id;
+  renderList(); renderDash(); renderSuggest();
+  bot("Hi, I am the simulated Copilot for this app. Pick a customer or use a suggestion below. Toll rates here are illustrative.");
+  select(topId);
+  const st = (location.hash.match(/state=([a-z]+)/) || [])[1];
+  if (st === "result") { S.method = "pct"; S.rec = 100; $("rec").value = 100; renderDetail(); submit(); }
+  if (st === "dashboard") { showTab("dash"); }
+  if (st === "chat") { ask(`Explain ${topId}'s toll impact`); ask("Compare recovery methods"); }
+})();
+</script>
+</body>
+</html>

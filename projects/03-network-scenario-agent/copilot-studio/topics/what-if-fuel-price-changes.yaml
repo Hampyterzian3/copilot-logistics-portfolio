@@ -1,0 +1,59 @@
+kind: AdaptiveDialog
+modelDescription: Re-runs the network with a changed diesel price and reports the cost change per design and whether the recommended mix changes.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: What if fuel price changes
+    triggerQueries:
+      - What if diesel goes up 30%
+      - What if fuel price changes
+      - Diesel drops by 10 percent
+      - How sensitive is the network to fuel
+
+  actions:
+    - kind: Question
+      id: askChange
+      variable: Topic.ChangePct
+      prompt: By how many percent does diesel change? Use a minus sign for a drop.
+      entity: NumberPrebuiltEntity
+      skipQuestionMode: SkipOnFirstExecutionIfVariableHasValue
+
+    - kind: SetVariable
+      id: newIndex
+      variable: Topic.FuelIndex
+      value: =Max(0.5, Min(2, 1 + Topic.ChangePct / 100))
+
+    - kind: SetVariable
+      id: keepBefore
+      variable: Topic.Before
+      value: =Global.LastScenario
+
+    - kind: InvokeConnectorAction
+      id: callRunScenario
+      connectionReference: cr_contosonetworkscenarios
+      connectionProperties:
+        mode: Invoker
+      operationId: RunScenario
+      input:
+        binding:
+          body: ={ fuel_index: Topic.FuelIndex }
+      output:
+        binding:
+          designs: Topic.After
+          recommendation: Topic.Recommendation
+
+    - kind: SetVariable
+      id: storeAfter
+      variable: Global.LastScenario
+      value: =Topic.After
+
+    - kind: SendActivity
+      id: sendDelta
+      activity: |-
+        Diesel index {Text(Topic.FuelIndex, "0.00")}. Weekly cost change:
+        - Direct full-load: {Text((Topic.After.direct.cost_week / Topic.Before.direct.cost_week - 1) * 100, "+0.0;-0.0")}%
+        - Regional milk-run: {Text((Topic.After.milkrun.cost_week / Topic.Before.milkrun.cost_week - 1) * 100, "+0.0;-0.0")}%
+        - Cross-dock: {Text((Topic.After.crossdock.cost_week / Topic.Before.crossdock.cost_week - 1) * 100, "+0.0;-0.0")}%
+        - Best mix: EUR {Text(Topic.After.bestmix.cost_week, "#,##0")} a week
+        {Topic.Recommendation.text}

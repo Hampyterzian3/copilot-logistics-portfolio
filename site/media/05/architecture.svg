@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="t d">
+  <title id="t">Executive KPI Briefing Copilot architecture</title>
+  <desc id="d">Operational sources feed a certified Power BI semantic model. A Monday Power Automate flow exports variances to Dataverse, a Copilot Studio agent with Microsoft 365 Copilot drafts the brief in Word, the outline in PowerPoint and a Teams post, and an analyst approves before leadership sees it.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#81cfb3"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ff6b35"/></marker>
+    <style>
+      .h{font:600 22px 'Space Grotesk',Arial,sans-serif;fill:#fffdf8}
+      .bt{font:600 17px 'Space Grotesk',Arial,sans-serif;fill:#fffdf8}
+      .bs{font:400 13.5px Inter,Arial,sans-serif;fill:#fffdf8;opacity:.85}
+      .lab{font:600 12px 'Space Grotesk',Arial,sans-serif;fill:#0c2c23}
+      .cap{font:600 13px 'Space Grotesk',Arial,sans-serif;fill:#81cfb3;letter-spacing:.06em}
+      .box{fill:#244139;stroke:rgba(255,253,248,.18)}
+      .ln{stroke:#81cfb3;stroke-width:2.2;fill:none}
+    </style>
+  </defs>
+  <rect width="1200" height="675" fill="#0c2c23"/>
+  <text x="40" y="52" class="h">Executive KPI Briefing Copilot</text>
+  <text x="40" y="76" class="bs">Contoso Logistics, top six customers, synthetic data. One governed source, drafted story, human approval.</text>
+
+  <text x="40" y="124" class="cap">GOVERNED DATA</text>
+  <text x="440" y="124" class="cap">MONDAY AUTOMATION AND DRAFTING</text>
+  <text x="900" y="124" class="cap">REVIEW AND RELEASE</text>
+
+  <!-- sources -->
+  <rect x="40" y="140" width="320" height="110" rx="12" class="box"/>
+  <text x="60" y="172" class="bt">Operational sources</text>
+  <text x="60" y="198" class="bs">TMS shipments, finance revenue and cost,</text>
+  <text x="60" y="218" class="bs">claims, CO2 per shipment (weekly)</text>
+  <rect x="60" y="226" width="118" height="18" rx="9" fill="#b0c6e8"/><text x="70" y="239" class="lab">Power BI dataflow</text>
+
+  <!-- semantic model -->
+  <rect x="40" y="290" width="320" height="190" rx="12" class="box" stroke="#81cfb3"/>
+  <text x="60" y="322" class="bt">Power BI semantic model</text>
+  <text x="60" y="348" class="bs">Certified, single source, RLS by account lead</text>
+  <text x="60" y="372" class="bs">DAX: KPIs, WoW, 8-week median baseline,</text>
+  <text x="60" y="392" class="bs">robust z-score, threshold flags,</text>
+  <text x="60" y="412" class="bs">materiality score, margin bridge</text>
+  <rect x="60" y="440" width="96" height="22" rx="11" fill="#81cfb3"/><text x="72" y="455" class="lab">Power BI</text>
+  <rect x="164" y="440" width="160" height="22" rx="11" fill="#e8d67d"/><text x="176" y="455" class="lab">Executive dashboard</text>
+
+  <!-- flow -->
+  <rect x="440" y="140" width="380" height="120" rx="12" class="box"/>
+  <text x="460" y="172" class="bt">Monday flow (06:00)</text>
+  <text x="460" y="198" class="bs">Check refresh, run DAX export, rank flagged</text>
+  <text x="460" y="218" class="bs">variances, validate every sentence has a source</text>
+  <rect x="460" y="230" width="128" height="20" rx="10" fill="#81a3da"/><text x="470" y="244" class="lab">Power Automate</text>
+
+  <!-- dataverse -->
+  <rect x="440" y="290" width="175" height="120" rx="12" class="box"/>
+  <text x="458" y="322" class="bt">Dataverse</text>
+  <text x="458" y="346" class="bs">Variances with</text>
+  <text x="458" y="364" class="bs">fact ids, drafts,</text>
+  <text x="458" y="382" class="bs">approval trail</text>
+
+  <!-- copilot studio -->
+  <rect x="635" y="290" width="185" height="120" rx="12" class="box" stroke="#ff6b35"/>
+  <text x="652" y="322" class="bt">Copilot Studio</text>
+  <text x="652" y="346" class="bs">Briefing agent,</text>
+  <text x="652" y="364" class="bs">4 topics, template</text>
+  <text x="652" y="382" class="bs">rules, no free figures</text>
+
+  <!-- m365 -->
+  <rect x="440" y="440" width="380" height="110" rx="12" class="box"/>
+  <text x="460" y="472" class="bt">Microsoft 365 Copilot</text>
+  <text x="460" y="496" class="bs">Brief drafted in Word, 5-slide outline in</text>
+  <text x="460" y="516" class="bs">PowerPoint, source tags kept in notes</text>
+  <rect x="460" y="524" width="62" height="20" rx="10" fill="#81a3da"/><text x="472" y="538" class="lab">Word</text>
+  <rect x="530" y="524" width="100" height="20" rx="10" fill="#da81a7"/><text x="542" y="538" class="lab">PowerPoint</text>
+  <rect x="638" y="524" width="84" height="20" rx="10" fill="#81cfb3"/><text x="650" y="538" class="lab">SharePoint</text>
+
+  <!-- approval -->
+  <rect x="900" y="140" width="260" height="170" rx="12" class="box" stroke="#ff6b35"/>
+  <text x="920" y="172" class="bt">Analyst approval</text>
+  <text x="920" y="198" class="bs">Approvals card in Teams.</text>
+  <text x="920" y="218" class="bs">Edit Word draft, check source</text>
+  <text x="920" y="238" class="bs">tags, approve or reject.</text>
+  <text x="920" y="262" class="bs">Agent cannot post on its own.</text>
+  <rect x="920" y="276" width="140" height="20" rx="10" fill="#e8d67d"/><text x="930" y="290" class="lab">Human in the loop</text>
+
+  <!-- leadership -->
+  <rect x="900" y="350" width="260" height="130" rx="12" class="box"/>
+  <text x="920" y="382" class="bt">Leadership weekly</text>
+  <text x="920" y="408" class="bs">Teams channel post with</text>
+  <text x="920" y="428" class="bs">headline, three things,</text>
+  <text x="920" y="448" class="bs">links to brief and deck</text>
+  <rect x="1070" y="448" width="70" height="20" rx="10" fill="#81a3da"/><text x="1084" y="462" class="lab">Teams</text>
+
+  <!-- arrows -->
+  <path class="ln" d="M200 250V284" marker-end="url(#a)"/>
+  <path class="ln" d="M360 330H400V200H434" marker-end="url(#a)"/>
+  <path class="ln" d="M527 260V284" marker-end="url(#a)"/>
+  <path class="ln" d="M615 350H629" marker-end="url(#a)"/>
+  <path class="ln" d="M727 410V434" marker-end="url(#a)"/>
+  <path class="ln" d="M820 495H860V225H894" marker-end="url(#a)"/>
+  <path d="M1030 310V344" stroke="#ff6b35" stroke-width="2.6" fill="none" marker-end="url(#o)"/>
+  <text x="1040" y="333" class="bs">only if approved</text>
+
+  <!-- footer band -->
+  <rect x="40" y="590" width="1120" height="52" rx="12" fill="#244139"/>
+  <text x="60" y="622" class="bs" style="opacity:1">Engineering: Python reference generator and pytest (no claim without data), DAX measures, topic YAML.</text>
+  <rect x="1000" y="604" width="140" height="24" rx="12" fill="#ff6b35"/><text x="1016" y="621" class="lab">GitHub Copilot</text>
+</svg>

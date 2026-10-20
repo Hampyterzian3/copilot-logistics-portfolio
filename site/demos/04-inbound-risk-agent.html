@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inbound Risk Agent</title>
+<meta name="description" content="Simulated demo: a transparent risk score flags in-transit shipments likely to arrive late or go missing, explains why in plain words, posts a Teams alert card and drafts the customer update.">
+<link rel="icon" type="image/png" href="../assets/brand/hampy-favicon-64.png">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/demo.css">
+<style>
+  .asof { margin-left: auto; font: 500 12px var(--font-body); opacity: .8; }
+  .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 8px; }
+  .filters > div { flex: 1 1 150px; min-width: 0; }
+  .filters label { margin-top: 0; }
+  .count { font-size: 13px; margin: 4px 0 8px; }
+  .list-wrap { max-height: 360px; overflow: auto; border: 1px solid rgba(12,44,35,.12); border-radius: var(--r-sm); }
+  .app th { position: sticky; top: 0; z-index: 1; background: #eceee9; white-space: nowrap; }
+  .app th button { all: unset; cursor: pointer; font: 600 12px var(--font-heading); }
+  .app th button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .app th[aria-sort="descending"] button::after { content: " \2193"; }
+  .app th[aria-sort="ascending"] button::after { content: " \2191"; }
+  .app tbody tr { cursor: pointer; }
+  .app tbody tr:hover td { background: rgba(129,163,218,.14); }
+  .app tbody tr.sel td { background: rgba(255,107,53,.14); }
+  .app td.score { font: 700 14px var(--font-heading); font-variant-numeric: tabular-nums; }
+  .list-wrap table { min-width: 1060px; }
+  .app td.why { min-width: 320px; font-size: 12px; }
+  .app td.nowrap { white-space: nowrap; }
+  .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 480px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .parity { font-size: 12px; margin: 0 0 12px; opacity: .85; }
+  .detail { margin-top: 16px; border-top: 1px solid rgba(12,44,35,.15); padding-top: 14px; }
+  .detail[hidden] { display: none; }
+  .detail h3 { font-size: 18px; margin-bottom: 4px; }
+  .detail .meta { font-size: 13px; margin-bottom: 10px; }
+  .dgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  @media (max-width: 1040px) { .dgrid { grid-template-columns: 1fr; } }
+  .dgrid h4 { font-size: 14px; margin: 0 0 6px; }
+  .reasons { margin: 0 0 12px; padding-left: 18px; font-size: 13px; }
+  .reasons li { margin-bottom: 4px; }
+  .factors { display: grid; grid-template-columns: 110px minmax(0, 1fr) 44px; gap: 4px 8px; align-items: center; font-size: 12px; }
+  .bar { height: 10px; background: rgba(12,44,35,.08); border-radius: 5px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--orange); }
+  .timeline { list-style: none; margin: 12px 0 0; padding: 0; font-size: 12px; }
+  .timeline li { padding: 3px 0 3px 12px; border-left: 2px solid rgba(12,44,35,.2); }
+  .timeline li:last-child { border-left-color: var(--orange); font-weight: 600; }
+  /* Adaptive Card preview (Teams-like) */
+  .teams-frame { background: #e9ebf3; border-radius: var(--r-xl); padding: 10px; }
+  .teams-frame .from { display: flex; align-items: center; gap: 8px; font: 600 12px var(--font-heading); margin-bottom: 6px; }
+  .teams-frame .from img { width: 20px; height: 20px; border-radius: 4px; }
+  .card-ac { border: 1px solid rgba(12,44,35,.15); padding: 0; overflow: hidden; }
+  .ac-c { padding: 10px 12px; }
+  .ac-c.attention { background: var(--pink); }
+  .ac-c.warning { background: var(--yellow); }
+  .ac-body { padding: 10px 12px; }
+  .ac-tb { margin: 0 0 6px; overflow-wrap: anywhere; }
+  .ac-tb.bold { font-weight: 700; } .ac-tb.medium { font-size: 15px; } .ac-tb.subtle { opacity: .8; margin-top: -4px; }
+  .ac-tb ul { margin: 0; padding-left: 18px; }
+  .ac-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 2px 10px; margin: 0 0 8px; }
+  .ac-facts dt { font-weight: 700; } .ac-facts dd { margin: 0; overflow-wrap: anywhere; }
+  .ac-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 12px; }
+  .ac-actions button { flex: 1 1 auto; border: 1px solid rgba(12,44,35,.3); background: #fff; color: var(--green); border-radius: var(--r-sm); padding: 7px 10px; font: 600 12px var(--font-heading); cursor: pointer; }
+  .ac-actions button.positive { background: var(--lime); border-color: var(--lime); }
+  .ac-actions button.destructive { background: var(--orange); border-color: var(--orange); }
+  .ac-status { padding: 0 12px 10px; font-size: 12px; font-weight: 600; }
+  .json-toggle { margin-top: 6px; font-size: 12px; }
+  .json-toggle pre { max-height: 220px; overflow: auto; background: rgba(12,44,35,.06); padding: 8px; border-radius: var(--r-sm); white-space: pre-wrap; word-break: break-word; }
+  .msg pre.email { white-space: pre-wrap; font: 13px/1.5 var(--font-body); margin: 6px 0 0; background: var(--green); padding: 10px; border-radius: var(--r-sm); }
+  .msg .tag { margin-right: 4px; }
+  .msg table { border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+  .msg td { padding: 2px 6px 2px 0; vertical-align: top; }
+  .stack-note ul { margin: 8px 0 0; padding-left: 18px; }
+  .stack-note li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<header class="demo-top">
+  <a class="back" href="../index.html#p04">&larr; Portfolio</a>
+  <img src="../assets/brand/hampy-logo-offwhite.svg" alt="hampy">
+  <span class="demo-badge">Simulated demo</span>
+  <span class="title">Inbound Risk Early-Warning Agent</span>
+</header>
+
+<main class="demo-wrap">
+  <section class="demo-intro">
+    <h1>Inbound Risk Early-Warning Agent</h1>
+    <p>Late or lost inbound shipments are often noticed only when the customer calls. Contoso Logistics scores every in-transit shipment every 30 minutes on seven factors, explains each score in plain words and alerts the control tower in Teams before the promised date is missed. Click a shipment, or use the agent suggestions on the right. All data is synthetic.</p>
+  </section>
+
+  <div class="demo-grid">
+    <section class="app" aria-label="Inbound risk monitor">
+      <div class="app-bar"><span class="dot"></span>Inbound risk monitor | Contoso Logistics<span class="asof" id="asof"></span></div>
+      <div class="app-body">
+        <div class="kpis" id="kpis"></div>
+        <p class="parity" id="parity"></p>
+        <div class="filters">
+          <div><label for="fCustomer">Customer</label><select id="fCustomer"></select></div>
+          <div><label for="fCarrier">Carrier</label><select id="fCarrier"></select></div>
+          <div><label for="fBand">Risk band</label>
+            <select id="fBand">
+              <option value="all">All bands</option>
+              <option value="watch">Watch or above</option>
+              <option value="at_risk">At risk or above</option>
+              <option value="critical">Critical only</option>
+            </select></div>
+        </div>
+        <p class="count" id="count" aria-live="polite"></p>
+        <div class="table-scroll list-wrap">
+          <table>
+            <thead><tr id="thead"></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <section class="detail" id="detail" hidden aria-live="polite"></section>
+      </div>
+    </section>
+
+    <aside class="copilot" aria-label="Inbound risk agent (simulated)">
+      <div class="copilot-head"><img src="../assets/brand/hampy-agent-icon.png" alt="">Inbound risk agent <span class="chip ghost" style="margin-left:auto">Copilot Studio, simulated</span></div>
+      <div class="copilot-log" id="log" aria-live="polite"></div>
+      <div class="suggest" id="suggest"></div>
+      <form class="copilot-input" id="ask">
+        <label class="sr-only" for="q">Ask the agent</label>
+        <input id="q" autocomplete="off" placeholder="Ask about a customer, a shipment or an area">
+        <button class="btn" type="submit">Ask</button>
+      </form>
+    </aside>
+  </div>
+
+  <section class="stack-note">
+    <strong>How this maps to Microsoft in production.</strong>
+    <ul>
+      <li><strong>Shipment list and scores</strong>: a Power Automate scheduled flow runs every 30 minutes, pulls new tracking events from the TMS or visibility platform through a custom connector, and calls the scoring code (an Azure Function running <code>risk_model.py</code>, or a Dataverse plug-in). Scores, bands and reasons are written to Dataverse. On this page the JavaScript port scores the same synthetic features and is checked against the Python output.</li>
+      <li><strong>KPI tiles and backtest</strong>: a Power BI risk dashboard on the Dataverse tables, with the monthly backtest (precision and recall of each band against actual delivery outcomes) as a report page.</li>
+      <li><strong>Alert card</strong>: the same flow posts an Adaptive Card 1.5 to the control tower channel in Teams for every new critical shipment. Acknowledge, Draft customer update and Escalate to carrier start child flows and update the Dataverse alert row.</li>
+      <li><strong>Agent panel</strong>: a Copilot Studio agent grounded on the Dataverse risk tables, with topics "At-risk shipments for a customer", "Why is this shipment at risk", "Draft customer update" and "Escalate to carrier". Drafts go to a planner for approval before anything is sent. Here the agent is simulated with keyword intents and fixed templates.</li>
+    </ul>
+  </section>
+</main>
+
+<script src="js/04-risk-model.js"></script>
+<script src="data/04-inbound-risk.js"></script>
+<script>
+(function () {
+  "use strict";
+  var M = window.RiskModel, D = window.RISK_DATA;
+  var TAG = { critical: "bad", at_risk: "warn", watch: "info", on_track: "ok" };
+  var RANK = { critical: 3, at_risk: 2, watch: 1, on_track: 0 };
+  var FACTOR_LABEL = { lane: "Lane delay", area: "Area loss", carrier: "Carrier on-time", dwell: "Dwell at last scan",
+    customs: "Customs", slack: "Time to promise", calendar: "Weekend / holiday" };
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function pct(x) { return (Math.round(x * 1000) / 10).toFixed(1) + "%"; }
+  function tag(band) { return '<span class="tag ' + TAG[band] + '">' + M.BAND_LABELS[band] + "</span>"; }
+
+  // Score every shipment in the browser with the JS port, and compare with the Python export
+  var matches = 0;
+  var rows = D.shipments.map(function (s) {
+    var r = M.scoreShipment(s);
+    if (JSON.stringify(r) === JSON.stringify(s.py)) matches++;
+    return { s: s, r: r, ack: false };
+  });
+  var byId = {};
+  rows.forEach(function (x) { byId[x.s.shipment_id] = x; });
+
+  var state = { sort: "score", dir: -1, customer: "all", carrier: "all", band: "all", selected: null };
+
+  // ---------- header, KPIs ----------
+  $("asof").textContent = "As of " + D.as_of_display;
+  var bt = D.backtest;
+  var kpis = [
+    [D.counts.critical, "Critical now"],
+    [D.counts.at_risk, "At risk now"],
+    [D.counts.watch, "Watch"],
+    [pct(bt.critical.recall), "Backtest recall, critical"],
+    [pct(bt.critical.precision), "Backtest precision, critical"],
+    [pct(bt.at_risk_or_above.recall), "Recall, at risk or above"]
+  ];
+  $("kpis").innerHTML = kpis.map(function (k) { return '<div class="kpi"><div class="v">' + k[0] + '</div><div class="l">' + k[1] + "</div></div>"; }).join("");
+  $("parity").innerHTML = "Scored in the browser by the JS port: <strong>" + matches + " of " + rows.length +
+    "</strong> match the Python export. Backtest: " + bt.test_snapshots + " closed shipments from " + bt.cutoff +
+    " onward, scored with rates learned before that date; " + pct(bt.test_late_rate) + " were actually late.";
+
+  // ---------- filters ----------
+  function opts(sel, values, allLabel) {
+    sel.innerHTML = '<option value="all">' + allLabel + "</option>" + values.map(function (v) { return '<option value="' + esc(v) + '">' + esc(v) + "</option>"; }).join("");
+  }
+  function uniq(key) { return rows.map(function (x) { return x.s[key]; }).filter(function (v, i, a) { return a.indexOf(v) === i; }).sort(); }
+  opts($("fCustomer"), uniq("customer"), "All customers");
+  opts($("fCarrier"), uniq("carrier"), "All carriers");
+  $("fCustomer").onchange = function () { state.customer = this.value; render(); };
+  $("fCarrier").onchange = function () { state.carrier = this.value; render(); };
+  $("fBand").onchange = function () { state.band = this.value; render(); };
+
+  // ---------- table ----------
+  var COLS = [
+    ["score", "Score"], ["band", "Band"], ["shipment_id", "Shipment"], ["customer", "Customer"],
+    ["carrier", "Carrier"], ["lane", "Lane"], ["area", "Area"], ["why", "Top reason"]
+  ];
+  function val(x, key) {
+    if (key === "score") return x.r.score;
+    if (key === "band") return RANK[x.r.band] * 1000 + x.r.score;
+    return x.s[key];
+  }
+  function filtered() {
+    var minRank = state.band === "all" ? 0 : RANK[state.band];
+    return rows.filter(function (x) {
+      return (state.customer === "all" || x.s.customer === state.customer) &&
+        (state.carrier === "all" || x.s.carrier === state.carrier) && RANK[x.r.band] >= minRank;
+    }).sort(function (a, b) {
+      var va = val(a, state.sort), vb = val(b, state.sort);
+      var c = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb));
+      return c * state.dir || b.r.score - a.r.score || a.s.shipment_id.localeCompare(b.s.shipment_id);
+    });
+  }
+  function render() {
+    $("thead").innerHTML = COLS.map(function (c) {
+      if (c[0] === "why") return "<th>" + c[1] + "</th>";
+      var sort = state.sort === c[0] ? (state.dir < 0 ? "descending" : "ascending") : "none";
+      return '<th aria-sort="' + sort + '"' + (c[0] === "score" ? ' class="num"' : "") + '><button type="button" data-sort="' + c[0] + '">' + c[1] + "</button></th>";
+    }).join("");
+    var list = filtered();
+    var n = { critical: 0, at_risk: 0 };
+    list.forEach(function (x) { if (n[x.r.band] !== undefined) n[x.r.band]++; });
+    $("count").textContent = list.length + " shipments shown, " + n.critical + " critical, " + n.at_risk + " at risk.";
+    $("tbody").innerHTML = list.map(function (x) {
+      var top = x.r.reasons[0] ? x.r.reasons[0].text : "No factor above 3 points";
+      return '<tr tabindex="0" data-id="' + x.s.shipment_id + '"' + (state.selected === x.s.shipment_id ? ' class="sel"' : "") + ">" +
+        '<td class="score num">' + x.r.score + "</td><td>" + tag(x.r.band) + '</td><td class="nowrap">' + x.s.shipment_id +
+        '</td><td class="nowrap">' + esc(x.s.customer) + '</td><td class="nowrap">' + esc(x.s.carrier) + '</td><td class="nowrap">' + esc(x.s.lane) +
+        '</td><td class="nowrap">' + x.s.area + '</td><td class="why">' + esc(top) + "</td></tr>";
+    }).join("");
+  }
+  $("thead").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-sort]");
+    if (!b) return;
+    var k = b.getAttribute("data-sort");
+    if (state.sort === k) state.dir = -state.dir; else { state.sort = k; state.dir = (k === "score" || k === "band") ? -1 : 1; }
+    render();
+  });
+  function rowPick(e) {
+    var tr = e.target.closest("tr[data-id]");
+    if (!tr) return;
+    if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
+    if (e.type === "keydown") e.preventDefault();
+    select(tr.getAttribute("data-id"), true);
+  }
+  $("tbody").addEventListener("click", rowPick);
+  $("tbody").addEventListener("keydown", rowPick);
+
+  // ---------- adaptive card renderer (subset used by alert-card.json) ----------
+  function renderTextBlock(el) {
+    var cls = "ac-tb" + (el.weight === "Bolder" ? " bold" : "") + (el.size === "Medium" ? " medium" : "") + (el.isSubtle ? " subtle" : "");
+    var lines = String(el.text).split("\n");
+    if (lines.every(function (l) { return l.indexOf("- ") === 0; })) {
+      return '<div class="' + cls + '"><ul>' + lines.map(function (l) { return "<li>" + esc(l.slice(2)) + "</li>"; }).join("") + "</ul></div>";
+    }
+    return '<p class="' + cls + '">' + esc(el.text) + "</p>";
+  }
+  function renderEl(el) {
+    if (el.type === "TextBlock") return renderTextBlock(el);
+    if (el.type === "FactSet") return '<dl class="ac-facts">' + el.facts.map(function (f) { return "<dt>" + esc(f.title) + "</dt><dd>" + esc(f.value) + "</dd>"; }).join("") + "</dl>";
+    if (el.type === "Container") return '<div class="ac-c ' + (el.style || "") + '">' + el.items.map(renderEl).join("") + "</div>";
+    return "";
+  }
+  function renderCard(card, x) {
+    var head = card.body[0], rest = card.body.slice(1);
+    return '<div class="card-ac">' + renderEl(head) + '<div class="ac-body">' + rest.map(renderEl).join("") + "</div>" +
+      (x.ack ? '<div class="ac-status">Acknowledged by control tower planner at ' + D.as_of_display.slice(-5) + "</div>" : "") +
+      '<div class="ac-actions">' + card.actions.map(function (a) {
+        return '<button type="button" class="' + (a.style || "") + '" data-action="' + a.data.action + '">' + esc(a.title) + "</button>";
+      }).join("") + "</div></div>";
+  }
+
+  // ---------- detail ----------
+  function select(id, announce) {
+    var x = byId[id];
+    if (!x) return;
+    state.selected = id;
+    render();
+    var s = x.s, r = x.r;
+    var card = M.buildAlertCard(s, r);
+    var evs = (D.events[id] || []).map(function (e) { return "<li>" + esc(e[2].replace("T", " ")) + ": " + esc(e[0]) + ", " + esc(e[1]) + "</li>"; }).join("");
+    var factors = M.WEIGHTS.map(function (w) {
+      var p = r.points[w[0]];
+      return "<span>" + FACTOR_LABEL[w[0]] + '</span><span class="bar" role="img" aria-label="' + p + " of " + w[1] + ' points"><i style="width:' + (p / w[1] * 100) + '%"></i></span><span class="num">' + p.toFixed(1) + "/" + w[1] + "</span>";
+    }).join("");
+    $("detail").hidden = false;
+    $("detail").innerHTML =
+      "<h3>" + id + " " + tag(r.band) + "</h3>" +
+      '<p class="meta">Score <strong>' + r.score + "/100</strong> | " + esc(s.customer) + ", " + esc(s.po_ref) + ", " + s.pieces + " pieces | " +
+      esc(s.carrier) + " | " + esc(s.lane) + " to " + s.area + " | promised " + esc(s.promised_display) + "</p>" +
+      '<div class="dgrid"><div><h4>Why it scores ' + r.score + "</h4>" +
+      (r.reasons.length ? '<ol class="reasons">' + r.reasons.map(function (q) { return "<li>" + esc(q.text) + " <strong>(+" + q.points.toFixed(1) + ")</strong></li>"; }).join("") + "</ol>" : "<p>No single factor above 3 points.</p>") +
+      '<h4>Points by factor</h4><div class="factors">' + factors + "</div>" +
+      '<h4 style="margin-top:12px">Scan events</h4><ul class="timeline">' + evs + "</ul></div>" +
+      '<div><h4>Teams alert preview</h4><div class="teams-frame"><div class="from"><img src="../assets/brand/hampy-agent-icon.png" alt="">Inbound Risk flow, Control tower channel</div>' +
+      renderCard(card, x) + '</div><details class="json-toggle"><summary>Adaptive Card JSON (version ' + card.version + ")</summary><pre>" + esc(JSON.stringify(card, null, 2)) + "</pre></details></div></div>";
+    if (announce) bot("Selected <strong>" + id + "</strong> " + tag(r.band) + " score " + r.score + ". Top reason: " + esc(r.reasons[0] ? r.reasons[0].text : "none above 3 points") + ". Ask me to draft the customer update or escalate to the carrier.");
+  }
+  $("detail").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-action]");
+    if (!b || !state.selected) return;
+    var a = b.getAttribute("data-action"), x = byId[state.selected];
+    if (a === "acknowledge") {
+      x.ack = true;
+      select(state.selected, false);
+      user("Acknowledge " + state.selected);
+      bot("Logged: " + state.selected + " acknowledged. The alert row in Dataverse is set to Acknowledged and the card stops repeating every 30 minutes.");
+    } else if (a === "draft_customer_update") { ask("Draft customer update for " + state.selected); }
+    else if (a === "escalate_to_carrier") { ask("Escalate " + state.selected + " to carrier"); }
+  });
+
+  // ---------- agent (deterministic simulation) ----------
+  var log = $("log");
+  function add(cls, html) { var d = document.createElement("div"); d.className = "msg " + cls; d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; }
+  function bot(html) { add("bot", html); }
+  function user(text) { add("user", esc(text)); }
+
+  function findCustomer(q) {
+    var lc = q.toLowerCase();
+    return uniq("customer").filter(function (c) { return lc.indexOf(c.toLowerCase()) >= 0 || lc.indexOf(c.split(" ")[0].toLowerCase()) >= 0; })[0];
+  }
+  function findShipment(q) {
+    var m = q.toUpperCase().match(/CTL-\d{6}/);
+    if (m && byId[m[0]]) return m[0];
+    if (/\b(this|it|that)\b/i.test(q) || !m) return state.selected;
+    return null;
+  }
+  function needShipment() { bot("Which shipment? Click one in the list or include its number, for example " + D.card_example_id + "."); }
+
+  function customerFacing(x) {
+    var s = x.s, out = [];
+    x.r.reasons.forEach(function (q) {
+      if (q.factor === "dwell") out.push("it has not been scanned since the " + s.last_scan_label + " scan at " + s.last_scan_location);
+      if (q.factor === "slack" && s.days_to_promise >= 0) out.push("the transit time still to run is longer than the time left before the promised delivery");
+      if (q.factor === "customs") out.push(s.customs_status === "held" ? "it is held for customs checks" : "customs clearance is still in progress");
+      if (q.factor === "calendar") out.push(s.holiday_name ? s.holiday_name + " falls before the delivery date" : "a weekend falls before the delivery date");
+    });
+    return out;
+  }
+  function draftEmail(x) {
+    var s = x.s, causes = customerFacing(x);
+    return "Subject: Update on your order " + s.po_ref + " (shipment " + s.shipment_id + ")\n\n" +
+      "Dear " + s.customer + " team,\n\n" +
+      "We are keeping a close eye on your shipment " + s.shipment_id + " (order " + s.po_ref + ", " + s.pieces + " pieces), promised for " + s.promised_display + ". " +
+      (s.days_to_promise < 0
+        ? "It has not been delivered by the promised time" + (causes.length ? ", because " + causes.join(", and ") : "") + "."
+        : "There is a risk it will arrive later than promised because " +
+          (causes.length ? causes.join(", and ") : "our monitoring shows a higher than usual delay risk on this route") + ".") + "\n\n" +
+      "We have asked " + s.carrier + " to confirm where the goods are and a new delivery time. We will send you a confirmed time as soon as we have it, and an update within four hours either way.\n\n" +
+      "We are sorry for the uncertainty. If the delivery is time-critical for your production or customers, reply to this email and we will look at options with you.\n\n" +
+      "Kind regards,\nCustomer Service, Contoso Logistics";
+  }
+  function draftEscalation(x) {
+    var s = x.s, r = x.r;
+    return "To: " + s.carrier + " operations desk\nSubject: Escalation " + s.shipment_id + ": please confirm location and ETA within 2 hours\n\n" +
+      "Shipment " + s.shipment_id + " on lane " + s.lane + " to area " + s.area + " is flagged " + M.BAND_LABELS[r.band].toLowerCase() + " (risk score " + r.score + "/100).\n" +
+      "Last scan: " + s.last_scan_label + " at " + s.last_scan_location + ", " + M.ri(s.dwell_hours) + " h ago. Promised: " + s.promised_display + ".\n\n" +
+      "Please confirm:\n1. Physical location of the goods\n2. Next planned scan and revised delivery time\n3. Any damage, loss or customs issue\n\n" +
+      "Contoso Logistics control tower";
+  }
+
+  var INTENTS = [
+    { test: /(postcode|area|lost|loss)/i, run: function () {
+      var top = D.areas_ranked.slice(0, 5);
+      bot("Destination areas by loss rate over the last 12 months (network " + pct(D.network_loss_rate) + "):<table>" +
+        top.map(function (a, i) { return "<tr><td>" + (i + 1) + ".</td><td>" + a[0] + "</td><td>" + pct(a[1]) + "</td><td>" + a[2] + " shipments</td></tr>"; }).join("") +
+        "</table>Two areas stand well apart: <strong>" + top[0][0] + "</strong> and <strong>" + top[1][0] + "</strong>. They feed the area factor in every score.<span class=\"cite\">Source: Dataverse, closed shipments (synthetic)</span>");
+    } },
+    { test: /(backtest|accura|precision|recall|trust)/i, run: function () {
+      var c = bt.critical, a = bt.at_risk_or_above;
+      bot("Backtest on " + bt.test_snapshots + " closed shipments from " + bt.cutoff + " onward (" + pct(bt.test_late_rate) + " actually late):<ul>" +
+        "<li>Critical: " + c.flagged + " flagged, precision " + pct(c.precision) + ", recall " + pct(c.recall) + "</li>" +
+        "<li>At risk or above: " + a.flagged + " flagged, precision " + pct(a.precision) + ", recall " + pct(a.recall) + "</li>" +
+        "<li>Late rate by band: " + ["critical", "at_risk", "watch", "on_track"].map(function (b) { return M.BAND_LABELS[b] + " " + pct(bt.by_band[b].late_rate); }).join(", ") + "</li></ul>" +
+        "Critical is tuned to be almost always right, so it can page people. At risk or above catches " + pct(a.recall) + " of late shipments while they are still in transit.");
+    } },
+    { test: /(escalat|carrier)/i, run: function (q) {
+      var id = findShipment(q); if (!id) return needShipment();
+      if (id !== state.selected) select(id, false);
+      bot("Escalation draft for " + id + ", ready for the planner to send:<pre class=\"email\">" + esc(draftEscalation(byId[id])) + "</pre><span class=\"cite\">Topic: Escalate to carrier. Production: Power Automate sends it from the shared mailbox after approval.</span>");
+    } },
+    { test: /(draft|update|email|write)/i, run: function (q) {
+      var id = findShipment(q); if (!id) return needShipment();
+      if (id !== state.selected) select(id, false);
+      bot("Draft customer update for " + id + ". It uses only customer-safe reasons (no carrier or area statistics):<pre class=\"email\">" + esc(draftEmail(byId[id])) + "</pre><span class=\"cite\">Topic: Draft customer update. Sent only after a planner approves.</span>");
+    } },
+    { test: /(why|reason|explain)/i, run: function (q) {
+      var id = findShipment(q); if (!id) return needShipment();
+      select(id, false);
+      var x = byId[id];
+      bot("<strong>" + id + "</strong> " + tag(x.r.band) + " scores " + x.r.score + "/100. Main reasons:<ul>" +
+        x.r.reasons.map(function (r) { return "<li>" + esc(r.text) + " (+" + r.points.toFixed(1) + " points)</li>"; }).join("") +
+        "</ul>Every point comes from one of seven weighted factors; the breakdown is under the list.");
+    } },
+    { test: /(risk|late|delay|which|show|list)/i, run: function (q) {
+      var c = findCustomer(q);
+      if (!c) { bot("Which customer? For example: " + uniq("customer").slice(0, 3).join(", ") + "."); return; }
+      state.customer = c; $("fCustomer").value = c; state.band = "watch"; $("fBand").value = "watch"; render();
+      var list = rows.filter(function (x) { return x.s.customer === c && RANK[x.r.band] >= 2; }).sort(function (a, b) { return b.r.score - a.r.score; });
+      var watch = rows.filter(function (x) { return x.s.customer === c && x.r.band === "watch"; }).length;
+      var total = rows.filter(function (x) { return x.s.customer === c; }).length;
+      if (!list.length) { bot(c + " has " + total + " shipments in transit and none at risk. " + watch + " are on watch."); return; }
+      bot(c + " has " + total + " shipments in transit. " + list.length + " need attention:<ul>" +
+        list.map(function (x) { return "<li>" + tag(x.r.band) + "<strong>" + x.s.shipment_id + "</strong> (" + x.r.score + "): " + esc(x.r.reasons[0].text) + "</li>"; }).join("") +
+        "</ul>" + watch + " more are on watch. I have filtered the list to this customer.<span class=\"cite\">Topic: At-risk shipments for a customer</span>");
+      if (list[0]) select(list[0].s.shipment_id, false);
+    } }
+  ];
+  function ask(q) {
+    user(q);
+    for (var i = 0; i < INTENTS.length; i++) if (INTENTS[i].test.test(q)) { INTENTS[i].run(q); return; }
+    bot("I can list at-risk shipments for a customer, explain a score, draft a customer update, escalate to the carrier, rank postcode areas by loss, or show the backtest.");
+  }
+  $("ask").addEventListener("submit", function (e) { e.preventDefault(); var q = $("q").value.trim(); if (q) { ask(q); $("q").value = ""; } });
+
+  var top = rows.filter(function (x) { return x.s.shipment_id === D.card_example_id; })[0];
+  var SUGGEST = [
+    "Which shipments for " + top.s.customer + " are at risk?",
+    "Why is " + top.s.shipment_id + " at risk?",
+    "Draft customer update for " + top.s.shipment_id,
+    "Escalate " + top.s.shipment_id + " to carrier",
+    "Which postcode areas lose most shipments?",
+    "How accurate is the score?"
+  ];
+  $("suggest").innerHTML = SUGGEST.map(function (s) { return '<button type="button">' + esc(s) + "</button>"; }).join("");
+  $("suggest").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) ask(b.textContent); });
+
+  bot("Morning scan done at " + D.as_of_display + ": <strong>" + D.counts.critical + " critical</strong> and <strong>" + D.counts.at_risk + " at risk</strong> out of " + rows.length + " in-transit shipments. Critical alerts are already in the control tower channel. Try a suggestion below.");
+  render();
+
+  // ---------- URL states for screenshots: #state=critical | agent | customer ----------
+  var st = (location.hash.match(/state=(\w+)/) || [])[1];
+  if (st === "critical") { state.band = "critical"; $("fBand").value = "critical"; select(D.card_example_id, true); }
+  if (st === "agent") { ask(SUGGEST[1]); ask(SUGGEST[2]); }
+  if (st === "customer") { ask(SUGGEST[0]); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="t d">
+  <title id="t">Road-Toll Surcharge Recovery App architecture</title>
+  <desc id="d">Shipment data and illustrative toll rates flow into Dataverse, a Python toll model writes toll per shipment, a Power Apps canvas app with Copilot builds surcharge proposals, Power Automate routes tiered approvals to Teams, and Power BI shows the steering dashboard.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ff6b35"/></marker>
+    <style>
+      .h{font:600 22px 'Space Grotesk',Arial,sans-serif;fill:#fffdf8}
+      .b{font:600 17px 'Space Grotesk',Arial,sans-serif;fill:#fffdf8}
+      .s{font:400 14px Inter,Arial,sans-serif;fill:#fffdf8;fill-opacity:.82}
+      .k{font:600 12px 'Space Grotesk',Arial,sans-serif;fill:#0c2c23}
+      .box{fill:#244139;stroke:#fffdf8;stroke-opacity:.18}
+      .ln{stroke:#ff6b35;stroke-width:2.5;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1200" height="675" fill="#0c2c23"/>
+  <text x="40" y="52" class="h">Road-Toll Surcharge Recovery: architecture</text>
+  <text x="40" y="78" class="s">Contoso Logistics (fictional). Synthetic data. Toll rates illustrative, not an official tariff.</text>
+
+  <!-- Sources -->
+  <rect x="40" y="120" width="240" height="110" rx="12" class="box"/>
+  <text x="60" y="152" class="b">Shipment data</text>
+  <text x="60" y="176" class="s">TMS / ERP export:</text>
+  <text x="60" y="196" class="s">lane, truck class, pallets,</text>
+  <text x="60" y="216" class="s">weight, revenue, cost</text>
+
+  <rect x="40" y="260" width="240" height="100" rx="12" class="box"/>
+  <text x="60" y="292" class="b">Toll rate table</text>
+  <text x="60" y="316" class="s">EUR/km by CO2 class</text>
+  <text x="60" y="336" class="s">and weight class</text>
+
+  <rect x="40" y="390" width="240" height="120" rx="12" class="box"/>
+  <text x="60" y="422" class="b">Toll model (Python)</text>
+  <text x="60" y="446" class="s">toll.py: km x rate x share</text>
+  <text x="60" y="466" class="s">Azure Function or Fabric</text>
+  <text x="60" y="486" class="s">notebook, pytest tested</text>
+
+  <!-- Dataverse -->
+  <rect x="350" y="120" width="250" height="390" rx="12" class="box"/>
+  <rect x="370" y="136" width="96" height="22" rx="11" fill="#81cfb3"/><text x="381" y="152" class="k">Dataverse</text>
+  <text x="370" y="190" class="b">Tables</text>
+  <text x="370" y="218" class="s">Customers</text>
+  <text x="370" y="242" class="s">Shipments (toll EUR)</text>
+  <text x="370" y="266" class="s">Lanes</text>
+  <text x="370" y="290" class="s">TollRates</text>
+  <text x="370" y="314" class="s">SurchargeProposals</text>
+  <text x="370" y="352" class="b">Policy</text>
+  <text x="370" y="378" class="s">Tier thresholds as</text>
+  <text x="370" y="398" class="s">environment variables</text>
+  <text x="370" y="436" class="b">Security</text>
+  <text x="370" y="462" class="s">Account owner sees own</text>
+  <text x="370" y="482" class="s">customers; steering sees all</text>
+
+  <!-- App -->
+  <rect x="670" y="120" width="240" height="170" rx="12" class="box"/>
+  <rect x="690" y="136" width="96" height="22" rx="11" fill="#81a3da"/><text x="700" y="152" class="k">Power Apps</text>
+  <text x="690" y="190" class="b">Canvas app</text>
+  <text x="690" y="214" class="s">Customer impact list,</text>
+  <text x="690" y="234" class="s">method + recovery %,</text>
+  <text x="690" y="254" class="s">margin effect, Patch</text>
+  <text x="690" y="274" class="s">(Power Fx)</text>
+
+  <rect x="670" y="320" width="240" height="90" rx="12" class="box"/>
+  <rect x="690" y="336" width="140" height="22" rx="11" fill="#e8d67d"/><text x="700" y="352" class="k">Copilot in Power Apps</text>
+  <text x="690" y="388" class="s">Explains a customer's impact</text>
+
+  <rect x="670" y="430" width="240" height="80" rx="12" class="box"/>
+  <rect x="690" y="446" width="110" height="22" rx="11" fill="#e8d67d"/><text x="700" y="462" class="k">Copilot Studio</text>
+  <text x="690" y="494" class="s">Optional agent, 3 topics</text>
+
+  <!-- Flow and outputs -->
+  <rect x="970" y="120" width="190" height="170" rx="12" class="box"/>
+  <rect x="990" y="136" width="120" height="22" rx="11" fill="#81a3da"/><text x="1000" y="152" class="k">Power Automate</text>
+  <text x="990" y="190" class="b">Tiered approval</text>
+  <text x="990" y="214" class="s">Auto under limits</text>
+  <text x="990" y="234" class="s">Commercial manager</text>
+  <text x="990" y="254" class="s">Steering Committee</text>
+
+  <rect x="970" y="320" width="190" height="90" rx="12" class="box"/>
+  <rect x="990" y="336" width="60" height="22" rx="11" fill="#da81a7"/><text x="1000" y="352" class="k">Teams</text>
+  <text x="990" y="388" class="s">Adaptive approval cards</text>
+
+  <rect x="970" y="430" width="190" height="80" rx="12" class="box"/>
+  <rect x="990" y="446" width="80" height="22" rx="11" fill="#81cfb3"/><text x="1000" y="462" class="k">Power BI</text>
+  <text x="990" y="494" class="s">Steering dashboard, DAX</text>
+
+  <!-- Arrows -->
+  <path class="ln" d="M280 175 H346"/>
+  <path class="ln" d="M280 310 H346"/>
+  <path class="ln" d="M280 450 H346"/>
+  <path class="ln" d="M600 205 H666"/>
+  <path class="ln" d="M790 290 V316"/>
+  <path class="ln" d="M910 205 H966"/>
+  <path class="ln" d="M1065 290 V316"/>
+  <path class="ln" d="M600 470 H666"/>
+  <path class="ln" d="M600 490 C 800 600, 960 600, 1060 514"/>
+
+  <!-- Footer -->
+  <rect x="40" y="560" width="1120" height="76" rx="12" fill="none" stroke="#fffdf8" stroke-opacity=".18"/>
+  <text x="60" y="592" class="b">Flow</text>
+  <text x="120" y="592" class="s">Toll per shipment = tolled km x rate (CO2 class, weight class) x share of truck (pallet places or weight).</text>
+  <text x="120" y="616" class="s">Proposal per customer: flat per shipment, % of freight or per km; margin effect; tier decides the approver.</text>
+</svg>

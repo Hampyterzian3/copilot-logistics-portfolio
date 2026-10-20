@@ -1,0 +1,63 @@
+kind: AdaptiveDialog
+modelDescription: Compares the top six customers for a week on revenue, margin and on-time performance against their eight-week baselines and names the most material variance.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Compare customers
+    triggerQueries:
+      - Compare customers
+      - How do the top six compare this week
+      - Rank customers by margin change
+      - Which customer moved most
+
+  actions:
+    - kind: Question
+      id: askWeek
+      variable: init:Topic.WeekLabel
+      prompt: Which week? Say "latest" or a week such as 2026-W35.
+      entity: StringPrebuiltEntity
+      defaultValue: latest
+      alwaysPrompt: false
+
+    - kind: InvokeFlowAction
+      id: getCompare
+      flowId: 00000000-0000-0000-0000-000000000504
+      input:
+        binding:
+          weekLabel: =Topic.WeekLabel
+      output:
+        binding:
+          compareJson: Topic.CompareJson
+
+    - kind: ParseValue
+      id: parseCompare
+      variable: Topic.Rows
+      valueType:
+        kind: Table
+        properties:
+          customer: String
+          revenueVsBasePct: Number
+          marginVsBasePP: Number
+          otpVsBasePP: Number
+          topTag: String
+      value: =Topic.CompareJson
+
+    - kind: SendActivity
+      id: table
+      activity:
+        attachments:
+          - kind: AdaptiveCardTemplate
+            cardContent: |-
+              ={ type: "AdaptiveCard", version: "1.5",
+                 body: [
+                   { type: "TextBlock", text: "Against eight-week baseline, " & Topic.WeekLabel, weight: "Bolder" },
+                   { type: "Table", columns: [ { width: 3 }, { width: 2 }, { width: 2 }, { width: 2 }, { width: 2 } ],
+                     rows: ForAll(Topic.Rows, { type: "TableRow", cells: [
+                       { type: "TableCell", items: [ { type: "TextBlock", text: customer, wrap: true } ] },
+                       { type: "TableCell", items: [ { type: "TextBlock", text: Text(revenueVsBasePct, "+0.0%;-0.0%") } ] },
+                       { type: "TableCell", items: [ { type: "TextBlock", text: Text(marginVsBasePP, "+0.0;-0.0") & " pp" } ] },
+                       { type: "TableCell", items: [ { type: "TextBlock", text: Text(otpVsBasePP, "+0.0;-0.0") & " pp" } ] },
+                       { type: "TableCell", items: [ { type: "TextBlock", text: Coalesce(topTag, "Steady") } ] } ] }) },
+                   { type: "TextBlock", text: "Source: [Revenue vs Baseline %], [Margin % vs Baseline pp], [OTP % vs Baseline pp]", isSubtle: true, wrap: true }
+                 ] }

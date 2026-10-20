@@ -1,0 +1,41 @@
+customer_id,method,recovery_pct,unit_rate,toll_eur,surcharge_eur,increase_pct,margin_pct_before,margin_pct_after,tier
+C001,pct,100,4.65,814.93,815.0,4.65,13.03,12.45,Steering committee
+C002,pct,100,4.36,188.56,188.55,4.36,6.41,6.14,Commercial manager
+C003,pct,100,4.79,112.46,112.45,4.79,11.77,11.23,Commercial manager
+C004,pct,100,2.86,73.2,73.25,2.86,10.35,10.06,Auto-approved
+C005,pct,100,3.73,164.83,164.75,3.73,11.42,11.01,Commercial manager
+C006,pct,100,4.8,3231.99,3233.71,4.8,5.14,4.9,Steering committee
+C007,pct,100,4.45,478.88,478.66,4.45,7.6,7.27,Commercial manager
+C008,pct,100,3.07,457.56,457.01,3.07,14.77,14.32,Commercial manager
+C009,pct,100,4.03,145.86,145.95,4.03,6.04,5.81,Commercial manager
+C010,pct,100,4.61,61.07,61.02,4.61,11.14,10.65,Commercial manager
+C011,pct,100,4.03,146.41,146.29,4.03,12.0,11.53,Commercial manager
+C012,pct,100,2.84,200.21,200.43,2.84,10.64,10.35,Commercial manager
+C013,pct,100,4.51,143.01,143.1,4.51,12.18,11.65,Commercial manager
+C014,pct,100,3.87,158.35,158.52,3.87,6.36,6.13,Commercial manager
+C015,pct,100,2.87,83.99,84.03,2.87,12.02,11.69,Auto-approved
+C016,pct,100,4.75,152.13,152.11,4.75,7.82,7.47,Commercial manager
+C017,pct,100,4.86,106.54,106.62,4.86,5.85,5.58,Commercial manager
+C018,pct,100,4.66,78.76,78.68,4.66,6.34,6.06,Commercial manager
+C019,pct,100,5.95,311.07,310.88,5.95,5.82,5.49,Steering committee
+C020,pct,100,4.02,155.1,155.21,4.02,10.48,10.08,Commercial manager
+C021,pct,100,3.65,103.7,103.68,3.65,11.67,11.26,Commercial manager
+C022,pct,100,6.12,186.6,186.75,6.12,6.58,6.2,Steering committee
+C023,pct,100,5.47,145.97,145.97,5.47,5.97,5.66,Steering committee
+C024,pct,100,4.82,487.36,487.58,4.82,9.28,8.86,Commercial manager
+C025,pct,100,5.94,442.55,442.86,5.94,9.34,8.82,Steering committee
+C026,pct,100,4.19,289.37,289.08,4.19,9.63,9.24,Commercial manager
+C027,pct,100,5.12,1218.79,1218.19,5.12,5.76,5.48,Steering committee
+C028,pct,100,4.36,165.89,166.08,4.36,5.95,5.71,Commercial manager
+C029,pct,100,5.72,201.08,201.03,5.72,11.55,10.92,Steering committee
+C030,pct,100,3.64,65.09,65.17,3.64,5.03,4.86,Commercial manager
+C031,pct,100,5.16,145.81,145.83,5.16,13.86,13.18,Steering committee
+C032,pct,100,5.26,185.6,185.68,5.26,14.8,14.06,Steering committee
+C033,pct,100,2.73,156.78,156.81,2.73,9.29,9.04,Auto-approved
+C034,pct,100,4.86,295.36,295.58,4.86,10.58,10.1,Commercial manager
+C035,pct,100,4.93,107.72,107.68,4.93,15.21,14.5,Commercial manager
+C036,pct,100,6.07,191.42,191.49,6.07,14.13,13.32,Steering committee
+C037,pct,100,5.04,256.07,256.24,5.04,12.0,11.43,Steering committee
+C038,pct,100,5.22,203.35,203.26,5.22,14.53,13.8,Steering committee
+C039,pct,100,4.84,274.3,274.37,4.84,9.87,9.42,Commercial manager
+C040,pct,100,3.2,1020.5,1018.98,3.2,9.0,8.71,Steering committee

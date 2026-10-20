@@ -1,0 +1,86 @@
+kind: AdaptiveDialog
+modelDescription: Drafts the weekly executive account brief for the top six customers from the governed variance export. Use when the user asks for the weekly brief, the Monday summary or what changed this week.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Weekly brief
+    triggerQueries:
+      - Weekly brief
+      - Draft this week's account brief
+      - What changed for our top customers this week
+      - Give me the Monday summary
+      - Write the leadership brief for week 39
+
+  actions:
+    - kind: Question
+      id: askWeek
+      interruptionPolicy:
+        allowInterruption: true
+      variable: init:Topic.WeekLabel
+      prompt: Which week? Say "latest" or a week such as 2026-W39.
+      entity: StringPrebuiltEntity
+      defaultValue: latest
+      alwaysPrompt: false
+
+    - kind: InvokeFlowAction
+      id: getVariances
+      flowId: 00000000-0000-0000-0000-000000000501
+      input:
+        binding:
+          weekLabel: =Topic.WeekLabel
+      output:
+        binding:
+          weekResolved: Topic.Week
+          flaggedCount: Topic.FlaggedCount
+          briefJson: Topic.BriefJson
+          wordDraftUrl: Topic.WordDraftUrl
+          deckOutlineUrl: Topic.DeckOutlineUrl
+
+    - kind: ConditionGroup
+      id: hasData
+      conditions:
+        - id: noData
+          condition: =IsBlank(Topic.BriefJson)
+          actions:
+            - kind: SendActivity
+              id: noDataMsg
+              activity: I could not find a published variance export for {Topic.WeekLabel}. The Monday flow may not have run yet, so I will not draft anything without data.
+            - kind: EndDialog
+              id: endNoData
+
+    - kind: ParseValue
+      id: parseBrief
+      variable: Topic.Brief
+      valueType:
+        kind: Record
+        properties:
+          headline: { type: { kind: Record, properties: { text: String, refs: { type: { kind: Table, properties: { Value: String } } } } } }
+          things: { type: { kind: Table, properties: { text: String } } }
+          actions: { type: { kind: Table, properties: { text: String } } }
+      value: =Topic.BriefJson
+
+    - kind: SendActivity
+      id: sendBrief
+      activity:
+        attachments:
+          - kind: AdaptiveCardTemplate
+            cardContent: |-
+              ={
+                type: "AdaptiveCard", version: "1.5",
+                body: [
+                  { type: "TextBlock", text: "Weekly account brief " & Topic.Week & " (draft)", weight: "Bolder", size: "Medium" },
+                  { type: "TextBlock", text: Topic.Brief.headline.text, wrap: true },
+                  { type: "TextBlock", text: "Three things that matter", weight: "Bolder" },
+                  { type: "TextBlock", text: Concat(Topic.Brief.things, "- " & text, Char(10)), wrap: true },
+                  { type: "TextBlock", text: "Every sentence carries source tags that map to Power BI measures.", isSubtle: true, wrap: true }
+                ],
+                actions: [
+                  { type: "Action.OpenUrl", title: "Open Word draft", url: Topic.WordDraftUrl },
+                  { type: "Action.OpenUrl", title: "Open deck outline", url: Topic.DeckOutlineUrl }
+                ]
+              }
+
+    - kind: SendActivity
+      id: approvalNote
+      activity: Nothing has been sent to leadership. Say "approve and post" when you have reviewed it, or edit the Word draft first.

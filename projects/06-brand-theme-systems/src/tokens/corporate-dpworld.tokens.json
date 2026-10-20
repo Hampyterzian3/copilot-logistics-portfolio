@@ -1,0 +1,82 @@
+{
+  "$description": "Corporate theme: DP World, as applied in DPark (staff parking booking app). Extracted from dpark/src/styles/tokens.css and tailwind.config.ts. Colour values and token names only; no logo or font files.",
+  "$extensions": {
+    "brand": { "id": "corporate-dpworld", "name": "Corporate theme: DP World", "mode": "light canvas" },
+    "office": {
+      "dk1": "{color.dark}", "lt1": "{color.card}", "dk2": "{color.panel}", "lt2": "{color.pageBg}",
+      "accent1": "{color.accent}", "accent2": "{color.grad}", "accent3": "{color.pos}",
+      "accent4": "{color.warn}", "accent5": "{color.vis}", "accent6": "{color.mut}",
+      "hlink": "{color.grad}", "folHlink": "{color.vis}",
+      "majorFont": "Pilat Wide", "minorFont": "Pilat"
+    },
+    "powerapps": { "brandBase": "{color.panel}" },
+    "modes": {
+      "dark": {
+        "color.dark": "#08080e", "color.panel": "#1a1242", "color.grad": "#261a64",
+        "color.pageBg": "#0f0f19", "color.card": "#1a1a28", "color.mut": "#9e9eb8",
+        "color.line": "#2f2f44", "color.ink": "#f0eef5", "color.pos": "#00d07e", "color.vis": "#a78bfa"
+      }
+    },
+    "contrastPairs": [
+      { "label": "Body ink on page", "fg": "{role.cardText}", "bg": "{role.canvas}" },
+      { "label": "Ink on card", "fg": "{role.cardText}", "bg": "{role.card}" },
+      { "label": "Light text on side panel", "fg": "{color.txtL}", "bg": "{role.surface}" },
+      { "label": "Light text on panel gradient end", "fg": "{color.txtL}", "bg": "{color.grad}" },
+      { "label": "Muted label on card", "fg": "{color.mut}", "bg": "{role.card}" },
+      { "label": "Button text on accent", "fg": "{role.onAccent}", "bg": "{role.accent}" },
+      { "label": "Accent text on card", "fg": "{role.accent}", "bg": "{role.card}" },
+      { "label": "White on success", "fg": "#ffffff", "bg": "{role.success}" },
+      { "label": "White on warning", "fg": "#ffffff", "bg": "{role.warning}" },
+      { "label": "White on visitor violet", "fg": "#ffffff", "bg": "{role.info}" }
+    ]
+  },
+  "color": {
+    "$type": "color",
+    "dark":   { "$value": "#0f0f19" },
+    "panel":  { "$value": "#1e1450", "$description": "Side panel, primary brand indigo" },
+    "grad":   { "$value": "#2d1e7a", "$description": "Panel gradient end" },
+    "accent": { "$value": "#ff2261", "$description": "CTA, active state" },
+    "pos":    { "$value": "#00b86f", "$description": "Available bay" },
+    "posH":   { "$value": "#00e68c" },
+    "warn":   { "$value": "#d97706" },
+    "vis":    { "$value": "#7c3aed", "$description": "Visitor bays" },
+    "txtL":   { "$value": "#f5f3f5" },
+    "pageBg": { "$value": "#f4f6fb" },
+    "card":   { "$value": "#ffffff" },
+    "mut":    { "$value": "#6b6b85" },
+    "line":   { "$value": "#e6e8f0" },
+    "ink":    { "$value": "#1e1450" }
+  },
+  "role": {
+    "$type": "color",
+    "canvas":   { "$value": "{color.pageBg}" },
+    "surface":  { "$value": "{color.panel}" },
+    "text":     { "$value": "{color.ink}" },
+    "card":     { "$value": "{color.card}" },
+    "cardText": { "$value": "{color.ink}" },
+    "accent":   { "$value": "{color.accent}" },
+    "onAccent": { "$value": "#ffffff" },
+    "success":  { "$value": "{color.pos}" },
+    "warning":  { "$value": "{color.warn}" },
+    "danger":   { "$value": "{color.accent}" },
+    "info":     { "$value": "{color.vis}" }
+  },
+  "chart": {
+    "$type": "color",
+    "1": { "$value": "{color.panel}" },
+    "2": { "$value": "{color.accent}" },
+    "3": { "$value": "{color.pos}" },
+    "4": { "$value": "{color.warn}" },
+    "5": { "$value": "{color.vis}" }
+  },
+  "font": {
+    "$type": "fontFamily",
+    "heading": { "$value": ["Pilat Wide", "Pilat", "Segoe UI", "system-ui", "Arial", "sans-serif"], "$description": "Licensed corporate face; files are not part of this repo" },
+    "body":    { "$value": ["Pilat", "Segoe UI", "system-ui", "Roboto", "Helvetica", "Arial", "sans-serif"] }
+  },
+  "radius": {
+    "$type": "dimension",
+    "sm":   { "$value": "8px" },
+    "card": { "$value": "14px" }
+  }
+}

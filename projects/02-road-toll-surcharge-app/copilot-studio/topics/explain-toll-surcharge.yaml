@@ -1,0 +1,92 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Explain my toll surcharge
+    triggerQueries:
+      - Explain my toll surcharge
+      - Why is the toll so high for this customer
+      - What is the toll impact for C006
+      - Explain the surcharge for a customer
+      - How much toll do we pay for this account
+
+  actions:
+    - kind: Question
+      id: askCustomer
+      variable: Topic.CustomerCode
+      prompt: Which customer code (for example C006)?
+      entity: StringPrebuiltEntity
+      skipQuestionMode: SkipOnFirstExecutionIfVariableHasValue
+
+    - kind: InvokeFlowAction
+      id: getImpact
+      flowId: 00000000-0000-0000-0000-000000000201
+      input:
+        binding:
+          customerCode: =Topic.CustomerCode
+      output:
+        binding:
+          found: Topic.Found
+          shipments: Topic.Shipments
+          tollEur: Topic.TollEur
+          tollPct: Topic.TollPct
+          tolledShare: Topic.TolledShare
+          marginBefore: Topic.MarginBefore
+          marginAbsorbed: Topic.MarginAbsorbed
+          topLanes: Topic.TopLanes
+          tier: Topic.Tier
+
+    - kind: ConditionGroup
+      id: checkFound
+      conditions:
+        - id: notFound
+          condition: =Topic.Found = false
+          actions:
+            - kind: SendActivity
+              id: sayNotFound
+              activity: I could not find customer {Topic.CustomerCode}. Check the code in the app's customer list.
+            - kind: EndDialog
+              id: endNotFound
+
+    - kind: SendActivity
+      id: sayImpact
+      activity: |-
+        **{Topic.CustomerCode}**: {Topic.Shipments} shipments, {Text(Topic.TolledShare, "0%")} of km on tolled roads.
+        - Toll allocated: EUR {Text(Topic.TollEur, "#,##0.00")} ({Text(Topic.TollPct, "0.00%")} of freight)
+        - Margin {Text(Topic.MarginBefore, "0.0%")} before toll, {Text(Topic.MarginAbsorbed, "0.0%")} if absorbed
+        - Biggest lanes: {Topic.TopLanes}
+        - Default proposal tier: {Topic.Tier}
+        Rates in this environment are illustrative, not an official tariff.
+
+    - kind: Question
+      id: askNext
+      variable: Topic.Next
+      prompt: Do you want to compare recovery methods or see why this tier applies?
+      entity:
+        kind: EmbeddedEntity
+        definition:
+          kind: ClosedListEntity
+          items:
+            - id: compare
+              displayName: Compare recovery methods
+            - id: tier
+              displayName: Why this approval tier
+            - id: none
+              displayName: No, thanks
+
+    - kind: ConditionGroup
+      id: route
+      conditions:
+        - id: goCompare
+          condition: =Topic.Next = 'compare'
+          actions:
+            - kind: BeginDialog
+              id: toCompare
+              dialog: cr_tollagent.topic.CompareRecoveryMethods
+        - id: goTier
+          condition: =Topic.Next = 'tier'
+          actions:
+            - kind: BeginDialog
+              id: toTier
+              dialog: cr_tollagent.topic.WhyApprovalTier

@@ -1,0 +1,110 @@
+{
+  "$comment": "Definition sketch of 'Tender Desk - Run RFQ check'. Connection references and site/library ids are placeholders; build the flow in the designer and compare.",
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "triggers": {
+      "When_an_RFQ_folder_is_created": {
+        "type": "OpenApiConnection",
+        "inputs": {
+          "host": { "connectionName": "shared_sharepointonline", "operationId": "GetOnUpdatedFileItems", "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline" },
+          "parameters": { "dataset": "https://contoso.sharepoint.com/sites/TenderDesk", "table": "<RFQ Library list id>" }
+        },
+        "recurrence": { "frequency": "Minute", "interval": 5 },
+        "conditions": [
+          { "expression": "@and(equals(triggerBody()?['{IsFolder}'], true), equals(triggerBody()?['{VersionNumber}'], '1.0'))" }
+        ]
+      }
+    },
+    "actions": {
+      "Get_lanes": {
+        "type": "OpenApiConnection",
+        "inputs": {
+          "host": { "connectionName": "shared_sharepointonline", "operationId": "GetFileContentByPath", "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline" },
+          "parameters": { "dataset": "https://contoso.sharepoint.com/sites/TenderDesk", "path": "@{triggerBody()?['{FullPath}']}/lanes.csv" }
+        }
+      },
+      "Get_requirements": {
+        "runAfter": { "Get_lanes": ["Succeeded"] },
+        "type": "OpenApiConnection",
+        "inputs": {
+          "host": { "connectionName": "shared_sharepointonline", "operationId": "GetFileContentByPath", "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline" },
+          "parameters": { "dataset": "https://contoso.sharepoint.com/sites/TenderDesk", "path": "@{triggerBody()?['{FullPath}']}/requirements.md" }
+        }
+      },
+      "CheckRfq": {
+        "runAfter": { "Get_requirements": ["Succeeded"] },
+        "type": "OpenApiConnection",
+        "inputs": {
+          "host": { "connectionName": "shared_tenderdeskchecker", "operationId": "CheckRfq", "apiId": "/providers/Microsoft.PowerApps/apis/shared_tenderdeskchecker" },
+          "parameters": {
+            "body/lanes_csv": "@{base64ToString(body('Get_lanes')?['$content'])}",
+            "body/requirements_md": "@{base64ToString(body('Get_requirements')?['$content'])}",
+            "body/meta/id": "@{triggerBody()?['{Name}']}"
+          }
+        },
+        "limit": { "timeout": "PT2M" }
+      },
+      "Add_tender_row": {
+        "runAfter": { "CheckRfq": ["Succeeded"] },
+        "type": "OpenApiConnection",
+        "inputs": {
+          "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "CreateRecord", "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps" },
+          "parameters": {
+            "entityName": "cr7a1_tenders",
+            "item/cr7a1_title": "@{triggerBody()?['{Name}']}",
+            "item/cr7a1_rfqfolder": "@{triggerBody()?['{FullPath}']}",
+            "item/cr7a1_lanecount": "@body('CheckRfq')?['scope']?['lane_count']",
+            "item/cr7a1_readinesspct": "@body('CheckRfq')?['summary']?['readiness_pct']",
+            "item/cr7a1_gapshigh": "@body('CheckRfq')?['summary']?['gaps_by_severity']?['high']",
+            "item/cr7a1_countries": "@{join(body('CheckRfq')?['scope']?['countries'], ', ')}"
+          }
+        }
+      },
+      "Apply_to_each_gap": {
+        "runAfter": { "Add_tender_row": ["Succeeded"] },
+        "type": "Foreach",
+        "foreach": "@body('CheckRfq')?['gaps']",
+        "actions": {
+          "Add_gap_row": {
+            "type": "OpenApiConnection",
+            "inputs": {
+              "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "CreateRecord", "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps" },
+              "parameters": {
+                "entityName": "cr7a1_rfqgaps",
+                "item/cr7a1_ruleid": "@items('Apply_to_each_gap')?['rule_id']",
+                "item/cr7a1_severity": "@items('Apply_to_each_gap')?['severity']",
+                "item/cr7a1_laneid": "@items('Apply_to_each_gap')?['lane_id']",
+                "item/cr7a1_message": "@items('Apply_to_each_gap')?['message']",
+                "item/cr7a1_Tender@odata.bind": "/cr7a1_tenders(@{body('Add_tender_row')?['cr7a1_tenderid']})"
+              }
+            }
+          }
+        }
+      },
+      "Create_summary_file": {
+        "runAfter": { "Apply_to_each_gap": ["Succeeded"] },
+        "type": "OpenApiConnection",
+        "inputs": {
+          "host": { "connectionName": "shared_sharepointonline", "operationId": "CreateFile", "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline" },
+          "parameters": { "dataset": "https://contoso.sharepoint.com/sites/TenderDesk", "folderPath": "@{triggerBody()?['{FullPath}']}", "name": "rfq-summary.md", "body": "@{body('CheckRfq')?['markdown']}" }
+        }
+      },
+      "Post_card_to_Teams": {
+        "runAfter": { "Create_summary_file": ["Succeeded"] },
+        "type": "OpenApiConnection",
+        "inputs": {
+          "host": { "connectionName": "shared_teams", "operationId": "PostCardToConversation", "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams" },
+          "parameters": {
+            "poster": "Flow bot",
+            "location": "Channel",
+            "body/recipient/groupId": "<Tender Desk team id>",
+            "body/recipient/channelId": "<New RFQs channel id>",
+            "body/messageBody": "{\"type\":\"AdaptiveCard\",\"version\":\"1.5\",\"body\":[{\"type\":\"TextBlock\",\"size\":\"Medium\",\"weight\":\"Bolder\",\"text\":\"RFQ checked: @{triggerBody()?['{Name}']}\"},{\"type\":\"FactSet\",\"facts\":[{\"title\":\"Lanes\",\"value\":\"@{body('CheckRfq')?['scope']?['lane_count']}\"},{\"title\":\"Ready to price\",\"value\":\"@{body('CheckRfq')?['summary']?['readiness_pct']}%\"},{\"title\":\"High gaps\",\"value\":\"@{body('CheckRfq')?['summary']?['gaps_by_severity']?['high']}\"}]}]}"
+          }
+        }
+      }
+    },
+    "outputs": {}
+  }
+}

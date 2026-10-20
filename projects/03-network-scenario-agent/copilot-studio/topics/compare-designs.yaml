@@ -1,0 +1,53 @@
+kind: AdaptiveDialog
+modelDescription: Compares direct full-load, regional milk-run, cross-dock and best mix on cost, CO2, truck trips and plant arrivals for the last scenario.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Compare designs
+    triggerQueries:
+      - Compare designs
+      - Milk-run versus cross-dock
+      - Which design has the lowest CO2
+      - How many trucks does each design need
+      - Show me the trade-offs
+
+  actions:
+    - kind: ConditionGroup
+      id: needScenario
+      conditions:
+        - id: noScenarioYet
+          condition: =IsBlank(Global.LastScenario)
+          actions:
+            - kind: BeginDialog
+              id: runFirst
+              dialog: cr_networkagent.topic.RunAScenario
+
+    - kind: SendActivity
+      id: sendCard
+      activity:
+        attachments:
+          - kind: AdaptiveCardTemplate
+            cardContent: |-
+              ={
+                type: "AdaptiveCard",
+                version: "1.5",
+                body: [
+                  { type: "TextBlock", text: "Designs per week", weight: "Bolder" },
+                  { type: "FactSet", facts: [
+                    { title: "Direct full-load", value: "EUR " & Text(Global.LastScenario.direct.cost_week, "#,##0") & " | " & Text(Global.LastScenario.direct.co2_t_week, "0.0") & " t | " & Global.LastScenario.direct.trucks_week & " trips" },
+                    { title: "Regional milk-run", value: "EUR " & Text(Global.LastScenario.milkrun.cost_week, "#,##0") & " | " & Text(Global.LastScenario.milkrun.co2_t_week, "0.0") & " t | " & Global.LastScenario.milkrun.trucks_week & " trips" },
+                    { title: "Cross-dock", value: "EUR " & Text(Global.LastScenario.crossdock.cost_week, "#,##0") & " | " & Text(Global.LastScenario.crossdock.co2_t_week, "0.0") & " t | " & Global.LastScenario.crossdock.trucks_week & " trips" },
+                    { title: "Best mix", value: "EUR " & Text(Global.LastScenario.bestmix.cost_week, "#,##0") & " | " & Text(Global.LastScenario.bestmix.co2_t_week, "0.0") & " t | " & Global.LastScenario.bestmix.trucks_week & " trips" }
+                  ]}
+                ]
+              }
+
+    - kind: SearchAndSummarizeContent
+      id: explainTradeOffs
+      variable: Topic.TradeOffText
+      userInput: ="Explain the trade-off between these designs in three bullets, using only these numbers: " & JSON(Global.LastScenario)
+
+    - kind: SendActivity
+      id: sendTradeOffs
+      activity: "{Topic.TradeOffText}"

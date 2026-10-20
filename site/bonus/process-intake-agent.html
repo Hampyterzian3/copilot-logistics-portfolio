@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="Hampy Terzian">
+<title>Process Intake Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Pixelify+Sans:wght@500;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--green:#0c2c23;--off:#fffdf8;--orange:#ff6b35;--lime:#81cfb3;--blue:#81a3da;--blue-soft:#b0c6e8;--pink:#da81a7;--pink-soft:#e8b0c6;--yellow:#e8d67d;--surface:#244139}
+@page{size:A4;margin:0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--off);color:var(--green);font:12px/1.42 Inter,Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:296mm;overflow:hidden;margin:0 auto;display:flex;flex-direction:column}
+header{background:var(--green);color:var(--off);padding:11mm 14mm 8mm}
+.logo{height:34px;width:auto;display:block;margin-bottom:6mm}
+.badge{display:inline-block;font:600 10px/1 Inter,Arial,sans-serif;letter-spacing:.025em;text-transform:uppercase;border:1px solid rgba(255,253,248,.3);border-radius:999px;padding:5px 9px;margin-bottom:4mm}
+h1{font:700 52px/0.95 "Pixelify Sans","Space Grotesk",Arial,sans-serif;margin-bottom:4mm}
+h1 em{font-style:normal;color:var(--orange)}
+.lead{font-size:14px;line-height:1.45;max-width:165mm;color:rgba(255,253,248,.85)}
+main{padding:6mm 14mm 0;display:grid;grid-template-columns:1fr 1fr;gap:5mm 8mm;flex:1}
+section h2{font:600 16px/1.2 "Space Grotesk",Inter,Arial,sans-serif;display:flex;align-items:baseline;gap:8px;margin-bottom:2.5mm}
+.num{font:700 16px/1 "Space Grotesk",Arial,sans-serif;color:var(--orange)}
+ul{list-style:none}
+li{padding-left:14px;position:relative;margin-bottom:1.2mm}
+li::before{content:"";position:absolute;left:0;top:.5em;width:6px;height:6px;background:var(--orange)}
+.full{grid-column:1/-1}
+.routes{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm}
+.route{border:1px solid var(--green);border-radius:12px;padding:3mm;font-size:11.5px}
+.route b{display:block;font:600 13px/1.2 "Space Grotesk",Arial,sans-serif;margin-bottom:1mm}
+.r1{background:var(--pink-soft)}.r2{background:var(--blue-soft)}.r3{background:var(--lime)}.r4{background:var(--yellow)}
+.flow{display:flex;gap:2mm;align-items:stretch;font-size:11.5px}
+.step{flex:1;background:var(--surface);color:var(--off);border-radius:12px;padding:3mm}
+.step b{display:block;font:600 12.5px/1.2 "Space Grotesk",Arial,sans-serif;color:var(--off);margin-bottom:1mm}
+.step .n{font:700 14px/1 "Space Grotesk",Arial,sans-serif;color:var(--orange)}
+.chips{display:flex;flex-wrap:wrap;gap:2mm}
+.chip{border:1px solid var(--green);border-radius:12px;padding:1.5mm 3mm;font-size:11.5px;background:#fff}
+footer{margin-top:auto;padding:5mm 14mm;border-top:1px solid rgba(12,44,35,.15);display:flex;justify-content:space-between;font-size:10.5px;color:rgba(12,44,35,.75)}
+@media screen and (max-width:820px){.page{width:auto;height:auto}header,main,footer{padding-left:16px;padding-right:16px}main{grid-template-columns:1fr}.routes{grid-template-columns:1fr 1fr}.flow{flex-direction:column}h1{font-size:40px}}
+</style></head>
+<body><div class="page">
+<header>
+  <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -5 57 20" role="img" aria-label="hampy" shape-rendering="crispEdges"><g fill="#fffdf8"><rect x="0" y="-4" width="2" height="14"/><rect x="0" y="0" width="6" height="1"/><rect x="0" y="1" width="7" height="1"/><rect x="5" y="2" width="3" height="1"/><rect x="6" y="3" width="2" height="7"/><rect x="0" y="2" width="2" height="8"/><rect x="9" y="0" width="6" height="1"/><rect x="9" y="1" width="7" height="1"/><rect x="14" y="2" width="3" height="1"/><rect x="15" y="3" width="2" height="7"/><rect x="10" y="4" width="5" height="2"/><rect x="9" y="5" width="2" height="4"/><rect x="10" y="8" width="5" height="2"/><rect x="18" y="0" width="6" height="1"/><rect x="25" y="0" width="4" height="1"/><rect x="18" y="1" width="12" height="1"/><rect x="18" y="2" width="2" height="8"/><rect x="23" y="2" width="2" height="8"/><rect x="28" y="2" width="2" height="8"/><rect x="31" y="0" width="2" height="14"/><rect x="31" y="0" width="6" height="1"/><rect x="31" y="1" width="7" height="1"/><rect x="36" y="2" width="3" height="1"/><rect x="37" y="3" width="2" height="4"/><rect x="36" y="7" width="3" height="1"/><rect x="31" y="8" width="7" height="1"/><rect x="31" y="9" width="6" height="1"/><rect x="40" y="0" width="2" height="7"/><rect x="40" y="7" width="3" height="1"/><rect x="41" y="8" width="7" height="1"/><rect x="42" y="9" width="6" height="1"/><rect x="46" y="0" width="2" height="12"/><rect x="45" y="11" width="3" height="1"/><rect x="40" y="12" width="7" height="1"/><rect x="40" y="13" width="6" height="1"/></g><g fill="#ff6b35"><rect x="50" y="0" width="5" height="10"/></g></svg>
+  <span class="badge">Personal demo build · Microsoft Copilot Studio</span>
+  <h1>Process Intake <em>Agent</em></h1>
+  <p class="lead">An AI agent that interviews a business user about a manual process, scores it against a transparent rubric and recommends the right automation route, so ideas reach the automation team as a clear, comparable intake instead of an email.</p>
+</header>
+<main>
+  <section>
+    <h2><span class="num">01</span>Problem</h2>
+    <ul>
+      <li>Automation requests arrive as vague emails; consultants spend the first meeting collecting basics.</li>
+      <li>Teams over-reach for pro-code, or automate steps that should be removed.</li>
+      <li>Risk is spotted late: credit, payments and personal data need review before design.</li>
+    </ul>
+  </section>
+  <section>
+    <h2><span class="num">02</span>What it does</h2>
+    <ul>
+      <li>Asks 8 short questions, one at a time, and skips what is already known.</li>
+      <li>Scores six criteria 0 to 3 (volume, rules, data, stability, systems, time).</li>
+      <li>Estimates hours saved with the formula shown, as a range.</li>
+      <li>Produces a structured intake summary card ready for the backlog.</li>
+    </ul>
+  </section>
+  <section class="full">
+    <h2><span class="num">03</span>Four routes, one recommendation</h2>
+    <div class="routes">
+      <div class="route r1"><b>Not worth automating</b>Low score or under 40 hours a year. Simplify or remove the step.</div>
+      <div class="route r2"><b>Out of the box</b>Personal productivity on documents and email: Microsoft 365 Copilot.</div>
+      <div class="route r3"><b>Low-code</b>Team processes on M365 and standard connectors: Copilot Studio, Power Automate.</div>
+      <div class="route r4"><b>Pro-code</b>High volume, core system APIs or complex logic: engineering backlog.</div>
+    </div>
+  </section>
+  <section class="full">
+    <h2><span class="num">04</span>How it is built</h2>
+    <div class="flow">
+      <div class="step"><span class="n">1</span><b>Instructions</b>Role, 8-step flow, scope, tone and refusal rules.</div>
+      <div class="step"><span class="n">2</span><b>Knowledge</b>One playbook as the only source; web search off.</div>
+      <div class="step"><span class="n">3</span><b>Topics</b>Deterministic PII guard, escalation and out-of-scope.</div>
+      <div class="step"><span class="n">4</span><b>Card</b>Adaptive Card summary with log or edit actions.</div>
+      <div class="step"><span class="n">5</span><b>Flow</b>Optional Power Automate tool logs the intake to Excel.</div>
+    </div>
+  </section>
+  <section>
+    <h2><span class="num">05</span>Guardrails</h2>
+    <ul>
+      <li>Grounded in a single knowledge source with citations; says when the playbook does not cover a question.</li>
+      <li>Never asks for or repeats personal data; a topic stops the conversation if it is pasted.</li>
+      <li>High-risk processes always routed to human review; the agent recommends, a consultant confirms.</li>
+      <li>No memory; the log stores process descriptions only.</li>
+    </ul>
+  </section>
+  <section>
+    <h2><span class="num">06</span>Testing and reuse</h2>
+    <ul>
+      <li>Test set of 8 scenarios: happy path, honest "not worth it", high risk, pasted IBAN, off-topic, hand-off, unknown answer.</li>
+      <li>Run in Copilot Studio Preview and Evaluate before recording.</li>
+      <li>Reusable: swap the playbook to run intake for HR, procurement or operations.</li>
+    </ul>
+    <div class="chips" style="margin-top:3mm">
+      <span class="chip">Copilot Studio</span><span class="chip">Generative orchestration</span><span class="chip">Adaptive Cards</span><span class="chip">Power Automate</span><span class="chip">Power Fx</span>
+    </div>
+  </section>
+</main>
+<footer><span>Hampy Terzian · Fictional organisation (Contoso Bank) and data, built for demonstration.</span><span>linkedin.com/in/hampy-terzian-58322ba6</span></footer>
+</div></body></html>

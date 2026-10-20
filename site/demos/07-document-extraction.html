@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invoice Intake Simulation</title>
+<meta name="description" content="Simulated run of the Invoice Intake Agent: extracted invoice fields, deterministic validation checks, approved register, exception queue with reasons, audit trail and an exception assistant.">
+<link rel="icon" href="../assets/brand/hampy-favicon-64.png">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/demo.css">
+<style>
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+  .app .btn.light { background: transparent; color: var(--green); border: 1px solid rgba(12,44,35,.35); }
+  .app .btn.small { padding: 6px 10px; font-size: 13px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; }
+  .tabs button { background: transparent; border: 1px solid rgba(12,44,35,.25); color: var(--green); border-radius: var(--r-xl); padding: 5px 12px; font: 600 12px var(--font-heading); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--green); color: var(--offwhite); border-color: var(--green); }
+  .app tr.row { cursor: pointer; }
+  .app tr.row:hover td, .app tr.row.sel td { background: rgba(129,163,218,.18); }
+  .detail { margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(12,44,35,.15); display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
+  @media (max-width: 640px) { .detail { grid-template-columns: 1fr; } }
+  .detail h4 { margin: 0 0 6px; font-size: 14px; }
+  .conf { display: inline-block; width: 46px; height: 6px; border-radius: 3px; background: rgba(12,44,35,.12); vertical-align: middle; margin-right: 6px; position: relative; overflow: hidden; }
+  .conf i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--green); }
+  .checks { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+  .checks li { display: flex; gap: 8px; align-items: baseline; padding: 4px 0; border-bottom: 1px solid rgba(12,44,35,.08); }
+  .checks .r { font-size: 12px; opacity: .8; }
+  .exc { border: 1px solid rgba(12,44,35,.15); border-radius: var(--r-xl); padding: 12px; margin-bottom: 10px; }
+  .exc .hd { font: 600 14px var(--font-heading); margin-bottom: 6px; overflow-wrap: anywhere; }
+  .exc ul { margin: 6px 0; padding-left: 18px; font-size: 13px; }
+  .exc .act { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .exc .act input { flex: 1 1 160px; width: auto; }
+  .empty { padding: 18px; text-align: center; opacity: .75; font-size: 14px; }
+  .sim-note { font-size: 12px; opacity: .75; margin: 8px 0 0; }
+  .card-ac select { width: 100%; margin: 6px 0; padding: 6px; border-radius: var(--r-sm); border: 1px solid rgba(12,44,35,.3); font: 13px var(--font-body); }
+  .card-ac .btn { padding: 6px 12px; font-size: 13px; }
+  .msg code { font-size: 12px; }
+</style>
+</head>
+<body>
+<header class="demo-top">
+  <a class="back" href="../index.html#p07">&larr; Portfolio</a>
+  <img src="../assets/brand/hampy-logo-offwhite.svg" alt="hampy">
+  <span class="demo-badge">Simulated demo</span>
+  <span class="title">Document data extraction</span>
+</header>
+
+<main class="demo-wrap">
+  <section class="demo-intro">
+    <h1>Invoice intake, simulated</h1>
+    <p>This page replays the logic of the Invoice Intake Agent I built in Python on 12 of its synthetic invoices. The validation checks are a line-by-line port of its <code>validate.py</code> and run in your browser. Extracted fields come from the app's ground-truth file; the confidence scores are illustrative, because the built app's rule-based reader does not produce them. The agent panel simulates the Copilot Studio exception assistant from the Power Platform design.</p>
+  </section>
+
+  <div class="demo-grid">
+    <section class="app" aria-label="Invoice intake app">
+      <div class="app-bar"><span class="dot"></span>Invoice intake <span style="margin-left:auto;font-weight:500;font-size:12px">AP workspace</span></div>
+      <div class="app-body">
+        <div class="toolbar">
+          <button class="btn" id="runBtn" type="button">Run intake (12 invoices)</button>
+          <button class="btn light" id="resetBtn" type="button">Reset</button>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="v" id="kProc">0</div><div class="l">invoices processed</div></div>
+          <div class="kpi"><div class="v" id="kAuto">0</div><div class="l">auto-approved</div></div>
+          <div class="kpi"><div class="v" id="kExc">0</div><div class="l">waiting for review</div></div>
+          <div class="kpi"><div class="v" id="kMin">0</div><div class="l">minutes of keying saved</div></div>
+        </div>
+        <div class="tabs" role="tablist">
+          <button role="tab" data-tab="extract" aria-selected="true">Extraction</button>
+          <button role="tab" data-tab="register" aria-selected="false">Register</button>
+          <button role="tab" data-tab="queue" aria-selected="false">Exception queue</button>
+          <button role="tab" data-tab="audit" aria-selected="false">Audit trail</button>
+        </div>
+        <div id="view"></div>
+        <p class="sim-note">Time saved uses the app's own formula: 3 minutes per auto-approved invoice, 2 minutes per exception (3 minutes keying minus 1 minute review).</p>
+      </div>
+    </section>
+
+    <aside class="copilot" aria-label="Exception assistant">
+      <div class="copilot-head"><img src="../assets/brand/hampy-agent-icon.png" alt="">Exception assistant <span class="tag info" style="margin-left:auto">simulation</span></div>
+      <div class="copilot-log" id="log" aria-live="polite"></div>
+      <div class="suggest" id="suggest">
+        <button type="button">Show today's exceptions</button>
+        <button type="button">Why was invoice_027 held?</button>
+        <button type="button">Release invoice_027</button>
+        <button type="button">Why was invoice_035 held?</button>
+        <button type="button">Release invoice_044</button>
+        <button type="button">Which checks run?</button>
+      </div>
+      <form class="copilot-input" id="chatForm">
+        <input id="chatIn" type="text" placeholder="Ask about an invoice, e.g. why was invoice_043 held" aria-label="Message">
+        <button class="btn" type="submit">Send</button>
+      </form>
+    </aside>
+  </div>
+
+  <div class="stack-note">
+    <strong>How this maps to Microsoft components in production.</strong>
+    Inbox and upload: <strong>SharePoint document library</strong> or <strong>Outlook</strong> shared mailbox trigger in <strong>Power Automate</strong>.
+    Extraction table and confidence: <strong>AI Builder</strong> invoice processing (prebuilt) or a custom document processing model.
+    Validation checks: <strong>Power Automate</strong> conditions with lookups to <strong>Dataverse</strong> vendor and purchase order tables.
+    Register, exception queue and audit trail: <strong>Dataverse</strong> tables surfaced in a <strong>Power Apps</strong> model-driven app, with a <strong>Teams</strong> adaptive card for the reviewer.
+    Exception assistant: <strong>Copilot Studio</strong> agent with three topics reading and updating Dataverse.
+    The built Python app does the same with pdfplumber or Claude for extraction, SQLite for the register and audit log, and Streamlit for the UI.
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  // Sample from the Invoice Intake Agent synthetic set (data/ground_truth.csv and data/master/*.csv, seed 7). Fictional data.
+  var DATA = {
+    vendors: [
+      ["V001","Northwind Office Supplies B.V.","NL812345671B01"],["V002","Delta Freight Services B.V.","NL823456782B01"],
+      ["V003","Kestrel IT Solutions B.V.","NL834567893B01"],["V004","Harbourline Facility Care","NL845678904B01"],
+      ["V007","Polder Energy Partners B.V.","NL878901237B01"],["V008","Ironbridge Security Services","NL889012348B01"],
+      ["V009","Canalside Legal Advisory","NL890123459B01"],["V010","Lumen Cloud Hosting B.V.","NL801234560B01"],
+      ["V011","Greenfield Waste Solutions","NL811223344B01"]
+    ],
+    pos: [
+      ["PO-4500100","V001",3295.27],["PO-4500101","V002",1631.17],["PO-4500107","V008",5061.53],["PO-4500109","V010",4351.67],
+      ["PO-4500126","V003",3147.60],["PO-4500127","V004",8031.14],["PO-4500132","V009",5449.30],["PO-4500142","V007",7821.93],
+      ["PO-4500146","V011",5232.39]
+    ],
+    invoices: [
+      ["invoice_001.pdf","A","Northwind Office Supplies B.V.","NL812345671B01","001-20268767","2026-10-15","PO-4500100",3295.27,692.01,3987.28],
+      ["invoice_002.pdf","B","Delta Freight Services B.V.","NL823456782B01","002-20262918","2026-10-02","PO-4500101",1630.67,342.44,1973.11],
+      ["invoice_008.pdf","B","Ironbridge Security Services","NL889012348B01","008-20266571","2026-10-09","PO-4500107",5061.53,1062.92,6124.45],
+      ["invoice_010.pdf","A","Shadowbrook Consulting Ltd","GB999888777","010-20265132","2026-09-23","PO-4500109",4351.67,913.85,5265.52],
+      ["invoice_026.pdf","B","Delta Freight Services B.V.","NL823456782B01","002-20265960","2026-09-08","PO-4599025",1313.16,275.76,1588.92],
+      ["invoice_027.pdf","C","Kestrel IT Solutions B.V.","NL834567893B01","003-20264597","2026-09-07","PO-4500126",3389.55,305.06,3694.61],
+      ["invoice_028.pdf","A","Harbourline Facility Care","NL845678904B01","004-20266556","2026-09-27","PO-4500127",8031.14,831.22,8862.36],
+      ["invoice_033.pdf","C","Canalside Legal Advisory","NL890123459B01","009-20267844","2026-09-18","PO-4500132",5449.30,1144.35,6593.65],
+      ["invoice_035.pdf","B","Canalside Legal Advisory","NL890123459B01","009-20267844","2026-09-18","PO-4500132",5449.30,1144.35,6593.65],
+      ["invoice_037.pdf","A","Northwind Office Supplies B.V.","NL812345671B01","001-20269110","2026-10-05",null,6725.45,605.29,7330.74],
+      ["invoice_043.pdf","A","Polder Energy Partners B.V.","NL878901237B01","007-20267545","2026-10-08","PO-4500142",7841.77,1646.77,9498.54],
+      ["invoice_044.pdf","B","Ironbridge Security Services","NL889012348B01","008-20267381","2026-09-21","PO-4500146",6904.33,1449.91,8354.24]
+    ]
+  };
+
+  // ---- Port of intake/validate.py ----
+  var VAT_RATES = [0.21, 0.09, 0.0], CENT = 0.02;
+  var RULES = { amount_tolerance: 0.01, vendor_match_score: 90 };
+  var REQUIRED = ["vendor_name","invoice_number","invoice_date","net_amount","vat_amount","total_amount"];
+  var LABEL = { EXTRACTION_INCOMPLETE: "Fields missing", UNKNOWN_VENDOR: "Unknown vendor", MISSING_PO: "Missing PO",
+    PO_NOT_FOUND: "PO not found", PO_VENDOR_MISMATCH: "PO of another vendor", AMOUNT_MISMATCH: "Amount differs from PO",
+    VAT_MISMATCH: "VAT incorrect", TOTAL_MISMATCH: "Total does not add up", DUPLICATE: "Duplicate" };
+  // Release policy from the Power Platform design (copilot-studio/topics/release-invoice.yaml), not in the Python app.
+  var RELEASABLE = ["AMOUNT_MISMATCH","MISSING_PO","PO_NOT_FOUND"];
+
+  var byVat = {}, byName = {}, pos = {};
+  DATA.vendors.forEach(function (v) { var o = { vendor_id: v[0], vendor_name: v[1], vat_id: v[2] }; byVat[v[2]] = o; byName[v[1]] = o; });
+  DATA.pos.forEach(function (p) { pos[p[0]] = { po_number: p[0], vendor_id: p[1], net_amount: p[2] }; });
+
+  function r2(x) { return Math.round(x * 100) / 100; }
+  function eur(x) { return x.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function pct(x) { return (x >= 0 ? "+" : "") + (x * 100).toFixed(1) + "%"; }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+  // Simplified token-sort ratio (RapidFuzz in the Python app). Only used when the VAT id is not in the master.
+  function tokenSort(s) { return s.toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter(Boolean).sort().join(" "); }
+  function ratio(a, b) {
+    a = tokenSort(a); b = tokenSort(b);
+    var m = a.length, n = b.length, d = [], i, j;
+    for (i = 0; i <= m; i++) { d[i] = [i]; }
+    for (j = 0; j <= n; j++) { d[0][j] = j; }
+    for (i = 1; i <= m; i++) for (j = 1; j <= n; j++)
+      d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 2));
+    return m + n === 0 ? 100 : 100 * (1 - d[m][n] / (m + n));
+  }
+  function matchVendor(name, vat) {
+    if (vat && byVat[vat]) return byVat[vat];
+    var best = null, score = 0;
+    Object.keys(byName).forEach(function (k) { var s = ratio(name || "", k); if (s > score) { score = s; best = byName[k]; } });
+    return score >= RULES.vendor_match_score ? best : null;
+  }
+
+  function validate(f, seen) {
+    var reasons = [], checks = [];
+    var missing = REQUIRED.filter(function (k) { return f[k] === null || f[k] === undefined || f[k] === ""; });
+    if (missing.length) reasons.push(["EXTRACTION_INCOMPLETE", "Could not read: " + missing.join(", ")]);
+    checks.push(["All required fields read", !missing.length]);
+
+    var vendor = matchVendor(f.vendor_name, f.vendor_vat_id), vid = vendor ? vendor.vendor_id : null;
+    if (!vendor) reasons.push(["UNKNOWN_VENDOR", "'" + f.vendor_name + "' is not in the vendor master"]);
+    checks.push(["Vendor in vendor master", !!vendor]);
+
+    var poOk = null, poVendorOk = null, amtOk = null;
+    if (!f.po_number) reasons.push(["MISSING_PO", "No purchase order reference on the invoice"]);
+    else if (!pos[f.po_number]) { reasons.push(["PO_NOT_FOUND", f.po_number + " does not exist"]); poOk = false; }
+    else {
+      var po = pos[f.po_number]; poOk = true;
+      if (vid && po.vendor_id !== vid) { reasons.push(["PO_VENDOR_MISMATCH", f.po_number + " belongs to vendor " + po.vendor_id + ", not " + vid]); poVendorOk = false; }
+      else if (vid) poVendorOk = true;
+      if (f.net_amount !== null) {
+        var diff = (f.net_amount - po.net_amount) / po.net_amount;
+        amtOk = Math.abs(diff) <= RULES.amount_tolerance;
+        if (!amtOk) reasons.push(["AMOUNT_MISMATCH", "Net " + eur(f.net_amount) + " vs PO " + eur(po.net_amount) + " (" + pct(diff) + ")"]);
+      }
+    }
+    checks.push(["PO reference present", !!f.po_number]);
+    checks.push(["PO exists", poOk]);
+    checks.push(["PO belongs to this vendor", poVendorOk]);
+    checks.push(["Net within 1% of PO", amtOk]);
+
+    var vatOk = null, totOk = null;
+    if (f.net_amount !== null && f.vat_amount !== null) {
+      vatOk = VAT_RATES.some(function (r) { return Math.abs(r2(f.net_amount * r) - f.vat_amount) <= CENT; });
+      if (!vatOk) reasons.push(["VAT_MISMATCH", "VAT " + eur(f.vat_amount) + " does not match 21%, 9% or 0% of net"]);
+      if (f.total_amount !== null) {
+        totOk = Math.abs(f.net_amount + f.vat_amount - f.total_amount) <= CENT;
+        if (!totOk) reasons.push(["TOTAL_MISMATCH", "Net + VAT = " + eur(r2(f.net_amount + f.vat_amount)) + ", invoice total " + eur(f.total_amount)]);
+      }
+    }
+    checks.push(["VAT is 21%, 9% or 0% of net", vatOk]);
+    checks.push(["Net + VAT = total", totOk]);
+
+    var key = (vid || f.vendor_name || "").toLowerCase() + "|" + (f.invoice_number || "").toLowerCase();
+    var dup = !!(f.invoice_number && seen[key]);
+    if (dup) reasons.push(["DUPLICATE", "Invoice " + f.invoice_number + " from this vendor was already received"]);
+    seen[key] = true;
+    checks.push(["Not already received", !dup]);
+
+    return { status: reasons.length ? "EXCEPTION" : "AUTO_APPROVED", vendor_id: vid, reasons: reasons, checks: checks };
+  }
+
+  // Illustrative per-field confidence (AI Builder style). Deterministic: layout base minus a field offset and a small hash.
+  var LAYOUT_BASE = { A: 0.98, B: 0.95, C: 0.92 };
+  var FIELD_OFF = { vendor_name: 0, vendor_vat_id: 0.03, invoice_number: 0.01, invoice_date: 0.02, po_number: 0.02, net_amount: 0.01, vat_amount: 0.02, total_amount: 0.01 };
+  function conf(inv, k) {
+    var s = inv.file + k, h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 997;
+    return Math.max(0, LAYOUT_BASE[inv.layout] - FIELD_OFF[k] - (h % 3) / 100);
+  }
+
+  // ---- State ----
+  var S;
+  function fresh() { return { run: false, rows: [], audit: [], tab: "extract", sel: null, clock: 0 }; }
+  function ts() { S.clock += 1; var s = 9 * 3600 + S.clock * 2, hh = Math.floor(s / 3600), mm = Math.floor(s / 60) % 60, ss = s % 60;
+    return "2026-10-20 " + [hh, mm, ss].map(function (x) { return (x < 10 ? "0" : "") + x; }).join(":"); }
+  function addAudit(file, action, actor, comment) { S.audit.unshift({ ts: ts(), file: file, action: action, actor: actor, comment: comment }); }
+
+  function runIntake() {
+    S = fresh(); S.run = true;
+    var seen = {};
+    DATA.invoices.forEach(function (a) {
+      var f = { file: a[0], layout: a[1], vendor_name: a[2], vendor_vat_id: a[3], invoice_number: a[4], invoice_date: a[5], po_number: a[6], net_amount: a[7], vat_amount: a[8], total_amount: a[9] };
+      var res = validate(f, seen);
+      var row = { f: f, res: res, status: res.status };
+      S.rows.push(row);
+      addAudit(f.file, res.status === "AUTO_APPROVED" ? "Auto-approved" : "Needs review", "intake-agent",
+        res.reasons.length ? res.reasons.map(function (r) { return r[1]; }).join("; ") : "All checks passed");
+    });
+    S.sel = S.rows[0].f.file;
+  }
+
+  function counts() {
+    var c = { proc: S.rows.length, auto: 0, exc: 0, rel: 0, rej: 0 };
+    S.rows.forEach(function (r) { if (r.res.status === "AUTO_APPROVED") c.auto++; else c.exc++;
+      if (r.status === "RELEASED") c.rel++; if (r.status === "REJECTED") c.rej++; });
+    c.open = c.exc - c.rel - c.rej;
+    c.minutes = c.auto * 3 + c.exc * Math.max(3 - 1, 0); // pipeline.minutes_saved
+    return c;
+  }
+  function find(file) { for (var i = 0; i < S.rows.length; i++) if (S.rows[i].f.file === file) return S.rows[i]; return null; }
+  function statusTag(st) {
+    if (st === "AUTO_APPROVED") return '<span class="tag ok">Auto-approved</span>';
+    if (st === "RELEASED") return '<span class="tag info">Released</span>';
+    if (st === "REJECTED") return '<span class="tag bad">Rejected</span>';
+    return '<span class="tag warn">Exception</span>';
+  }
+  function reasonTags(res) { return res.reasons.map(function (r) { return '<span class="tag bad">' + LABEL[r[0]] + "</span>"; }).join(" "); }
+
+  // ---- Rendering ----
+  var view = document.getElementById("view");
+  function render() {
+    var c = S.run ? counts() : { proc: 0, auto: 0, open: 0, minutes: 0 };
+    document.getElementById("kProc").textContent = c.proc;
+    document.getElementById("kAuto").textContent = c.auto;
+    document.getElementById("kExc").textContent = c.open;
+    document.getElementById("kMin").textContent = c.minutes;
+    document.querySelectorAll(".tabs button").forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.tab === S.tab)); });
+    if (!S.run) { view.innerHTML = '<div class="empty">12 invoices waiting in the inbox (3 layouts). Click <strong>Run intake</strong>.</div>'; return; }
+    view.innerHTML = { extract: vExtract, register: vRegister, queue: vQueue, audit: vAudit }[S.tab]();
+  }
+
+  function vExtract() {
+    var h = '<div class="table-scroll"><table><thead><tr><th>File</th><th>Vendor</th><th>Invoice no.</th><th>PO</th><th class="num">Total EUR</th><th>Status</th></tr></thead><tbody>';
+    S.rows.forEach(function (r) {
+      h += '<tr class="row' + (S.sel === r.f.file ? " sel" : "") + '" data-file="' + r.f.file + '" tabindex="0"><td>' + r.f.file.replace(".pdf", "") + "</td><td>" + esc(r.f.vendor_name) +
+        "</td><td>" + r.f.invoice_number + "</td><td>" + (r.f.po_number || "&ndash;") + '</td><td class="num">' + eur(r.f.total_amount) + "</td><td>" + statusTag(r.status) + "</td></tr>";
+    });
+    h += "</tbody></table></div>";
+    var tbl = h; h = "";
+    var r = find(S.sel);
+    if (r) {
+      var fields = [["vendor_name","Vendor"],["vendor_vat_id","VAT number"],["invoice_number","Invoice number"],["invoice_date","Invoice date"],["po_number","PO number"],["net_amount","Net"],["vat_amount","VAT"],["total_amount","Total"]];
+      h += '<div class="detail"><div><h4>' + r.f.file + " &middot; layout " + r.f.layout + '</h4><div class="table-scroll"><table><thead><tr><th>Field</th><th>Value</th><th>Confidence</th></tr></thead><tbody>';
+      fields.forEach(function (fd) {
+        var v = r.f[fd[0]], cf = conf(r.f, fd[0]);
+        var shown = v === null ? "&ndash;" : (typeof v === "number" ? eur(v) : esc(v));
+        h += "<tr><td>" + fd[1] + "</td><td>" + shown + '</td><td><span class="conf"><i style="width:' + Math.round(cf * 100) + '%"></i></span>' + (v === null ? "not printed" : Math.round(cf * 100) + "%") + "</td></tr>";
+      });
+      h += '</tbody></table></div></div><div><h4>Validation checks</h4><ul class="checks">';
+      r.res.checks.forEach(function (ck) {
+        var t = ck[1] === null ? '<span class="tag info">n/a</span>' : (ck[1] ? '<span class="tag ok">pass</span>' : '<span class="tag bad">fail</span>');
+        h += "<li>" + t + "<span>" + ck[0] + "</span></li>";
+      });
+      h += "</ul>";
+      if (r.res.reasons.length) h += '<p class="checks r">' + r.res.reasons.map(function (x) { return "<strong>" + x[0] + "</strong>: " + esc(x[1]); }).join("<br>") + "</p>";
+      h += "</div></div>";
+    }
+    return h + tbl;
+  }
+  function vRegister() {
+    var rows = S.rows.filter(function (r) { return r.status === "AUTO_APPROVED" || r.status === "RELEASED"; });
+    var h = '<div class="table-scroll"><table><thead><tr><th>Vendor</th><th>Invoice no.</th><th>Date</th><th>PO</th><th class="num">Net</th><th class="num">VAT</th><th class="num">Total</th><th>Status</th></tr></thead><tbody>';
+    rows.forEach(function (r) { h += "<tr><td>" + esc(r.f.vendor_name) + "</td><td>" + r.f.invoice_number + "</td><td>" + r.f.invoice_date + "</td><td>" + (r.f.po_number || "&ndash;") +
+      '</td><td class="num">' + eur(r.f.net_amount) + '</td><td class="num">' + eur(r.f.vat_amount) + '</td><td class="num">' + eur(r.f.total_amount) + "</td><td>" + statusTag(r.status) + "</td></tr>"; });
+    return h + "</tbody></table></div>";
+  }
+  function vQueue() {
+    var rows = S.rows.filter(function (r) { return r.status === "EXCEPTION"; });
+    if (!rows.length) return '<div class="empty">The exception queue is empty.</div>';
+    return rows.map(function (r) {
+      return '<div class="exc"><div class="hd">' + esc(r.f.vendor_name) + " &middot; " + r.f.invoice_number + " &middot; EUR " + eur(r.f.total_amount) + " &middot; " + r.f.file + "</div>" + reasonTags(r.res) +
+        "<ul>" + r.res.reasons.map(function (x) { return "<li>" + esc(x[1]) + "</li>"; }).join("") + "</ul>" +
+        '<div class="act"><input type="text" placeholder="Comment" aria-label="Comment for ' + r.f.file + '" data-c="' + r.f.file + '">' +
+        '<button class="btn small" type="button" data-rel="' + r.f.file + '">Release</button><button class="btn light small" type="button" data-rej="' + r.f.file + '">Reject</button></div></div>';
+    }).join("");
+  }
+  function vAudit() {
+    var h = '<div class="table-scroll"><table><thead><tr><th>Time</th><th>Invoice</th><th>Action</th><th>Actor</th><th>Comment</th></tr></thead><tbody>';
+    S.audit.forEach(function (a) { h += "<tr><td>" + a.ts.slice(11) + "</td><td>" + a.file.replace(".pdf", "") + "</td><td>" + a.action + "</td><td>" + esc(a.actor) + "</td><td>" + esc(a.comment) + "</td></tr>"; });
+    return h + "</tbody></table></div>";
+  }
+
+  function decide(file, release, actor, comment) {
+    var r = find(file);
+    if (!r || r.status !== "EXCEPTION") return false;
+    r.status = release ? "RELEASED" : "REJECTED";
+    addAudit(file, release ? "Released" : "Rejected", actor, comment || (release ? "Released by reviewer" : "Rejected by reviewer"));
+    render();
+    return true;
+  }
+
+  view.addEventListener("click", function (e) {
+    var tr = e.target.closest("tr.row");
+    if (tr) { S.sel = tr.dataset.file; render(); return; }
+    var b = e.target.closest("button");
+    if (!b) return;
+    var file = b.dataset.rel || b.dataset.rej;
+    if (!file) return;
+    var inp = view.querySelector('input[data-c="' + file + '"]');
+    decide(file, !!b.dataset.rel, "AP reviewer", inp ? inp.value.trim() : "");
+  });
+  view.addEventListener("keydown", function (e) { var tr = e.target.closest("tr.row"); if (tr && e.key === "Enter") { S.sel = tr.dataset.file; render(); } });
+  document.querySelectorAll(".tabs button").forEach(function (b) { b.addEventListener("click", function () { S.tab = b.dataset.tab; render(); }); });
+  document.getElementById("runBtn").addEventListener("click", function () { runIntake(); render(); bot("Intake complete: " + counts().proc + " invoices, " + counts().auto + " auto-approved, " + counts().exc + " sent for review. Ask me why any invoice was held."); });
+  document.getElementById("resetBtn").addEventListener("click", function () { S = fresh(); render(); });
+
+  // ---- Exception assistant (deterministic keyword intents) ----
+  var log = document.getElementById("log");
+  function bot(html) { var d = document.createElement("div"); d.className = "msg bot"; d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; return d; }
+  function user(t) { var d = document.createElement("div"); d.className = "msg user"; d.textContent = t; log.appendChild(d); log.scrollTop = log.scrollHeight; }
+  function fileFrom(t) {
+    var m = t.match(/invoice[_ ]?0*(\d{1,3})/i) || t.match(/\b0*(\d{1,3})\b/);
+    if (m) { var n = ("00" + parseInt(m[1], 10)).slice(-3); return "invoice_" + n + ".pdf"; }
+    var m2 = t.match(/\d{3}-\d{8}/);
+    if (m2) { for (var i = 0; i < S.rows.length; i++) if (S.rows[i].f.invoice_number === m2[0]) return S.rows[i].f.file; }
+    return null;
+  }
+  var ADVICE = { UNKNOWN_VENDOR: "Check whether the supplier should be onboarded; until then return it to the sender.",
+    MISSING_PO: "Ask the requester for the PO number, or confirm it is a non-PO spend category.",
+    PO_NOT_FOUND: "Likely a typo in the PO number. Confirm the correct PO with the buyer.",
+    PO_VENDOR_MISMATCH: "The PO belongs to a different supplier. Do not pay against it; ask the vendor to correct the reference.",
+    AMOUNT_MISMATCH: "Confirm the price change or extra quantity with the buyer before releasing.",
+    VAT_MISMATCH: "Ask the vendor for a corrected invoice; VAT cannot be adjusted on our side.",
+    TOTAL_MISMATCH: "The invoice arithmetic is wrong. Request a credit note and corrected invoice.",
+    DUPLICATE: "Reject: the same invoice number from this vendor is already in the register.",
+    EXTRACTION_INCOMPLETE: "Open the PDF and key the missing fields, then re-run the checks." };
+
+  function answer(t) {
+    var q = t.toLowerCase();
+    if (!S.run) { runIntake(); render(); bot("I ran the intake first so there is something to look at."); }
+    if (/check|rule|control/.test(q) && !/why/.test(q)) {
+      return bot("Every invoice runs the same deterministic controls (ported from <code>validate.py</code>):<ul><li>required fields read</li><li>vendor known by VAT number, else name match &ge; 90</li><li>PO present, exists and belongs to the vendor</li><li>net within 1% of the PO</li><li>VAT is 21%, 9% or 0% of net (2 cent tolerance)</li><li>net + VAT = total</li><li>no duplicate vendor + invoice number</li></ul>An invoice is approved only if all pass.");
+    }
+    if (/exception|today|queue|held\b.*\?$|open/.test(q) && !fileFrom(t)) {
+      var open = S.rows.filter(function (r) { return r.status === "EXCEPTION"; });
+      if (!open.length) return bot("No open exceptions today.");
+      var tally = {};
+      open.forEach(function (r) { r.res.reasons.forEach(function (x) { tally[x[0]] = (tally[x[0]] || 0) + 1; }); });
+      S.tab = "queue"; render();
+      return bot("<strong>" + open.length + " open exceptions</strong>, EUR " + eur(open.reduce(function (s, r) { return s + r.f.total_amount; }, 0)) + " in total:<ul>" +
+        open.map(function (r) { return "<li>" + r.f.file.replace(".pdf", "") + ", " + esc(r.f.vendor_name) + ": " + r.res.reasons.map(function (x) { return LABEL[x[0]]; }).join(", ") + "</li>"; }).join("") +
+        '</ul><span class="cite">Source: Dataverse Invoice table, status = Exception</span>');
+    }
+    var file = fileFrom(t), r = file ? find(file) : null;
+    if (/release|approve|reject/.test(q)) {
+      if (!r) return bot("Which invoice? Try <em>Release invoice_027</em>.");
+      if (r.status !== "EXCEPTION") return bot(r.f.file + " is not in the exception queue (status: " + statusTag(r.status) + ").");
+      if (/reject/.test(q)) { decide(r.f.file, false, "AP reviewer (via agent)", "Rejected via exception assistant"); return bot("Rejected " + r.f.file + " and logged it in the audit trail."); }
+      var blocked = r.res.reasons.filter(function (x) { return RELEASABLE.indexOf(x[0]) < 0; });
+      if (blocked.length) return bot("I cannot release " + r.f.file + ". Policy only lets the assistant release " + RELEASABLE.map(function (c) { return LABEL[c].toLowerCase(); }).join(", ") +
+        ". Blocking reason: <strong>" + blocked.map(function (x) { return LABEL[x[0]]; }).join(", ") + "</strong>. " + ADVICE[blocked[0][0]]);
+      var d = bot('<div class="card-ac"><h4>Release ' + r.f.file + "?</h4>" + esc(r.f.vendor_name) + ", EUR " + eur(r.f.total_amount) + "<br>" + reasonTags(r.res) +
+        '<label for="relReason" style="display:block;margin-top:6px;font-weight:600">Reason (required)</label><select id="relReason"><option>Price change confirmed by buyer</option><option>Extra quantity received and booked</option><option>PO reference corrected by buyer</option></select>' +
+        '<button class="btn" type="button" data-confirm="' + r.f.file + '">Confirm release</button></div>');
+      d.querySelector("[data-confirm]").addEventListener("click", function (e) {
+        var why = d.querySelector("select").value;
+        e.target.disabled = true;
+        if (decide(r.f.file, true, "AP reviewer (via agent)", why)) bot("Released " + r.f.file + " to the register. Audit entry written: <em>" + esc(why) + "</em>.");
+      });
+      return d;
+    }
+    if (r) {
+      if (r.res.status === "AUTO_APPROVED") return bot(r.f.file + " was not held. All " + r.res.checks.filter(function (c) { return c[1] !== null; }).length + " applicable checks passed and it went straight to the register.");
+      S.sel = r.f.file; S.tab = "extract"; render();
+      return bot("<strong>" + r.f.file + "</strong> (" + esc(r.f.vendor_name) + ", " + r.f.invoice_number + ") was held because:<ul>" +
+        r.res.reasons.map(function (x) { return "<li><strong>" + LABEL[x[0]] + "</strong>: " + esc(x[1]) + "</li>"; }).join("") + "</ul>Next step: " + ADVICE[r.res.reasons[0][0]] +
+        (r.status !== "EXCEPTION" ? " Current status: " + r.status.toLowerCase() + "." : "") + '<span class="cite">Source: Invoice reasons and audit log</span>');
+    }
+    return bot("I can explain why an invoice was held, show today's exceptions, or release an invoice. Try one of the suggestions below.");
+  }
+
+  function ask(t) { t = t.trim(); if (!t) return; user(t); answer(t); }
+  document.getElementById("suggest").addEventListener("click", function (e) { if (e.target.tagName === "BUTTON") ask(e.target.textContent); });
+  document.getElementById("chatForm").addEventListener("submit", function (e) { e.preventDefault(); var i = document.getElementById("chatIn"); ask(i.value); i.value = ""; });
+
+  // ---- Boot, with #state= presets for screenshots ----
+  S = fresh();
+  bot("Hi, I am the exception assistant. Run the intake, then ask why an invoice was held, list today's exceptions or release one.");
+  var st = (location.hash.match(/state=(\w+)/) || [])[1];
+  if (st) {
+    runIntake();
+    if (st === "queue") { ask("Why was invoice_027 held?"); S.tab = "queue"; }
+    if (st === "detail") { S.sel = "invoice_044.pdf"; ask("Why was invoice_044 held?"); }
+    if (st === "released") { ask("Release invoice_027"); var cb = log.querySelector("[data-confirm]"); if (cb) cb.click(); S.tab = "audit"; }
+  }
+  render();
+})();
+</script>
+</body>
+</html>

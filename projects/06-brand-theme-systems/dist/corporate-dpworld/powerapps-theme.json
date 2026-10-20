@@ -1,0 +1,36 @@
+{
+  "name": "Corporate theme: DP World",
+  "format": "Fluent 2 BrandVariants palette (10 to 160) with token overrides, for Power Apps modern controls",
+  "brandBase": "#1e1450",
+  "palette": {
+    "10": "#060410",
+    "20": "#090619",
+    "30": "#0d0922",
+    "40": "#100b2b",
+    "50": "#140d35",
+    "60": "#170f3e",
+    "70": "#1b1247",
+    "80": "#1e1450",
+    "90": "#383065",
+    "100": "#534b79",
+    "110": "#6d678e",
+    "120": "#8882a2",
+    "130": "#a29eb7",
+    "140": "#bdbacb",
+    "150": "#d7d5e0",
+    "160": "#f2f1f5"
+  },
+  "overrides": {
+    "colorNeutralBackground1": "#ffffff",
+    "colorNeutralForeground1": "#1e1450",
+    "colorNeutralBackground2": "#f4f6fb",
+    "colorBrandBackground": "#1e1450",
+    "colorCompoundBrandBackground": "#ff2261",
+    "colorNeutralForegroundOnBrand": "#ffffff",
+    "colorPaletteGreenBackground3": "#00b86f",
+    "colorPaletteYellowBackground3": "#d97706",
+    "colorPaletteRedBackground3": "#ff2261",
+    "colorPaletteBerryBackground3": "#7c3aed"
+  },
+  "fontFamilyBase": "Pilat, \"Segoe UI\", system-ui, Roboto, Helvetica, Arial, sans-serif"
+}

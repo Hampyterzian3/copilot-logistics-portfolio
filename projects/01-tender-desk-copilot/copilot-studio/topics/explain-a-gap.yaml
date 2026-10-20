@@ -1,0 +1,51 @@
+kind: AdaptiveDialog
+modelDescription: Explains one checker gap for a lane or rule id, why it matters for pricing and what to ask the customer.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Explain a gap
+    triggerQueries:
+      - explain this gap
+      - why is lane NW-006 flagged
+      - what does R06 mean
+      - what is wrong with this lane
+      - explain the hazardous goods gap
+
+  actions:
+    - kind: Question
+      id: askLane
+      variable: Topic.LaneOrRule
+      prompt: Which lane ID or rule ID (R01 to R09) should I explain?
+      entity: StringPrebuiltEntity
+      alwaysPrompt: false
+
+    - kind: SetVariable
+      id: setKey
+      variable: Topic.Key
+      value: =Upper(Trim(Topic.LaneOrRule))
+
+    # Gap rows written by the checker flow into Dataverse (table RFQ Gap)
+    - kind: SetVariable
+      id: findGaps
+      variable: Topic.Gaps
+      value: =Filter('RFQ Gaps', 'Lane ID' = Topic.Key || 'Rule ID' = Topic.Key)
+
+    - kind: ConditionGroup
+      id: found
+      conditions:
+        - id: none
+          condition: =IsEmpty(Topic.Gaps)
+          actions:
+            - kind: SendActivity
+              id: noGap
+              activity: I found no open gap for {Topic.Key}. It may be clean, or the ID is not in this RFQ.
+      elseActions:
+        - kind: SendActivity
+          id: explain
+          activity: |-
+            {Topic.Key}: {Concat(Topic.Gaps, 'Rule ID' & " " & 'Rule name' & " (" & Severity & "): " & Message, Char(10))}
+            Why it matters and what to ask is in the page "Tender rules R01 to R09".
+        - kind: SearchAndSummarizeContent
+          id: why  # answers from the knowledge sources and cites them
+          userInput: ="Why does " & First(Topic.Gaps).'Rule name' & " matter for road freight pricing?"

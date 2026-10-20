@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Network Scenario Agent</title>
+<meta name="description" content="Simulated Copilot Studio agent that compares direct full-load, regional milk-run and cross-dock designs for an automotive inbound network on cost, CO2 and truck movements.">
+<link rel="icon" type="image/png" href="../assets/brand/hampy-favicon-64.png">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/demo.css">
+<style>
+  .ctrls { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 4px 16px; margin-bottom: 14px; }
+  .ctrls label { display: flex; justify-content: space-between; gap: 8px; }
+  .ctrls output { font: 600 12px var(--font-heading); font-variant-numeric: tabular-nums; }
+  .app input[type=range] { padding: 0; border: 0; background: transparent; accent-color: var(--orange); }
+  .hint { font-size: 12px; opacity: .8; margin: 2px 0 0; }
+  .app h3 { font-size: 15px; margin: 16px 0 8px; }
+  tr.design-row { cursor: pointer; }
+  tr.design-row.sel td { background: rgba(129,163,218,.22); }
+  tr.design-row td:first-child { font-weight: 600; }
+  .mapbox { background: var(--green); color: var(--offwhite); border-radius: var(--r-xl); padding: 10px; }
+  .mapbox svg { display: block; width: 100%; height: auto; }
+  .map-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+  .map-tabs button { cursor: pointer; border: 1px solid rgba(12,44,35,.3); background: #fff; color: var(--green); border-radius: var(--r-xl); padding: 4px 10px; font: 600 12px var(--font-heading); }
+  .map-tabs button[aria-pressed=true] { background: var(--green); color: var(--offwhite); border-color: var(--green); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; margin-top: 8px; }
+  .legend i { display: inline-block; width: 18px; height: 3px; vertical-align: middle; margin-right: 5px; }
+  .parity { font-size: 12px; margin-top: 10px; opacity: .85; }
+  .card-ac table { font-size: 12px; width: 100%; border-collapse: collapse; }
+  .card-ac td, .card-ac th { padding: 3px 4px; border-bottom: 1px solid rgba(12,44,35,.12); text-align: left; }
+  .card-ac .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .sim-note { font-size: 12px; color: var(--muted); padding: 8px 14px 0; }
+</style>
+</head>
+<body>
+<header class="demo-top">
+  <a class="back" href="../index.html#p03">&larr; Portfolio</a>
+  <img src="../assets/brand/hampy-logo-offwhite.svg" alt="hampy">
+  <span class="demo-badge">Simulated demo</span>
+  <span class="title">Network Scenario Agent</span>
+</header>
+
+<main class="demo-wrap">
+  <section class="demo-intro">
+    <h1>Network Scenario Agent</h1>
+    <p>Contoso Logistics runs the inbound network for an automotive OEM plant in central Germany: 60 suppliers across Europe. For each supplier the planner can choose direct full-load, a regional milk-run or cross-dock consolidation through one of three hubs. Move the sliders, pick a design on the map, and ask the agent why it recommends the mix it does. Every number below is computed live by the network engine on synthetic data.</p>
+  </section>
+
+  <div class="demo-grid">
+    <section class="app" aria-label="Scenario app">
+      <div class="app-bar"><span class="dot"></span>Inbound network scenarios <span style="margin-left:auto;font-weight:500;font-size:12px">Power Apps (simulated)</span></div>
+      <div class="app-body">
+        <div class="ctrls">
+          <div><label for="fuel">Diesel cost index <output id="fuelOut"></output></label><input id="fuel" type="range" min="0.6" max="1.8" step="0.05" value="1"></div>
+          <div><label for="co2">CO2 price per tonne <output id="co2Out"></output></label><input id="co2" type="range" min="0" max="300" step="10" value="0"></div>
+          <div><label for="handling">Cross-dock handling per ldm <output id="handlingOut"></output></label><input id="handling" type="range" min="0" max="20" step="0.5" value="6"></div>
+          <div><label for="stops">Milk-run max stops <output id="stopsOut"></output></label><input id="stops" type="range" min="1" max="8" step="1" value="4"></div>
+        </div>
+
+        <div class="kpis" id="kpis"></div>
+
+        <h3>Results per design (per week)</h3>
+        <div class="table-scroll">
+          <table id="results">
+            <thead><tr><th>Design</th><th class="num">Cost</th><th class="num">CO2 t</th><th class="num">Trucks</th><th class="num">Plant arrivals</th><th class="num">Cost + CO2 price</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="hint">Click a row or a map tab to draw that design. ldm = loading metres (13.6 per trailer).</p>
+
+        <h3>Flows on the map</h3>
+        <div class="map-tabs" role="group" aria-label="Design shown on map" id="mapTabs"></div>
+        <div class="mapbox"><svg id="map" viewBox="0 0 600 430" role="img" aria-label="Map of supplier flows for the selected design"></svg>
+          <div class="legend" id="legend"></div>
+        </div>
+        <p class="parity" id="parity">Checking JS engine against the Python baseline...</p>
+      </div>
+    </section>
+
+    <aside class="copilot" aria-label="Network Scenario Agent chat">
+      <div class="copilot-head"><img src="../assets/brand/hampy-agent-icon.png" alt="">Network Scenario Agent</div>
+      <p class="sim-note">Simulation of the Copilot Studio agent: fixed intents and rules in this page stand in for the generative answers. In production it calls the scenario connector as a tool.</p>
+      <div class="copilot-log" id="log" aria-live="polite"></div>
+      <div class="suggest" id="suggest">
+        <button type="button" data-q="Run a scenario">Run a scenario</button>
+        <button type="button" data-q="Compare designs">Compare designs</button>
+        <button type="button" data-q="What if diesel goes up 30%?">What if diesel +30%?</button>
+        <button type="button" data-q="Explain the recommendation">Explain recommendation</button>
+        <button type="button" data-q="Set CO2 price to 150">CO2 at 150 per tonne</button>
+        <button type="button" data-q="Reset">Reset</button>
+      </div>
+      <form class="copilot-input" id="ask">
+        <input id="q" type="text" placeholder="Ask, e.g. max stops 6" aria-label="Message the agent">
+        <button class="btn" type="submit">Send</button>
+      </form>
+    </aside>
+  </div>
+
+  <div class="stack-note">
+    <strong>How this maps to Microsoft in production.</strong>
+    Sliders and results table: <strong>Power Apps</strong> canvas app (or the Copilot Studio chat itself).
+    Network engine: Python package written with <strong>GitHub Copilot</strong>, hosted in an <strong>Azure Function</strong> (POST /scenarios).
+    Tool call: <strong>Power Platform custom connector</strong> from the OpenAPI file, added to the agent as an action.
+    Chat panel: <strong>Copilot Studio</strong> agent "Network Scenario Agent" with topics Run a scenario, Compare designs, What if fuel price changes and Explain recommendation.
+    Scenario log: <strong>Dataverse</strong> tables via <strong>Power Automate</strong>.
+    Map: <strong>Power BI</strong> map visual on the logged flows. Here, the engine is ported to JavaScript and checked against the Python baseline.
+  </div>
+</main>
+
+<script src="data/03-baseline.js"></script>
+<script>
+// ENGINE START
+const NetEngine = (function () {
+  const MODES = ["direct", "milkrun", "crossdock"];
+  const EARTH_RADIUS_KM = 6371.0;
+  const DEFAULTS = {
+    capacity_ldm: 13.6, road_factor: 1.2, runs_per_week: 5, max_stops: 4,
+    ftl_rate_km: 1.55, linehaul_rate_km: 1.35, fuel_share: 0.30, fuel_index: 1.0,
+    trip_fixed: 90.0, stop_cost: 35.0, handling_ldm: 6.0,
+    co2_vkm: 0.60, co2_tkm: 0.0125, co2_price_t: 0.0
+  };
+  function params(o) {
+    const p = Object.assign({}, DEFAULTS);
+    for (const k of Object.keys(o || {})) {
+      if (!(k in p)) throw new Error("unknown parameter: " + k);
+      p[k] = (k === "runs_per_week" || k === "max_stops") ? Math.trunc(Number(o[k])) : Number(o[k]);
+    }
+    return p;
+  }
+  const rad = d => d * Math.PI / 180;
+  function haversine(lat1, lon1, lat2, lon2) {
+    const p1 = rad(lat1), p2 = rad(lat2), dp = p2 - p1, dl = rad(lon2 - lon1);
+    const a = Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
+    return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(a));
+  }
+  const roadKm = (a, b, p) => haversine(a.lat, a.lon, b.lat, b.lon) * p.road_factor;
+  const fuelFactor = p => (1 - p.fuel_share) + p.fuel_share * p.fuel_index;
+  const tripCost = (km, p, rk) => p.trip_fixed + km * p[rk || "ftl_rate_km"] * fuelFactor(p);
+  const tripCo2 = (km, t, p) => km * p.co2_vkm + km * t * p.co2_tkm;
+
+  function addTotals(T, cost, co2, trips, km, arrive) {
+    T.cost += cost; T.co2_kg += co2; T.trips += trips; T.vkm += trips * km; if (arrive) T.arrivals += trips;
+  }
+  function direct(s, plant, p, alloc, flows, T) {
+    const cap = p.capacity_ldm, load = s.ldm_week / s.freq;
+    const trucks = Math.ceil(load / cap - 1e-9), trips = s.freq * trucks;
+    const km = roadKm(s, plant, p), t = load / trucks * s.t_per_ldm;
+    const cost = trips * tripCost(km, p), co2 = trips * tripCo2(km, t, p);
+    alloc[s.id].cost += cost; alloc[s.id].co2_kg += co2;
+    addTotals(T, cost, co2, trips, km, true);
+    flows.push({ kind: "direct", path: [s.id, "PLANT"], trips });
+  }
+  function split(s, p) {
+    const cap = p.capacity_ldm, daily = s.ldm_week / p.runs_per_week;
+    const full = Math.floor(daily / cap + 1e-9);
+    let rest = daily - full * cap;
+    if (rest < 1e-6) rest = 0;
+    return [full, rest];
+  }
+  function fullTrucks(s, full, plant, p, alloc, flows, T) {
+    if (full <= 0) return;
+    const trips = full * p.runs_per_week, km = roadKm(s, plant, p);
+    const t = p.capacity_ldm * s.t_per_ldm;
+    const cost = trips * tripCost(km, p), co2 = trips * tripCo2(km, t, p);
+    alloc[s.id].cost += cost; alloc[s.id].co2_kg += co2;
+    addTotals(T, cost, co2, trips, km, true);
+    flows.push({ kind: "full", path: [s.id, "PLANT"], trips });
+  }
+  function buildRoutes(members, end, p) {
+    const cap = p.capacity_ldm;
+    const pool = members.slice().sort((a, b) => {
+      const da = -roadKm(a[0], end, p), db = -roadKm(b[0], end, p);
+      if (da !== db) return da - db;
+      return a[0].id < b[0].id ? -1 : a[0].id > b[0].id ? 1 : 0;
+    });
+    const routes = [];
+    while (pool.length) {
+      const first = pool.shift();
+      const route = [first];
+      let load = first[1], cur = first[0];
+      while (route.length < p.max_stops) {
+        let bi = -1, bd = 0;
+        for (let i = 0; i < pool.length; i++) {
+          const m = pool[i];
+          if (load + m[1] > cap + 1e-9) continue;
+          const d = roadKm(cur, m[0], p);
+          if (bi < 0 || d < bd - 1e-9 || (Math.abs(d - bd) <= 1e-9 && m[0].id < pool[bi][0].id)) { bi = i; bd = d; }
+        }
+        if (bi < 0) break;
+        const m = pool.splice(bi, 1)[0];
+        route.push(m); load += m[1]; cur = m[0];
+      }
+      routes.push(route);
+    }
+    return routes;
+  }
+  function runRoutes(routes, end, endId, p, alloc, flows, T, toPlant) {
+    const runs = p.runs_per_week;
+    for (const route of routes) {
+      let km = 0, tkm = 0, tonnes = 0;
+      route.forEach(([s, load], i) => {
+        tonnes += load * s.t_per_ldm;
+        const nxt = i + 1 < route.length ? route[i + 1][0] : end;
+        const leg = roadKm(s, nxt, p);
+        km += leg; tkm += leg * tonnes;
+      });
+      const costRun = p.trip_fixed + km * p.ftl_rate_km * fuelFactor(p) + route.length * p.stop_cost;
+      const co2Run = km * p.co2_vkm + tkm * p.co2_tkm;
+      const cost = costRun * runs, co2 = co2Run * runs;
+      const w = route.map(([s, load]) => load * roadKm(s, end, p) + 1e-9);
+      const ws = w.reduce((x, y) => x + y, 0);
+      route.forEach(([s], i) => { alloc[s.id].cost += cost * w[i] / ws; alloc[s.id].co2_kg += co2 * w[i] / ws; });
+      addTotals(T, cost, co2, runs, km, toPlant);
+      flows.push({ kind: toPlant ? "milkrun" : "collect", path: route.map(m => m[0].id).concat([endId]), trips: runs });
+    }
+  }
+  function nearestHub(s, hubs, plant, p) {
+    let best = null, bv = 0;
+    for (const h of hubs) {
+      const v = roadKm(s, h, p) + roadKm(h, plant, p);
+      if (best === null || v < bv || (v === bv && h.id < best.id)) { best = h; bv = v; }
+    }
+    return best;
+  }
+  function evaluate(sups, plant, hubs, assign, p) {
+    const T = { cost: 0, co2_kg: 0, trips: 0, arrivals: 0, vkm: 0, handling: 0 };
+    const alloc = {}, flows = [], byRegion = {}, byHub = {}, hubOf = {};
+    for (const s of sups) alloc[s.id] = { cost: 0, co2_kg: 0 };
+    for (const s of sups) {
+      const mode = assign[s.id];
+      if (mode === "direct") { direct(s, plant, p, alloc, flows, T); continue; }
+      const [full, rest] = split(s, p);
+      fullTrucks(s, full, plant, p, alloc, flows, T);
+      if (rest <= 0) continue;
+      if (mode === "milkrun") (byRegion[s.region] = byRegion[s.region] || []).push([s, rest]);
+      else { const h = nearestHub(s, hubs, plant, p); hubOf[s.id] = h.id; (byHub[h.id] = byHub[h.id] || []).push([s, rest]); }
+    }
+    for (const r of Object.keys(byRegion).sort()) runRoutes(buildRoutes(byRegion[r], plant, p), plant, "PLANT", p, alloc, flows, T, true);
+    const hubById = {}; for (const h of hubs) hubById[h.id] = h;
+    for (const hid of Object.keys(byHub).sort()) {
+      const h = hubById[hid], members = byHub[hid];
+      runRoutes(buildRoutes(members, h, p), h, hid, p, alloc, flows, T, false);
+      let dayLdm = 0, dayT = 0;
+      for (const [s, load] of members) { dayLdm += load; dayT += load * s.t_per_ldm; }
+      const trucks = Math.ceil(dayLdm / p.capacity_ldm - 1e-9), trips = trucks * p.runs_per_week;
+      const km = roadKm(h, plant, p);
+      const cost = trips * tripCost(km, p, "linehaul_rate_km"), co2 = trips * tripCo2(km, dayT / trucks, p);
+      const handling = dayLdm * p.runs_per_week * p.handling_ldm;
+      for (const [s, load] of members) { const sh = load / dayLdm; alloc[s.id].cost += (cost + handling) * sh; alloc[s.id].co2_kg += co2 * sh; }
+      addTotals(T, cost + handling, co2, trips, km, true);
+      T.handling += handling;
+      flows.push({ kind: "linehaul", path: [hid, "PLANT"], trips });
+    }
+    const co2t = T.co2_kg / 1000;
+    return { cost_week: T.cost, co2_t_week: co2t, trucks_week: T.trips, plant_arrivals_week: T.arrivals,
+      vkm_week: T.vkm, handling_week: T.handling, objective: T.cost + co2t * p.co2_price_t,
+      assign: Object.assign({}, assign), hub_of: hubOf, alloc, flows };
+  }
+  const obj = (a, p) => a.cost + a.co2_kg / 1000 * p.co2_price_t;
+  const pureDesigns = (sups, plant, hubs, p) => {
+    const out = {};
+    for (const m of MODES) { const a = {}; for (const s of sups) a[s.id] = m; out[m] = evaluate(sups, plant, hubs, a, p); }
+    return out;
+  };
+  function bestMix(sups, plant, hubs, p, pure, extraSeeds, maxPasses) {
+    pure = pure || pureDesigns(sups, plant, hubs, p);
+    maxPasses = maxPasses || 4;
+    const seed = {};
+    for (const s of sups) {
+      let bm = null, bv = 0;
+      for (const m of MODES) { const v = obj(pure[m].alloc[s.id], p); if (bm === null || v < bv) { bm = m; bv = v; } }
+      seed[s.id] = bm;
+    }
+    const cands = MODES.map(m => pure[m]).concat([evaluate(sups, plant, hubs, seed, p)]);
+    for (const a of (extraSeeds || [])) cands.push(evaluate(sups, plant, hubs, a, p));
+    let best = cands[0];
+    for (const c of cands.slice(1)) if (c.objective < best.objective - 0.01) best = c;
+    for (let pass = 0; pass < maxPasses; pass++) {
+      let improved = false;
+      for (const s of sups) {
+        let current = best.assign[s.id];
+        for (const m of MODES) {
+          if (m === current) continue;
+          const ta = Object.assign({}, best.assign); ta[s.id] = m;
+          const trial = evaluate(sups, plant, hubs, ta, p);
+          if (trial.objective < best.objective - 0.01) { best = trial; current = m; improved = true; }
+        }
+      }
+      if (!improved) break;
+    }
+    return best;
+  }
+  function runScenario(net, overrides) {
+    const p = params(overrides);
+    const sups = net.suppliers, plant = net.plant, hubs = net.hubs.filter(h => h.active !== false);
+    const pure = pureDesigns(sups, plant, hubs, p);
+    const seeds = [];
+    if (p.co2_price_t > 0) {
+      const p0 = Object.assign({}, p, { co2_price_t: 0 });
+      seeds.push(bestMix(sups, plant, hubs, p0, pureDesigns(sups, plant, hubs, p0)).assign);
+    }
+    const designs = Object.assign({}, pure, { bestmix: bestMix(sups, plant, hubs, p, pure, seeds) });
+    return { params: p, designs };
+  }
+  function summary(res) {
+    const out = {};
+    for (const [name, d] of Object.entries(res.designs)) {
+      const counts = { direct: 0, milkrun: 0, crossdock: 0 };
+      for (const m of Object.values(d.assign)) counts[m]++;
+      out[name] = { cost_week: d.cost_week, co2_t_week: d.co2_t_week, trucks_week: d.trucks_week,
+        plant_arrivals_week: d.plant_arrivals_week, vkm_week: d.vkm_week, objective: d.objective, mode_counts: counts };
+    }
+    return out;
+  }
+  return { MODES, DEFAULTS, params, haversine, roadKm, evaluate, bestMix, runScenario, summary };
+})();
+// ENGINE END
+
+(function () {
+  const BASE = window.NETWORK_BASELINE;
+  const NET = BASE.network;
+  const LABEL = { direct: "Direct full-load", milkrun: "Regional milk-run", crossdock: "Cross-dock", bestmix: "Best mix" };
+  const ORDER = ["direct", "milkrun", "crossdock", "bestmix"];
+  const COL = { direct: "#81a3da", full: "#81a3da", milkrun: "#81cfb3", crossdock: "#e8d67d", collect: "#e8d67d", linehaul: "#ff6b35" };
+  const $ = id => document.getElementById(id);
+  const eur = v => "€" + Math.round(v).toLocaleString("en-GB");
+  const f1 = v => v.toLocaleString("en-GB", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const pct = v => (v >= 0 ? "+" : "") + v.toFixed(1) + "%";
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const sliders = { fuel_index: $("fuel"), co2_price_t: $("co2"), handling_ldm: $("handling"), max_stops: $("stops") };
+  const SUPP = {}; NET.suppliers.forEach(s => SUPP[s.id] = s);
+  const HUB = {}; NET.hubs.forEach(h => HUB[h.id] = h);
+  let state = { res: null, sum: null, overrides: null, mapDesign: "bestmix" };
+  let logId = 0;
+
+  function overrides() {
+    const o = {};
+    for (const [k, el] of Object.entries(sliders)) o[k] = Number(el.value);
+    return o;
+  }
+  function showSliderValues() {
+    $("fuelOut").textContent = Number(sliders.fuel_index.value).toFixed(2);
+    $("co2Out").textContent = "€" + sliders.co2_price_t.value;
+    $("handlingOut").textContent = "€" + Number(sliders.handling_ldm.value).toFixed(1);
+    $("stopsOut").textContent = sliders.max_stops.value;
+  }
+  function compute() {
+    showSliderValues();
+    const o = overrides();
+    const res = NetEngine.runScenario(NET, o);
+    state = Object.assign(state, { res, sum: NetEngine.summary(res), overrides: o });
+    render();
+    return state;
+  }
+  function bestPure(sum) { return ["direct", "milkrun", "crossdock"].reduce((a, b) => sum[b].objective < sum[a].objective ? b : a); }
+
+  function render() {
+    const s = state.sum, bp = bestPure(s), mix = s.bestmix;
+    const saving = s[bp].objective - mix.objective;
+    $("kpis").innerHTML = [
+      [eur(mix.cost_week), "best mix cost / week"],
+      [(100 * saving / s[bp].objective).toFixed(1) + "%", "saving vs " + LABEL[bp].toLowerCase()],
+      [f1(mix.co2_t_week) + " t", "CO2 / week, best mix"],
+      [String(mix.trucks_week), "truck trips / week"]
+    ].map(([v, l]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+    const minOf = k => Math.min(...ORDER.map(d => s[d][k]));
+    const cell = (d, k, txt) => `<td class="num">${txt}${s[d][k] === minOf(k) ? ' <span class="tag ok">low</span>' : ""}</td>`;
+    $("results").querySelector("tbody").innerHTML = ORDER.map(d => `<tr class="design-row${d === state.mapDesign ? " sel" : ""}" data-d="${d}" tabindex="0">
+      <td>${LABEL[d]}${d === "bestmix" ? ' <span class="tag info">Recommended</span>' : ""}</td>
+      ${cell(d, "cost_week", eur(s[d].cost_week))}${cell(d, "co2_t_week", f1(s[d].co2_t_week))}
+      ${cell(d, "trucks_week", s[d].trucks_week)}${cell(d, "plant_arrivals_week", s[d].plant_arrivals_week)}
+      <td class="num">${eur(s[d].objective)}</td></tr>`).join("");
+    $("mapTabs").innerHTML = ORDER.map(d => `<button type="button" data-d="${d}" aria-pressed="${d === state.mapDesign}">${LABEL[d]}</button>`).join("");
+    drawMap();
+  }
+
+  // Simple equirectangular projection, scaled for mid-latitude
+  const LAT0 = 47.5, KX = Math.cos(LAT0 * Math.PI / 180);
+  const pts = NET.suppliers.concat(NET.hubs, [NET.plant]);
+  const minX = Math.min(...pts.map(q => q.lon)) * KX, maxX = Math.max(...pts.map(q => q.lon)) * KX;
+  const minY = Math.min(...pts.map(q => q.lat)), maxY = Math.max(...pts.map(q => q.lat));
+  const W = 600, PAD = 22;
+  const scale = (W - 2 * PAD) / (maxX - minX);
+  const H = Math.round((maxY - minY) * scale + 2 * PAD);
+  const offX = PAD, offY = PAD;
+  $("map").setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const proj = q => [offX + (q.lon * KX - minX) * scale, offY + (maxY - q.lat) * scale];
+  const where = id => proj(id === "PLANT" ? NET.plant : (HUB[id] || SUPP[id]));
+
+  function drawMap() {
+    const d = state.res.designs[state.mapDesign];
+    const usedHubs = new Set(Object.values(d.hub_of));
+    let out = "";
+    for (const f of d.flows) {
+      const xy = f.path.map(where).map(([x, y]) => x.toFixed(1) + "," + y.toFixed(1)).join(" ");
+      const w = f.kind === "linehaul" ? Math.min(2 + f.trips * 0.12, 7) : f.kind === "direct" || f.kind === "full" ? Math.min(0.8 + f.trips * 0.18, 4) : 1.6;
+      out += `<polyline points="${xy}" fill="none" stroke="${COL[f.kind]}" stroke-width="${w.toFixed(2)}" stroke-opacity="${f.kind === "linehaul" ? 0.95 : 0.7}" stroke-linejoin="round"><title>${f.kind}: ${f.path.join(" > ")}, ${f.trips} trips/week</title></polyline>`;
+    }
+    for (const s of NET.suppliers) {
+      const [x, y] = proj(s), m = d.assign[s.id];
+      const r = 2.5 + Math.sqrt(s.ldm_week) * 0.55;
+      out += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${COL[m]}" stroke="#0c2c23" stroke-width="1"><title>${s.id} (${s.region}): ${s.ldm_week} ldm/week, ${s.freq}x/week, ${LABEL[m]}</title></circle>`;
+    }
+    for (const h of NET.hubs) {
+      const [x, y] = proj(h), on = usedHubs.has(h.id);
+      out += `<rect x="${(x - 7).toFixed(1)}" y="${(y - 7).toFixed(1)}" width="14" height="14" fill="${on ? "#e8d67d" : "none"}" stroke="#e8d67d" stroke-width="1.5" opacity="${on ? 1 : 0.5}"><title>${h.name}${on ? "" : " (not used)"}</title></rect>`;
+      out += `<text x="${(x + 10).toFixed(1)}" y="${(y + 4).toFixed(1)}" fill="#fffdf8" font-size="11" font-family="Inter, Arial" opacity="${on ? 1 : 0.6}">${h.id.replace("HUB-", "Hub ")}</text>`;
+    }
+    const [px, py] = proj(NET.plant);
+    out += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="9" fill="#fffdf8" stroke="#ff6b35" stroke-width="3"><title>${NET.plant.name}</title></circle>`;
+    out += `<text x="${(px + 13).toFixed(1)}" y="${(py - 8).toFixed(1)}" fill="#fffdf8" font-size="12" font-weight="600" font-family="Space Grotesk, Arial">OEM plant</text>`;
+    $("map").innerHTML = out;
+    const sum = state.sum[state.mapDesign];
+    $("legend").innerHTML = `<span><i style="background:#81a3da"></i>Direct</span><span><i style="background:#81cfb3"></i>Milk-run</span><span><i style="background:#e8d67d"></i>Collection to hub</span><span><i style="background:#ff6b35"></i>Hub line-haul</span>
+      <span style="margin-left:auto">${LABEL[state.mapDesign]}: ${eur(sum.cost_week)}, ${f1(sum.co2_t_week)} t CO2, ${sum.trucks_week} trips</span>`;
+  }
+
+  // ---- agent (deterministic simulation of the Copilot Studio agent) ----
+  function say(html, who) {
+    const el = document.createElement("div");
+    el.className = "msg " + (who || "bot");
+    el.innerHTML = html;
+    $("log").appendChild(el);
+    $("log").scrollTop = $("log").scrollHeight;
+  }
+  function paramsLine(o) {
+    return `diesel index ${o.fuel_index.toFixed(2)}, CO2 €${o.co2_price_t}/t, handling €${o.handling_ldm.toFixed(1)}/ldm, max ${o.max_stops} stops`;
+  }
+  function designTable(sum, ref) {
+    return `<table><tr><th>Design</th><th class="num">Cost/wk</th><th class="num">CO2 t</th><th class="num">Trucks</th></tr>` +
+      ORDER.map(d => `<tr><td>${LABEL[d]}</td><td class="num">${eur(sum[d].cost_week)}${ref ? " (" + pct(100 * (sum[d].cost_week - ref[d].cost_week) / ref[d].cost_week) + ")" : ""}</td><td class="num">${f1(sum[d].co2_t_week)}</td><td class="num">${sum[d].trucks_week}</td></tr>`).join("") + "</table>";
+  }
+  function intentRun() {
+    compute();
+    const s = state.sum, bp = bestPure(s);
+    logId++;
+    say(`Ran the scenario (${paramsLine(state.overrides)}).
+      <div class="card-ac" style="margin-top:8px"><h4>Scenario NS-${String(logId).padStart(4, "0")}</h4>${designTable(s)}</div>
+      Best mix costs ${eur(s.bestmix.cost_week)} a week, ${eur(s[bp].objective - s.bestmix.objective)} less than the cheapest single design (${LABEL[bp].toLowerCase()}).
+      <span class="cite">Tool: POST /scenarios via custom connector. Logged to Dataverse: Network Scenario NS-${String(logId).padStart(4, "0")} (simulated).</span>`);
+  }
+  function intentCompare() {
+    const s = state.sum;
+    const most = ORDER.reduce((a, b) => s[b].plant_arrivals_week > s[a].plant_arrivals_week ? b : a);
+    const greenest = ORDER.reduce((a, b) => s[b].co2_t_week < s[a].co2_t_week ? b : a);
+    const items = ["direct", "milkrun", "crossdock"].map(d =>
+      `<li><strong>${LABEL[d]}</strong>: ${eur(s[d].cost_week)} (${pct(100 * (s[d].cost_week - s.bestmix.cost_week) / s.bestmix.cost_week)} vs best mix), ${f1(s[d].co2_t_week)} t CO2, ${s[d].trucks_week} trips, ${s[d].plant_arrivals_week} plant arrivals.</li>`).join("");
+    say(`Per week, against the best mix (${eur(s.bestmix.cost_week)}, ${f1(s.bestmix.co2_t_week)} t, ${s.bestmix.trucks_week} trips):<ul>${items}</ul>
+      Lowest CO2: ${LABEL[greenest].toLowerCase()}. Most trucks at the plant gate: ${LABEL[most].toLowerCase()} (${s[most].plant_arrivals_week} a week).
+      <span class="cite">Source: engine results for the current sliders.</span>`);
+  }
+  function intentFuel(text) {
+    const m = /([+-]?\d+(?:\.\d+)?)\s*%/.exec(text || "");
+    let change = m ? Number(m[1]) : 30;
+    if (/down|drop|fall|cheaper|lower/i.test(text || "") && change > 0) change = -change;
+    const before = state.sum, beforeAssign = state.res.designs.bestmix.assign, oldIdx = Number(sliders.fuel_index.value);
+    const idx = Math.max(0.6, Math.min(1.8, Math.round((1 + change / 100) * 20) / 20));
+    sliders.fuel_index.value = idx;
+    compute();
+    const moved = Object.keys(beforeAssign).filter(k => beforeAssign[k] !== state.res.designs.bestmix.assign[k]).length;
+    say(`Diesel cost index ${oldIdx.toFixed(2)} to ${idx.toFixed(2)} (fuel is ${Math.round(100 * NetEngine.DEFAULTS.fuel_share)}% of the km rate).
+      <div class="card-ac" style="margin-top:8px"><h4>Cost change per design</h4>${designTable(state.sum, before)}</div>
+      ${moved ? `${moved} supplier${moved > 1 ? "s" : ""} switch mode in the best mix.` : "The best mix keeps the same mode for every supplier: the ranking is stable, only the bill moves."}
+      Least exposed: ${LABEL[["direct", "milkrun", "crossdock"].reduce((a, b) => Math.abs(state.sum[b].cost_week / before[b].cost_week - 1) < Math.abs(state.sum[a].cost_week / before[a].cost_week - 1) ? b : a)].toLowerCase()}, as fixed trip, stop and handling costs do not move with diesel.`);
+  }
+  function intentExplain() {
+    const mix = state.res.designs.bestmix, s = state.sum, bp = bestPure(s);
+    const by = { direct: [], milkrun: [], crossdock: [] };
+    for (const sp of NET.suppliers) by[mix.assign[sp.id]].push(sp);
+    const avg = (arr, f) => arr.length ? arr.reduce((a, x) => a + f(x), 0) / arr.length : 0;
+    const p = state.res.params, km = sp => NetEngine.roadKm(sp, NET.plant, p);
+    const regions = arr => [...new Set(arr.map(x => x.region))].sort().join(", ");
+    const hubs = {}; for (const [sid, h] of Object.entries(mix.hub_of)) if (mix.assign[sid] === "crossdock") hubs[h] = (hubs[h] || 0) + 1;
+    const li = [];
+    if (by.direct.length) li.push(`<li><strong>Direct (${by.direct.length})</strong>: average ${f1(avg(by.direct, x => x.ldm_week))} ldm a week and ${Math.round(avg(by.direct, km))} km. Volume fills trucks, so pooling adds stops without saving trips.</li>`);
+    if (by.milkrun.length) li.push(`<li><strong>Milk-run (${by.milkrun.length})</strong>: average ${f1(avg(by.milkrun, x => x.ldm_week))} ldm a week, regions ${regions(by.milkrun)}. Part loads share one truck a day.</li>`);
+    if (by.crossdock.length) li.push(`<li><strong>Cross-dock (${by.crossdock.length})</strong>: average ${f1(avg(by.crossdock, x => x.ldm_week))} ldm a week and ${Math.round(avg(by.crossdock, km))} km from the plant, via ${Object.entries(hubs).map(([h, n]) => h + " (" + n + ")").join(", ")}. Long distance plus small volume: a short collection and a full line-haul beat a long part-empty run.</li>`);
+    say(`I recommend the <strong>best mix</strong>: ${eur(s.bestmix.cost_week)} and ${f1(s.bestmix.co2_t_week)} t CO2 a week, ${eur(s[bp].objective - s.bestmix.objective)} below ${LABEL[bp].toLowerCase()} on cost plus CO2 price.<ul>${li.join("")}</ul>
+      Trade-off: ${s.bestmix.trucks_week} truck trips against ${s.direct.trucks_week} for all-direct, at the price of fixed daily milk-run and hub schedules.
+      <span class="cite">Rules: per-supplier mode choice by the engine; cost allocated by load x distance on shared routes.</span>`);
+  }
+  function setSlider(key, val, label) {
+    const el = sliders[key];
+    const v = Math.max(Number(el.min), Math.min(Number(el.max), val));
+    const before = state.sum;
+    el.value = v;
+    compute();
+    say(`Set ${label} to ${key === "max_stops" ? v : "€" + v}. Best mix now ${eur(state.sum.bestmix.cost_week)} (${pct(100 * (state.sum.bestmix.cost_week - before.bestmix.cost_week) / before.bestmix.cost_week)}), ${f1(state.sum.bestmix.co2_t_week)} t CO2, ${state.sum.bestmix.trucks_week} trips.
+      <span class="cite">Mix: ${state.sum.bestmix.mode_counts.direct} direct, ${state.sum.bestmix.mode_counts.milkrun} milk-run, ${state.sum.bestmix.mode_counts.crossdock} cross-dock.</span>`);
+  }
+  function reset() {
+    sliders.fuel_index.value = 1; sliders.co2_price_t.value = 0; sliders.handling_ldm.value = 6; sliders.max_stops.value = 4;
+    state.mapDesign = "bestmix";
+    compute();
+    say("Reset to the base case: diesel index 1.00, no CO2 price, handling €6.0/ldm, 4 stops.");
+  }
+  function handle(text) {
+    const t = text.toLowerCase();
+    const num = (/(\d+(?:\.\d+)?)/.exec(t) || [])[1];
+    if (/reset|base case/.test(t)) return reset();
+    if (/explain|why|recommend/.test(t)) return intentExplain();
+    if (/compare|versus|vs\b|difference/.test(t)) return intentCompare();
+    if (/fuel|diesel/.test(t)) return intentFuel(text);
+    if (/co2|carbon/.test(t) && num) return setSlider("co2_price_t", Number(num), "the CO2 price per tonne");
+    if (/stop/.test(t) && num) return setSlider("max_stops", Math.round(Number(num)), "milk-run max stops");
+    if (/handling|cross.?dock cost/.test(t) && num) return setSlider("handling_ldm", Number(num), "cross-dock handling per ldm");
+    if (/run|scenario|calculate/.test(t)) return intentRun();
+    say("I can run a scenario, compare designs, test a diesel change (\"diesel +20%\"), set a CO2 price, handling cost or max stops, and explain the recommendation.");
+  }
+  function ask(text) { say(esc(text), "user"); handle(text); }
+
+  // ---- wiring ----
+  let timer = null;
+  Object.values(sliders).forEach(el => el.addEventListener("input", () => { showSliderValues(); clearTimeout(timer); timer = setTimeout(compute, 120); }));
+  $("suggest").addEventListener("click", e => { const b = e.target.closest("button"); if (b) ask(b.dataset.q); });
+  $("ask").addEventListener("submit", e => { e.preventDefault(); const v = $("q").value.trim(); if (v) { ask(v); $("q").value = ""; } });
+  const pick = d => { if (d) { state.mapDesign = d; render(); } };
+  $("mapTabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) pick(b.dataset.d); });
+  $("results").addEventListener("click", e => { const r = e.target.closest("tr[data-d]"); if (r) pick(r.dataset.d); });
+  $("results").addEventListener("keydown", e => { const r = e.target.closest("tr[data-d]"); if (r && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pick(r.dataset.d); } });
+
+  compute();
+  say("Hello. I compare inbound network designs for the plant on cost, CO2 and truck movements. Pick a suggestion below or move the sliders.");
+
+  // Hash states for screenshots: #state=result | fuel | crossdock
+  const hs = (/state=([a-z]+)/.exec(location.hash) || [])[1];
+  if (hs === "result") { ask("Run a scenario"); ask("Explain the recommendation"); }
+  if (hs === "fuel") { ask("What if diesel goes up 30%?"); }
+  if (hs === "crossdock") { sliders.max_stops.value = 2; compute(); state.mapDesign = "crossdock"; render(); ask("Compare designs"); }
+
+  // Parity check: JS engine vs Python baseline export
+  setTimeout(() => {
+    let worst = 0, n = 0;
+    for (const sc of BASE.scenarios) {
+      const js = NetEngine.summary(NetEngine.runScenario(NET, sc.overrides));
+      for (const d of ORDER) for (const k of ["cost_week", "co2_t_week", "trucks_week"]) {
+        const py = sc.results[d][k], dev = py ? Math.abs(js[d][k] - py) / Math.abs(py) : 0;
+        worst = Math.max(worst, dev); n++;
+      }
+    }
+    $("parity").innerHTML = `Engine parity: JavaScript port vs Python baseline on ${BASE.scenarios.length} scenarios, ${n} values, max deviation ${(100 * worst).toFixed(3)}% <span class="tag ${worst <= 0.005 ? "ok" : "bad"}">${worst <= 0.005 ? "within 0.5%" : "check"}</span>`;
+  }, 50);
+})();
+</script>
+</body>
+</html>

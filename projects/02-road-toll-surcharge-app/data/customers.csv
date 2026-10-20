@@ -1,0 +1,41 @@
+customer_id,name,industry,allocation_basis
+C001,Customer 001,Steel manufacturer,pallet
+C002,Customer 002,Machinery maker,pallet
+C003,Customer 003,Paper and packaging,pallet
+C004,Customer 004,Paper and packaging,weight
+C005,Customer 005,Machinery maker,weight
+C006,Customer 006,Consumer electronics,pallet
+C007,Customer 007,Automotive OEM,pallet
+C008,Customer 008,Agri-food,weight
+C009,Customer 009,Paper and packaging,pallet
+C010,Customer 010,Steel manufacturer,pallet
+C011,Customer 011,Agri-food,pallet
+C012,Customer 012,Agri-food,weight
+C013,Customer 013,Consumer electronics,pallet
+C014,Customer 014,Automotive OEM,pallet
+C015,Customer 015,Agri-food,weight
+C016,Customer 016,Paper and packaging,pallet
+C017,Customer 017,Consumer electronics,pallet
+C018,Customer 018,Building materials,pallet
+C019,Customer 019,Agri-food,pallet
+C020,Customer 020,Consumer electronics,weight
+C021,Customer 021,Food and beverage,weight
+C022,Customer 022,Consumer electronics,pallet
+C023,Customer 023,Paper and packaging,pallet
+C024,Customer 024,Chemicals producer,pallet
+C025,Customer 025,Food and beverage,pallet
+C026,Customer 026,Building materials,pallet
+C027,Customer 027,Paper and packaging,pallet
+C028,Customer 028,Paper and packaging,pallet
+C029,Customer 029,Agri-food,pallet
+C030,Customer 030,Retail chain,weight
+C031,Customer 031,Consumer electronics,pallet
+C032,Customer 032,Consumer electronics,pallet
+C033,Customer 033,Automotive OEM,weight
+C034,Customer 034,Automotive OEM,pallet
+C035,Customer 035,Paper and packaging,pallet
+C036,Customer 036,Machinery maker,pallet
+C037,Customer 037,Chemicals producer,pallet
+C038,Customer 038,Steel manufacturer,pallet
+C039,Customer 039,Retail chain,pallet
+C040,Customer 040,Paper and packaging,weight

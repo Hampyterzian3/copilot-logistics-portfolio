@@ -1,0 +1,73 @@
+{
+  "$description": "hampy personal brand. Extracted from the hampy brand kit tokens.css and BRAND_GUIDE.md; palette origin mttn soft palette (2026-10-06).",
+  "$extensions": {
+    "brand": { "id": "hampy", "name": "hampy", "mode": "dark canvas" },
+    "office": {
+      "dk1": "{color.green}", "lt1": "{color.offwhite}", "dk2": "{color.surface}", "lt2": "{color.blueSoft}",
+      "accent1": "{color.orange}", "accent2": "{color.blue}", "accent3": "{color.lime}",
+      "accent4": "{color.pink}", "accent5": "{color.yellow}", "accent6": "{color.pinkSoft}",
+      "hlink": "{color.surface}", "folHlink": "{color.green}",
+      "majorFont": "Space Grotesk", "minorFont": "Inter"
+    },
+    "powerapps": { "brandBase": "{color.green}" },
+    "contrastPairs": [
+      { "label": "Body text on canvas", "fg": "{role.text}", "bg": "{role.canvas}" },
+      { "label": "Text on raised surface", "fg": "{role.text}", "bg": "{role.surface}" },
+      { "label": "Ink on light card", "fg": "{role.cardText}", "bg": "{role.card}" },
+      { "label": "Accent numerals on canvas", "fg": "{role.accent}", "bg": "{role.canvas}", "large": true },
+      { "label": "Button text on accent", "fg": "{role.onAccent}", "bg": "{role.accent}" },
+      { "label": "Ink on success chip", "fg": "{color.green}", "bg": "{role.success}" },
+      { "label": "Ink on warning chip", "fg": "{color.green}", "bg": "{role.warning}" },
+      { "label": "Ink on danger chip", "fg": "{color.green}", "bg": "{role.danger}" },
+      { "label": "Ink on info chip", "fg": "{color.green}", "bg": "{role.info}" },
+      { "label": "Offwhite on orange (banned by guide)", "fg": "{color.offwhite}", "bg": "{color.orange}", "expectFail": true },
+      { "label": "Offwhite on lime (banned by guide)", "fg": "{color.offwhite}", "bg": "{color.lime}", "expectFail": true }
+    ]
+  },
+  "color": {
+    "$type": "color",
+    "green":    { "$value": "#0c2c23", "$description": "Canvas, ink on every bright fill" },
+    "offwhite": { "$value": "#fffdf8", "$description": "Text on green, light canvas" },
+    "orange":   { "$value": "#ff6b35", "$description": "The single bright accent: cursor, CTA, numerals" },
+    "pink":     { "$value": "#da81a7" },
+    "pinkSoft": { "$value": "#e8b0c6" },
+    "blue":     { "$value": "#81a3da" },
+    "blueSoft": { "$value": "#b0c6e8" },
+    "lime":     { "$value": "#81cfb3" },
+    "yellow":   { "$value": "#e8d67d" },
+    "surface":  { "$value": "#244139", "$description": "White 10% flattened on green" }
+  },
+  "role": {
+    "$type": "color",
+    "canvas":   { "$value": "{color.green}" },
+    "surface":  { "$value": "{color.surface}" },
+    "text":     { "$value": "{color.offwhite}" },
+    "card":     { "$value": "{color.offwhite}" },
+    "cardText": { "$value": "{color.green}" },
+    "accent":   { "$value": "{color.orange}" },
+    "onAccent": { "$value": "{color.green}" },
+    "success":  { "$value": "{color.lime}" },
+    "warning":  { "$value": "{color.yellow}" },
+    "danger":   { "$value": "{color.pink}" },
+    "info":     { "$value": "{color.blue}" }
+  },
+  "chart": {
+    "$type": "color",
+    "1": { "$value": "{color.orange}" },
+    "2": { "$value": "{color.blue}" },
+    "3": { "$value": "{color.lime}" },
+    "4": { "$value": "{color.pink}" },
+    "5": { "$value": "{color.yellow}" }
+  },
+  "font": {
+    "$type": "fontFamily",
+    "display": { "$value": ["Pixelify Sans", "Space Grotesk", "Arial", "sans-serif"], "$description": "48px and up only" },
+    "heading": { "$value": ["Space Grotesk", "Inter", "Arial", "sans-serif"] },
+    "body":    { "$value": ["Inter", "Arial", "sans-serif"] }
+  },
+  "radius": {
+    "$type": "dimension",
+    "sm":   { "$value": "4px", "$description": "Buttons, inputs" },
+    "card": { "$value": "12px", "$description": "Cards, chips" }
+  }
+}

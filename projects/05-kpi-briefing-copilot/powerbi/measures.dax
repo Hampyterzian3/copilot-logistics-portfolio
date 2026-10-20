@@ -1,0 +1,238 @@
+// Contoso Logistics: Executive KPI Briefing semantic model
+// Home table for all measures: _Measures. Star schema: FactWeeklyKPI -> DimCustomer, DimWeek.
+// DimWeek[WeekIndex] is a contiguous integer (1 = first week), so "previous 8 weeks" is a simple range.
+// Baseline = median of the previous 8 weekly values. Spread = 1.4826 x median absolute deviation (robust sigma).
+// Mirrors projects/05-kpi-briefing-copilot/src/briefing.py; thresholds live in the Thresholds table.
+
+// ============================================================ base KPIs
+Shipments = SUM ( FactWeeklyKPI[Shipments] )
+
+Revenue = SUM ( FactWeeklyKPI[RevenueEUR] )
+
+Cost = SUM ( FactWeeklyKPI[CostEUR] )
+
+Cost to Serve per Shipment = DIVIDE ( [Cost], [Shipments] )
+
+Revenue per Shipment = DIVIDE ( [Revenue], [Shipments] )
+
+Margin % = DIVIDE ( [Revenue] - [Cost], [Revenue] )
+
+OTP % = DIVIDE ( SUM ( FactWeeklyKPI[OnTimeShipments] ), [Shipments] )
+
+Claims = SUM ( FactWeeklyKPI[Claims] )
+
+CO2 kg per Shipment = DIVIDE ( SUM ( FactWeeklyKPI[CO2Kg] ), [Shipments] )
+
+// ============================================================ week helpers
+Selected Week Index = MAX ( DimWeek[WeekIndex] )
+
+Has Full Baseline = [Selected Week Index] > 8
+
+// ============================================================ week on week
+Shipments Prev Week =
+VAR _w = [Selected Week Index]
+RETURN CALCULATE ( [Shipments], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _w - 1 )
+
+Shipments WoW % = DIVIDE ( [Shipments] - [Shipments Prev Week], [Shipments Prev Week] )
+
+Revenue Prev Week =
+VAR _w = [Selected Week Index]
+RETURN CALCULATE ( [Revenue], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _w - 1 )
+
+Revenue WoW % = DIVIDE ( [Revenue] - [Revenue Prev Week], [Revenue Prev Week] )
+
+Cost to Serve WoW % =
+VAR _w = [Selected Week Index]
+VAR _prev = CALCULATE ( [Cost to Serve per Shipment], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _w - 1 )
+RETURN DIVIDE ( [Cost to Serve per Shipment] - _prev, _prev )
+
+Margin % WoW pp =
+VAR _w = [Selected Week Index]
+VAR _prev = CALCULATE ( [Margin %], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _w - 1 )
+RETURN ( [Margin %] - _prev ) * 100
+
+OTP % WoW pp =
+VAR _w = [Selected Week Index]
+VAR _prev = CALCULATE ( [OTP %], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _w - 1 )
+RETURN ( [OTP %] - _prev ) * 100
+
+Claims WoW =
+VAR _w = [Selected Week Index]
+RETURN [Claims] - CALCULATE ( [Claims], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _w - 1 )
+
+CO2 WoW % =
+VAR _w = [Selected Week Index]
+VAR _prev = CALCULATE ( [CO2 kg per Shipment], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _w - 1 )
+RETURN DIVIDE ( [CO2 kg per Shipment] - _prev, _prev )
+
+// ============================================================ 8-week baseline (median) and robust spread
+// Pattern shown in full for Margin %; the other KPIs repeat it with their own base measure.
+Margin % Baseline =
+VAR _w = [Selected Week Index]
+VAR _win = CALCULATETABLE ( VALUES ( DimWeek[WeekIndex] ), REMOVEFILTERS ( DimWeek ),
+                            DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+RETURN IF ( [Has Full Baseline],
+    MEDIANX ( _win, VAR _i = DimWeek[WeekIndex]
+                    RETURN CALCULATE ( [Margin %], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _i ) ) )
+
+Margin % Spread =
+VAR _w = [Selected Week Index]
+VAR _base = [Margin % Baseline]
+VAR _win = CALCULATETABLE ( VALUES ( DimWeek[WeekIndex] ), REMOVEFILTERS ( DimWeek ),
+                            DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+RETURN 1.4826 * MEDIANX ( _win, VAR _i = DimWeek[WeekIndex]
+    RETURN ABS ( CALCULATE ( [Margin %], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _i ) - _base ) )
+
+Margin % vs Baseline pp = ( [Margin %] - [Margin % Baseline] ) * 100
+
+Margin % Z =
+VAR _floor = 0.0025   // 0.25 pp
+RETURN DIVIDE ( [Margin %] - [Margin % Baseline], MAX ( [Margin % Spread], _floor ) )
+
+OTP % Baseline =
+VAR _w = [Selected Week Index]
+VAR _win = CALCULATETABLE ( VALUES ( DimWeek[WeekIndex] ), REMOVEFILTERS ( DimWeek ),
+                            DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+RETURN IF ( [Has Full Baseline],
+    MEDIANX ( _win, VAR _i = DimWeek[WeekIndex]
+                    RETURN CALCULATE ( [OTP %], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _i ) ) )
+
+OTP % Spread =
+VAR _w = [Selected Week Index]
+VAR _base = [OTP % Baseline]
+VAR _win = CALCULATETABLE ( VALUES ( DimWeek[WeekIndex] ), REMOVEFILTERS ( DimWeek ),
+                            DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+RETURN 1.4826 * MEDIANX ( _win, VAR _i = DimWeek[WeekIndex]
+    RETURN ABS ( CALCULATE ( [OTP %], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _i ) - _base ) )
+
+OTP % vs Baseline pp = ( [OTP %] - [OTP % Baseline] ) * 100
+
+OTP % Z = DIVIDE ( [OTP %] - [OTP % Baseline], MAX ( [OTP % Spread], 0.0025 ) )
+
+Shipments Baseline =
+VAR _w = [Selected Week Index]
+VAR _win = CALCULATETABLE ( VALUES ( DimWeek[WeekIndex] ), REMOVEFILTERS ( DimWeek ),
+                            DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+RETURN IF ( [Has Full Baseline],
+    MEDIANX ( _win, VAR _i = DimWeek[WeekIndex]
+                    RETURN CALCULATE ( [Shipments], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _i ) ) )
+
+Shipments Spread =
+VAR _w = [Selected Week Index]
+VAR _base = [Shipments Baseline]
+VAR _win = CALCULATETABLE ( VALUES ( DimWeek[WeekIndex] ), REMOVEFILTERS ( DimWeek ),
+                            DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+RETURN 1.4826 * MEDIANX ( _win, VAR _i = DimWeek[WeekIndex]
+    RETURN ABS ( CALCULATE ( [Shipments], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _i ) - _base ) )
+
+Shipments vs Baseline % = DIVIDE ( [Shipments] - [Shipments Baseline], [Shipments Baseline] )
+
+Shipments Z = DIVIDE ( [Shipments] - [Shipments Baseline], MAX ( [Shipments Spread], 0.01 * [Shipments Baseline] ) )
+
+Revenue Baseline =
+VAR _w = [Selected Week Index]
+VAR _win = CALCULATETABLE ( VALUES ( DimWeek[WeekIndex] ), REMOVEFILTERS ( DimWeek ),
+                            DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+RETURN IF ( [Has Full Baseline],
+    MEDIANX ( _win, VAR _i = DimWeek[WeekIndex]
+                    RETURN CALCULATE ( [Revenue], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _i ) ) )
+
+Revenue Spread =
+VAR _w = [Selected Week Index]
+VAR _base = [Revenue Baseline]
+VAR _win = CALCULATETABLE ( VALUES ( DimWeek[WeekIndex] ), REMOVEFILTERS ( DimWeek ),
+                            DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+RETURN 1.4826 * MEDIANX ( _win, VAR _i = DimWeek[WeekIndex]
+    RETURN ABS ( CALCULATE ( [Revenue], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _i ) - _base ) )
+
+Revenue vs Baseline % = DIVIDE ( [Revenue] - [Revenue Baseline], [Revenue Baseline] )
+
+Revenue Z = DIVIDE ( [Revenue] - [Revenue Baseline], MAX ( [Revenue Spread], 0.01 * [Revenue Baseline] ) )
+
+Cost to Serve Baseline =
+VAR _w = [Selected Week Index]
+VAR _win = CALCULATETABLE ( VALUES ( DimWeek[WeekIndex] ), REMOVEFILTERS ( DimWeek ),
+                            DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+RETURN IF ( [Has Full Baseline],
+    MEDIANX ( _win, VAR _i = DimWeek[WeekIndex]
+                    RETURN CALCULATE ( [Cost to Serve per Shipment], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _i ) ) )
+
+Cost to Serve vs Baseline % = DIVIDE ( [Cost to Serve per Shipment] - [Cost to Serve Baseline], [Cost to Serve Baseline] )
+
+Claims Baseline =
+VAR _w = [Selected Week Index]
+VAR _win = CALCULATETABLE ( VALUES ( DimWeek[WeekIndex] ), REMOVEFILTERS ( DimWeek ),
+                            DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+RETURN IF ( [Has Full Baseline],
+    MEDIANX ( _win, VAR _i = DimWeek[WeekIndex]
+                    RETURN CALCULATE ( [Claims], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _i ) ) )
+
+Claims vs Baseline = [Claims] - [Claims Baseline]
+
+CO2 Baseline =
+VAR _w = [Selected Week Index]
+VAR _win = CALCULATETABLE ( VALUES ( DimWeek[WeekIndex] ), REMOVEFILTERS ( DimWeek ),
+                            DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+RETURN IF ( [Has Full Baseline],
+    MEDIANX ( _win, VAR _i = DimWeek[WeekIndex]
+                    RETURN CALCULATE ( [CO2 kg per Shipment], REMOVEFILTERS ( DimWeek ), DimWeek[WeekIndex] = _i ) ) )
+
+CO2 vs Baseline % = DIVIDE ( [CO2 kg per Shipment] - [CO2 Baseline], [CO2 Baseline] )
+
+// Cost to Serve, Claims and CO2 Spread / Z follow the Revenue pattern (floors: 0.5% relative, 1 claim, 1% relative).
+
+// ============================================================ flags and materiality
+// Thresholds is a small disconnected table maintained by the analytics team (one row per KPI).
+Margin Flag =
+VAR _thr = LOOKUPVALUE ( Thresholds[Threshold], Thresholds[KPI], "Margin %" )   // 2.0 pp
+RETURN ABS ( [Margin % vs Baseline pp] ) >= _thr && ABS ( [Margin % Z] ) >= 2
+
+OTP Flag =
+VAR _thr = LOOKUPVALUE ( Thresholds[Threshold], Thresholds[KPI], "OTP %" )      // 2.0 pp
+RETURN ABS ( [OTP % vs Baseline pp] ) >= _thr && ABS ( [OTP % Z] ) >= 2
+
+Shipments Flag =
+VAR _thr = LOOKUPVALUE ( Thresholds[Threshold], Thresholds[KPI], "Shipments" )  // 0.10
+RETURN ABS ( [Shipments vs Baseline %] ) >= _thr && ABS ( [Shipments Z] ) >= 2
+
+Revenue Share of Top Six =
+VAR _b = [Revenue Baseline]
+VAR _all = SUMX ( ALL ( DimCustomer[CustomerKey] ), [Revenue Baseline] )
+RETURN DIVIDE ( _b, _all )
+
+// |z| capped at 8 x KPI weight x size factor (1.0 for an average customer of six)
+Margin Materiality Score =
+IF ( [Margin Flag],
+    MIN ( ABS ( [Margin % Z] ), 8 ) * 1.0 * SQRT ( [Revenue Share of Top Six] * 6 ) )
+
+OTP Materiality Score =
+IF ( [OTP Flag],
+    MIN ( ABS ( [OTP % Z] ), 8 ) * 0.9 * SQRT ( [Revenue Share of Top Six] * 6 ) )
+
+Shipments Materiality Score =
+IF ( [Shipments Flag],
+    MIN ( ABS ( [Shipments Z] ), 8 ) * 0.7 * SQRT ( [Revenue Share of Top Six] * 6 ) )
+
+Materiality Tag (Margin) =
+VAR _s = [Margin Materiality Score]
+RETURN SWITCH ( TRUE (), ISBLANK ( _s ), BLANK (), _s >= 5, "High", _s >= 3, "Medium", "Low" )
+
+// ============================================================ margin bridge (pooled 8 weeks)
+Revenue per Shipment Baseline =
+VAR _w = [Selected Week Index]
+RETURN CALCULATE ( [Revenue per Shipment], REMOVEFILTERS ( DimWeek ),
+                   DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+
+Cost per Shipment Baseline =
+VAR _w = [Selected Week Index]
+RETURN CALCULATE ( [Cost to Serve per Shipment], REMOVEFILTERS ( DimWeek ),
+                   DimWeek[WeekIndex] >= _w - 8, DimWeek[WeekIndex] <= _w - 1 )
+
+Margin Rate Effect pp =
+VAR _mb = 1 - DIVIDE ( [Cost per Shipment Baseline], [Revenue per Shipment Baseline] )
+VAR _mr = 1 - DIVIDE ( [Cost per Shipment Baseline], [Revenue per Shipment] )
+RETURN ( _mr - _mb ) * 100
+
+Margin Cost Effect pp =
+VAR _mr = 1 - DIVIDE ( [Cost per Shipment Baseline], [Revenue per Shipment] )
+RETURN ( [Margin %] - _mr ) * 100

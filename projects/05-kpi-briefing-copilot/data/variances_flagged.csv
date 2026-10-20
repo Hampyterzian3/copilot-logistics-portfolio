@@ -1,0 +1,21 @@
+week,rank,customer,metric,value_fmt,baseline_fmt,vs_base,z,score,tag
+2026-W24,1,Tailspin Retail,claims,12,6.5,5.5,2.47,1.36,Low
+2026-W27,1,Adventure Works Consumer,claims,9,4,5.0,2.25,1.19,Low
+2026-W29,1,Tailspin Retail,claims,4,9,-5.0,-2.25,1.23,Low
+2026-W31,1,Fabrikam Steel,margin_pct,5.9%,12.2%,-6.3,-11.97,8.83,High
+2026-W31,2,Fabrikam Steel,cts,€737,€686,0.0744,12.74,7.06,High
+2026-W32,1,Fabrikam Steel,cts,€730,€687,0.0633,10.86,7.07,High
+2026-W32,2,Fabrikam Steel,margin_pct,6.4%,12.1%,-5.68,-5.85,6.46,High
+2026-W33,1,Fabrikam Steel,cts,€731,€687,0.0638,10.95,7.08,High
+2026-W33,2,Fabrikam Steel,margin_pct,6.3%,12.1%,-5.77,-5.94,6.57,High
+2026-W35,1,Tailspin Retail,otp_pct,91.0%,97.2%,-6.18,-22.53,6.64,High
+2026-W35,2,Adventure Works Consumer,claims,12,2,10.0,10.0,4.23,Medium
+2026-W35,3,Tailspin Retail,claims,13,7,6.0,2.7,1.49,Low
+2026-W36,1,Tailspin Retail,otp_pct,90.3%,97.2%,-6.8,-18.35,6.63,High
+2026-W36,2,Tailspin Retail,margin_pct,10.8%,8.4%,2.335,3.99,3.67,Medium
+2026-W36,3,Tailspin Retail,claims,19,7.5,11.5,5.17,2.86,Low
+2026-W38,1,Northwind Automotive,revenue,€1.03m,€0.75m,0.3612,20.45,7.81,High
+2026-W38,2,Northwind Automotive,shipments,"2,518","1,842",0.367,26.05,6.08,High
+2026-W39,1,Northwind Automotive,revenue,€0.97m,€0.76m,0.2752,16.42,7.95,High
+2026-W39,2,Northwind Automotive,shipments,"2,366","1,852",0.2772,16.11,6.18,High
+2026-W39,3,Fabrikam Steel,margin_pct,10.0%,12.3%,-2.375,-2.05,2.26,Low

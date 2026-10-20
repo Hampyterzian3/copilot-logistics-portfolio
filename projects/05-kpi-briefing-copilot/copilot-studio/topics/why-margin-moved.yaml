@@ -1,0 +1,67 @@
+kind: AdaptiveDialog
+modelDescription: Explains why gross margin moved for one customer in a given week, splitting the change into a rate effect (revenue per shipment) and a cost effect (cost to serve per shipment) from the governed semantic model.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Why did margin move for customer X
+    triggerQueries:
+      - Why did margin move for Fabrikam Steel
+      - Why is margin down for this customer
+      - Explain the margin dip
+      - What drove the margin change for Northwind Automotive
+      - Margin bridge for a customer
+
+  actions:
+    - kind: Question
+      id: askCustomer
+      interruptionPolicy:
+        allowInterruption: true
+      variable: init:Topic.Customer
+      prompt: Which customer?
+      entity:
+        kind: ClosedListEntityReference
+        entityId: TopSixCustomers
+      alwaysPrompt: false
+
+    - kind: Question
+      id: askWeek
+      variable: init:Topic.WeekLabel
+      prompt: Which week? Say "latest" or a week such as 2026-W32.
+      entity: StringPrebuiltEntity
+      defaultValue: latest
+      alwaysPrompt: false
+
+    - kind: InvokeFlowAction
+      id: getBridge
+      flowId: 00000000-0000-0000-0000-000000000502
+      input:
+        binding:
+          customerName: =Topic.Customer
+          weekLabel: =Topic.WeekLabel
+      output:
+        binding:
+          marginPct: Topic.MarginPct
+          marginBaseline: Topic.MarginBaseline
+          marginVsBasePP: Topic.MarginVsBasePP
+          rateEffectPP: Topic.RateEffectPP
+          costEffectPP: Topic.CostEffectPP
+          revPerShipment: Topic.RevPerShipment
+          revPerShipmentBase: Topic.RevPerShipmentBase
+          costPerShipment: Topic.CostPerShipment
+          costPerShipmentBase: Topic.CostPerShipmentBase
+          materialityTag: Topic.Tag
+
+    - kind: SetVariable
+      id: setDriver
+      variable: Topic.Driver
+      value: =If(Abs(Topic.CostEffectPP) >= Abs(Topic.RateEffectPP), "cost to serve", "price and mix (revenue per shipment)")
+
+    - kind: SendActivity
+      id: answer
+      activity: |-
+        {Topic.Customer}, {Topic.WeekLabel}: margin {Text(Topic.MarginPct, "0.0%")} against an eight-week baseline of {Text(Topic.MarginBaseline, "0.0%")} ({Text(Topic.MarginVsBasePP, "+0.0;-0.0")} pp, {Topic.Tag}).
+        - Revenue per shipment €{Text(Topic.RevPerShipment, "#,##0")} against €{Text(Topic.RevPerShipmentBase, "#,##0")}: rate effect {Text(Topic.RateEffectPP, "+0.0;-0.0")} pp
+        - Cost to serve €{Text(Topic.CostPerShipment, "#,##0")} against €{Text(Topic.CostPerShipmentBase, "#,##0")}: cost effect {Text(Topic.CostEffectPP, "+0.0;-0.0")} pp
+        Main driver: {Topic.Driver}.
+        Sources: [Margin %], [Margin % Baseline], [Margin Rate Effect pp], [Margin Cost Effect pp].

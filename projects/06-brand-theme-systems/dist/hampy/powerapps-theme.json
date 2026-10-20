@@ -1,0 +1,36 @@
+{
+  "name": "hampy",
+  "format": "Fluent 2 BrandVariants palette (10 to 160) with token overrides, for Power Apps modern controls",
+  "brandBase": "#0c2c23",
+  "palette": {
+    "10": "#020907",
+    "20": "#040e0b",
+    "30": "#05130f",
+    "40": "#071813",
+    "50": "#081d17",
+    "60": "#09221b",
+    "70": "#0b271f",
+    "80": "#0c2c23",
+    "90": "#29453d",
+    "100": "#455e57",
+    "110": "#627671",
+    "120": "#7e8f8a",
+    "130": "#9ba8a4",
+    "140": "#b7c1be",
+    "150": "#d4dad8",
+    "160": "#f0f2f2"
+  },
+  "overrides": {
+    "colorNeutralBackground1": "#fffdf8",
+    "colorNeutralForeground1": "#0c2c23",
+    "colorNeutralBackground2": "#0c2c23",
+    "colorBrandBackground": "#0c2c23",
+    "colorCompoundBrandBackground": "#ff6b35",
+    "colorNeutralForegroundOnBrand": "#ffffff",
+    "colorPaletteGreenBackground3": "#81cfb3",
+    "colorPaletteYellowBackground3": "#e8d67d",
+    "colorPaletteRedBackground3": "#da81a7",
+    "colorPaletteBerryBackground3": "#81a3da"
+  },
+  "fontFamilyBase": "Inter, Arial, sans-serif"
+}

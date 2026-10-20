@@ -1,0 +1,56 @@
+{
+  "train_snapshots": 5428,
+  "test_snapshots": 1772,
+  "cutoff": "2026-08-01",
+  "test_late": 192,
+  "test_late_rate": 0.1084,
+  "critical": {
+    "flagged": 32,
+    "tp": 31,
+    "fp": 1,
+    "fn": 161,
+    "tn": 1579,
+    "precision": 0.9688,
+    "recall": 0.1615
+  },
+  "at_risk_or_above": {
+    "flagged": 122,
+    "tp": 94,
+    "fp": 28,
+    "fn": 98,
+    "tn": 1552,
+    "precision": 0.7705,
+    "recall": 0.4896
+  },
+  "watch_or_above": {
+    "flagged": 377,
+    "tp": 140,
+    "fp": 237,
+    "fn": 52,
+    "tn": 1343,
+    "precision": 0.3714,
+    "recall": 0.7292
+  },
+  "by_band": {
+    "critical": {
+      "shipments": 32,
+      "late": 31,
+      "late_rate": 0.9688
+    },
+    "at_risk": {
+      "shipments": 90,
+      "late": 63,
+      "late_rate": 0.7
+    },
+    "watch": {
+      "shipments": 255,
+      "late": 46,
+      "late_rate": 0.1804
+    },
+    "on_track": {
+      "shipments": 1395,
+      "late": 52,
+      "late_rate": 0.0373
+    }
+  }
+}

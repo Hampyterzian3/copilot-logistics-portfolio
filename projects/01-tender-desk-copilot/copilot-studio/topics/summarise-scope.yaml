@@ -1,0 +1,39 @@
+kind: AdaptiveDialog
+modelDescription: Summarises RFQ scope (lanes, countries, volumes, corridors) and the suggested mode per lane band.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Summarise scope
+    triggerQueries:
+      - summarise scope
+      - how big is this tender
+      - which countries are in the RFQ
+      - suggest mode per lane
+      - how many pallets a year
+
+  actions:
+    - kind: Question
+      id: askFolder
+      variable: Topic.RfqFolder
+      prompt: Which RFQ folder should I summarise?
+      entity: StringPrebuiltEntity
+      alwaysPrompt: false
+
+    - kind: SetVariable
+      id: getTender
+      variable: Topic.Tender
+      value: =LookUp(Tenders, 'RFQ Folder' = Topic.RfqFolder)
+
+    - kind: SendActivity
+      id: scope
+      activity: |-
+        {Topic.Tender.Title}: {Topic.Tender.'Lane Count'} lanes across {Topic.Tender.Countries}.
+        Known volume: {Text(Topic.Tender.'Annual Pallets', "#,##0")} pallets in {Text(Topic.Tender.'Annual Shipments', "#,##0")} shipments a year.
+        Hazardous lanes: {Topic.Tender.'Hazardous Lanes'}.
+        Suggested mode per lane band: {Topic.Tender.'Mode Bands'}.
+        Source: rfq-summary.md in the RFQ Library.
+
+    - kind: SendActivity
+      id: nextStep
+      activity: For the customer presentation, open rfq-summary.md and ask Copilot in PowerPoint to "create a solution outline from this file" using the Solution templates library.

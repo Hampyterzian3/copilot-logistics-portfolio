@@ -1,0 +1,91 @@
+{
+  "id": "02",
+  "slug": "road-toll-surcharge-app",
+  "title": "Road-Toll Surcharge Recovery App",
+  "outcome": "Per-customer toll impact, a defensible surcharge and the right approver in one screen.",
+  "summary": "A new per-kilometre HGV toll hits every customer contract at once, and commercial teams need each customer's impact and an approved surcharge fast. Built a tested toll model, a Power Apps surcharge screen with margin effect, a tiered Power Automate approval and a Power BI steering dashboard.",
+  "stack": [
+    "Power Apps",
+    "Dataverse",
+    "Power Automate",
+    "Power BI",
+    "Copilot in Power Apps",
+    "Copilot Studio",
+    "Python",
+    "GitHub Copilot"
+  ],
+  "cv": "Inspired by: quantified the commercial impact of the Dutch road-freight toll across more than 400,000 annual shipments and 2,400 customers, and built the customer surcharge recovery model and executive dashboard for the Commercial Steering Committee.",
+  "demo": "demos/02-road-toll-surcharge-app.html",
+  "repo": "projects/02-road-toll-surcharge-app",
+  "cards": [
+    {
+      "type": "image",
+      "title": "Surcharge proposal and approval",
+      "caption": "Pick a customer, choose flat, % of freight or per km recovery, see the margin effect and submit. The approval card shows the correct tier and route. Synthetic data, illustrative rates.",
+      "src": "media/02/result.png",
+      "alt": "Power Apps style screen with customer list, surcharge proposal, margin bars and an approval card for the steering committee"
+    },
+    {
+      "type": "diagram",
+      "title": "Architecture",
+      "caption": "Dataverse holds customers, shipments, lanes, toll rates and proposals. A Python model writes toll per shipment; Power Apps, Power Automate, Teams and Power BI do the rest.",
+      "src": "media/02/architecture.svg",
+      "alt": "Architecture diagram from shipment data and toll rates through Dataverse to Power Apps, Power Automate, Teams and Power BI"
+    },
+    {
+      "type": "code",
+      "title": "The toll formula",
+      "caption": "Toll per shipment is tolled km x rate by CO2 and weight class x share of the truck. Excerpt from src/toll.py.",
+      "lang": "python",
+      "code": "def allocation_share(pallets: float, weight_kg: float, basis: str) -> float:\n    \"\"\"Share of the truck used by a shipment, capped at 1.\"\"\"\n    if basis == \"pallet\":\n        share = pallets / TRUCK_PALLET_PLACES\n    elif basis == \"weight\":\n        share = weight_kg / TRUCK_PAYLOAD_KG\n    else:\n        raise ValueError(f\"Unknown allocation basis: {basis}\")\n    return min(max(share, 0.0), 1.0)\n\n\ndef shipment_toll(tolled_km: float, co2_class: int, weight_class: str,\n                  pallets: float, weight_kg: float, basis: str) -> float:\n    \"\"\"Toll (EUR) allocated to one shipment. Unrounded; round totals for display.\"\"\"\n    return tolled_km * rate(co2_class, weight_class) * allocation_share(pallets, weight_kg, basis)"
+    },
+    {
+      "type": "code",
+      "title": "Tier logic in Power Fx",
+      "caption": "The same thresholds drive the app, the approval flow and the Copilot answer. Excerpt from power-apps/formulas.md.",
+      "lang": "powerfx",
+      "code": "ApprovalTier(incPct: Number, eur: Number): Text =\n    If(incPct <= TierAutoMaxPct && eur <= TierAutoMaxEur, \"Auto-approved\",\n       incPct <= TierCmMaxPct && eur <= TierCmMaxEur, \"Commercial manager\",\n       \"Steering committee\");"
+    },
+    {
+      "type": "metric",
+      "title": "On the synthetic dataset",
+      "caption": "2,000 shipments, 40 customers, illustrative rates. Computed by toll.py and matched to the cent by the JS demo.",
+      "metrics": [
+        {
+          "value": "4.4%",
+          "label": "toll as share of freight"
+        },
+        {
+          "value": "8.7% to 4.3%",
+          "label": "margin if toll absorbed"
+        },
+        {
+          "value": "8.4%",
+          "label": "margin with 100% recovery"
+        },
+        {
+          "value": "3 / 23 / 14",
+          "label": "auto / manager / steering"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "title": "Steering dashboard",
+      "caption": "KPI tiles, a hand-built SVG chart of the top 10 customers by toll impact and proposals by tier, mirroring the Power BI report.",
+      "src": "media/02/dashboard.png",
+      "alt": "Dashboard tab with KPI tiles and a bar chart of the top 10 customers by toll impact"
+    },
+    {
+      "type": "text",
+      "title": "GitHub Copilot ready",
+      "caption": "Code drafted with AI pair programming and verified by 20 pytest tests and a Python to JavaScript parity check. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
+    },
+    {
+      "type": "demo",
+      "title": "Try it",
+      "caption": "Open the simulated app: pick a customer, change the recovery method, submit for approval and ask the Copilot panel to explain the impact.",
+      "href": "demos/02-road-toll-surcharge-app.html"
+    }
+  ]
+}

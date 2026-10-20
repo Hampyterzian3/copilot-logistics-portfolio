@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KPI Briefing Copilot</title>
+<meta name="description" content="Simulated demo: a governed weekly KPI dataset for six top customers, a variance engine with materiality ranking, and a traceable executive brief, slide outline and Teams post drafted for human approval.">
+<link rel="icon" href="../assets/brand/hampy-favicon-64.png">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/demo.css">
+<style>
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-bottom: 14px; }
+  .controls > div { min-width: 140px; flex: 1; }
+  .controls label { margin-top: 0; }
+  .status { margin-left: auto; align-self: center; }
+  .kpi .d { font-size: 12px; font-weight: 600; margin-top: 2px; }
+  .kpi .d.good { color: #1f6b52; } .kpi .d.bad { color: #9b2c5c; }
+  h3.sec { font-size: 15px; margin: 18px 0 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  h3.sec small { font: 400 12px var(--font-body); opacity: .75; }
+  .sparks { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .spark { border: 1px solid rgba(12,44,35,.14); border-radius: var(--r-xl); padding: 8px 10px; background: #fff; }
+  .spark .n { font: 600 12px var(--font-heading); display: flex; justify-content: space-between; gap: 6px; }
+  .spark .val { font: 700 16px var(--font-heading); font-variant-numeric: tabular-nums; }
+  .spark svg { display: block; width: 100%; height: 44px; margin-top: 4px; }
+  .spark .ind { font-size: 11px; opacity: .7; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 18px 0 10px; border-bottom: 1px solid rgba(12,44,35,.15); }
+  .tabs button { background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 10px; cursor: pointer; font: 600 13px var(--font-heading); color: var(--green); }
+  .tabs button[aria-selected="true"] { border-bottom-color: var(--orange); }
+  .word { background: #eef0ee; border-radius: var(--r-xl); padding: 10px; }
+  .word-bar { display: flex; gap: 8px; align-items: center; font: 600 12px var(--font-heading); padding: 4px 6px 10px; flex-wrap: wrap; }
+  .word-bar .ic { background: var(--blue); color: var(--green); border-radius: 3px; padding: 1px 6px; }
+  .page { background: #fff; padding: 22px 24px; border-radius: 4px; box-shadow: 0 1px 4px rgba(12,44,35,.15); font-size: 14px; }
+  .page h2 { font-size: 19px; margin-bottom: 4px; }
+  .page h4 { font-size: 14px; margin: 16px 0 6px; }
+  .page p, .page li { margin: 0 0 6px; }
+  .page ul { padding-left: 18px; margin: 0; }
+  .page .meta { font-size: 12px; opacity: .7; margin-bottom: 12px; }
+  .ref { display: inline-block; font: 600 10px var(--font-mono); background: var(--blue-soft); color: var(--green); border: 0; border-radius: 3px; padding: 0 4px; margin-left: 3px; cursor: pointer; vertical-align: super; line-height: 1.5; }
+  .ref:hover, .ref.on { background: var(--orange); }
+  .factbox { margin-top: 12px; font-size: 13px; background: rgba(12,44,35,.05); border-left: 3px solid var(--orange); padding: 8px 10px; border-radius: 4px; }
+  .slides { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+  .slide { background: #fff; border: 1px solid rgba(12,44,35,.15); border-radius: 6px; padding: 12px; font-size: 13px; aspect-ratio: auto; }
+  .slide .no { font: 700 11px var(--font-heading); color: var(--green); background: var(--yellow); border-radius: 3px; padding: 1px 6px; }
+  .slide h4 { margin: 8px 0 4px; font-size: 15px; }
+  .slide .vis { font-size: 11px; opacity: .7; margin-bottom: 6px; }
+  .slide ul { padding-left: 16px; margin: 0; }
+  .teams { background: #f3f2f6; border-radius: var(--r-xl); padding: 12px; }
+  .tmsg { display: flex; gap: 10px; }
+  .tmsg img { width: 32px; height: 32px; border-radius: 50%; }
+  .tbody { background: #fff; border-radius: 6px; padding: 10px 12px; flex: 1; min-width: 0; font-size: 13px; }
+  .tbody .who { font-size: 12px; opacity: .75; margin-bottom: 4px; }
+  .tbody h4 { font-size: 14px; margin: 0 0 6px; }
+  .tbody ul { padding-left: 16px; margin: 6px 0; }
+  .tbody .foot { font-size: 12px; opacity: .8; }
+  .tacts { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .app .btn.secondary { color: var(--green); border-color: rgba(12,44,35,.3); }
+  td.tagc, td.rk { white-space: nowrap; }
+  .mt { margin-top: 8px; }
+  .msg table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+  .msg th, .msg td { text-align: left; padding: 3px 4px; border-bottom: 1px solid var(--line); }
+  .msg td.num, .msg th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .sim { font-size: 11px; color: var(--muted); padding: 0 14px 10px; }
+  .legend { font-size: 12px; opacity: .8; display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+  .legend i { display: inline-block; width: 14px; height: 8px; vertical-align: middle; margin-right: 4px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<header class="demo-top">
+  <a class="back" href="../index.html#p05">&larr; Portfolio</a>
+  <img src="../assets/brand/hampy-logo-offwhite.svg" alt="hampy">
+  <span class="demo-badge">Simulated demo</span>
+  <span class="title">Executive KPI Briefing Copilot</span>
+</header>
+
+<main class="demo-wrap">
+  <section class="demo-intro" id="intro">
+    <h1>Executive KPI Briefing Copilot</h1>
+    <p>Leadership gets dashboards but not the story, and analysts spend Monday mornings writing the weekly account brief by hand. This demo shows a governed weekly KPI view for Contoso Logistics' six top customers (fictional, synthetic data), a variance engine that ranks what is material, and a drafted brief, slide outline and Teams post in which every sentence links back to the number it came from. Pick a week, then use the suggestions on the right.</p>
+  </section>
+
+  <div class="demo-grid">
+    <section class="app" aria-label="Weekly account brief workspace">
+      <div class="app-bar"><span class="dot"></span>Contoso Logistics &middot; Top six customers &middot; Weekly brief</div>
+      <div class="app-body">
+        <div class="controls">
+          <div><label for="week">Week (Monday flow run)</label><select id="week"></select></div>
+          <div><label for="metric">Sparkline metric</label><select id="metric"></select></div>
+          <span class="status" id="status"></span>
+        </div>
+
+        <div id="overview">
+        <div class="kpis" id="kpis"></div>
+
+        <h3 class="sec">Customers <small>26 weeks, shaded band = eight-week baseline window, dot = selected week</small></h3>
+        <div class="sparks" id="sparks"></div>
+        </div>
+
+        <h3 class="sec">Material variances <small>flag = threshold breached and |z| &ge; 2 against the eight-week baseline</small></h3>
+        <div class="table-scroll"><table id="vartable"></table></div>
+        <div class="legend"><span><span class="tag bad">High</span> act this week</span><span><span class="tag warn">Medium</span> mention</span><span><span class="tag info">Low</span> monitor</span></div>
+
+        <div class="tabs" role="tablist">
+          <button role="tab" id="tab-brief" aria-selected="true" data-tab="brief">Brief (Word)</button>
+          <button role="tab" id="tab-slides" aria-selected="false" data-tab="slides">Slide outline (PowerPoint)</button>
+          <button role="tab" id="tab-teams" aria-selected="false" data-tab="teams">Teams post</button>
+        </div>
+        <div id="panel-brief" role="tabpanel"></div>
+        <div id="panel-slides" role="tabpanel" hidden></div>
+        <div id="panel-teams" role="tabpanel" hidden></div>
+        <div class="factbox" id="factbox">Click any blue source tag (for example <span class="ref">F02</span>) to see the measure and number behind a sentence.</div>
+      </div>
+    </section>
+
+    <aside class="copilot" aria-label="Briefing agent">
+      <div class="copilot-head"><img src="../assets/brand/hampy-agent-icon.png" alt="">Briefing agent</div>
+      <div class="sim">Simulation of the Copilot Studio agent: deterministic keyword intents over the exported variances. No live model.</div>
+      <div class="copilot-log" id="log" aria-live="polite"></div>
+      <div class="suggest" id="suggest"></div>
+      <form class="copilot-input" id="ask">
+        <label for="q" class="sr-only">Ask the agent</label>
+        <input id="q" placeholder="Ask, for example: why did margin move for Fabrikam Steel?" autocomplete="off">
+        <button class="btn" type="submit">Ask</button>
+      </form>
+    </aside>
+  </div>
+
+  <div class="stack-note">
+    <strong>How this maps to Microsoft 365 in production.</strong>
+    KPI tiles, sparklines and the variance table: <strong>Power BI semantic model</strong> (single governed source, DAX measures for WoW, baseline and z-score).
+    Monday export of flagged variances: <strong>Power Automate</strong> scheduled flow running a DAX query against the dataset and writing to <strong>Dataverse</strong>.
+    Brief, slide outline and Teams post: <strong>Copilot Studio</strong> agent with <strong>Microsoft 365 Copilot</strong> drafting in <strong>Word</strong> and <strong>PowerPoint</strong>, from the variance rows only.
+    Approval: <strong>Power Automate approvals</strong> in <strong>Teams</strong>; nothing reaches leadership until an analyst approves.
+    Source tags: the fact ids map to named DAX measures, so each sentence can be checked in Power BI.
+    Built with <strong>GitHub Copilot</strong>.
+  </div>
+</main>
+
+<script src="data/05-kpi-briefing.js"></script>
+<script>
+(function () {
+  "use strict";
+  var D = window.KPI_BRIEFING;
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  var briefWeeks = Object.keys(D.briefs);
+  var state = { week: briefWeeks[briefWeeks.length - 1], metric: "revenue", tab: "brief", approved: {} };
+  var cust = {}; D.customers.forEach(function (c) { cust[c.id] = c; });
+  var SPARK_METRICS = ["revenue", "shipments", "margin_pct", "otp_pct", "cts", "claims", "co2"];
+
+  function W() { return D.briefs[state.week]; }
+  function F(id) { return W().facts[id]; }
+  function refs(list) { return list.map(function (r) { return '<button class="ref" type="button" data-ref="' + r + '">' + r + "</button>"; }).join(""); }
+  function sent(s) { return esc(s.text) + refs(s.refs); }
+  function tagCls(t) { return t === "High" ? "bad" : t === "Medium" ? "warn" : t === "Low" ? "info" : "ok"; }
+
+  // ---------------------------------------------------------------- controls
+  briefWeeks.forEach(function (w) {
+    var o = document.createElement("option"); o.value = w; o.textContent = w + " (w/e " + D.briefs[w].week_end + ")"; $("week").appendChild(o);
+  });
+  SPARK_METRICS.forEach(function (m) {
+    var o = document.createElement("option"); o.value = m; o.textContent = D.metrics[m].label; $("metric").appendChild(o);
+  });
+  $("week").addEventListener("change", function () { state.week = this.value; render(); });
+  $("metric").addEventListener("change", function () { state.metric = this.value; renderSparks(); });
+  document.querySelectorAll(".tabs button").forEach(function (b) { b.addEventListener("click", function () { setTab(b.dataset.tab); }); });
+
+  function setTab(t) {
+    state.tab = t;
+    document.querySelectorAll(".tabs button").forEach(function (b) { b.setAttribute("aria-selected", b.dataset.tab === t ? "true" : "false"); });
+    ["brief", "slides", "teams"].forEach(function (p) { $("panel-" + p).hidden = p !== t; });
+  }
+
+  // ---------------------------------------------------------------- render
+  function deltaText(f, good) {
+    if (!f.wow_fmt) return "";
+    var arrow = f.wow_dir === "up" ? "▲" : f.wow_dir === "down" ? "▼" : "";
+    return '<div class="d ' + (good ? "good" : "bad") + '">' + arrow + " " + esc(f.wow_fmt) + " WoW</div>";
+  }
+  function renderKpis() {
+    var p = W().portfolio, html = "";
+    var order = [["revenue", "Revenue"], ["margin_pct", "Margin"], ["otp_pct", "On-time"], ["shipments", "Shipments"], ["claims", "Claims"], ["co2", "CO2 per shipment"]];
+    order.forEach(function (o) {
+      var f = F(p[o[0]]), better = D.metrics[o[0]].better;
+      var good = f.wow_dir === "flat" || (f.wow_dir === "up") === (better === "up");
+      html += '<div class="kpi"><div class="v">' + esc(f.value_fmt) + '</div><div class="l">' + o[1] + refs([f.id]) + "</div>" + deltaText(f, good) + "</div>";
+    });
+    $("kpis").innerHTML = html;
+  }
+
+  function sparkSvg(vals, idx, flagged) {
+    var w = 160, h = 44, pad = 3;
+    var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+    if (mx === mn) { mx += 1; mn -= 1; }
+    var x = function (i) { return pad + i * (w - 2 * pad) / (vals.length - 1); };
+    var y = function (v) { return h - pad - (v - mn) * (h - 2 * pad) / (mx - mn); };
+    var pts = vals.map(function (v, i) { return x(i).toFixed(1) + "," + y(v).toFixed(1); }).join(" ");
+    var b0 = x(Math.max(idx - D.meta.baseline_weeks, 0)), b1 = x(idx - 1);
+    return '<svg viewBox="0 0 ' + w + " " + h + '" preserveAspectRatio="none" role="img" aria-label="26-week trend">' +
+      '<rect x="' + b0.toFixed(1) + '" y="0" width="' + (b1 - b0).toFixed(1) + '" height="' + h + '" fill="#b0c6e8" opacity=".55"/>' +
+      '<polyline points="' + pts + '" fill="none" stroke="#0c2c23" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>' +
+      '<circle cx="' + x(idx).toFixed(1) + '" cy="' + y(vals[idx]).toFixed(1) + '" r="3.2" fill="' + (flagged ? "#ff6b35" : "#0c2c23") + '"/></svg>';
+  }
+  function renderSparks() {
+    var w = W(), m = state.metric, html = "";
+    D.customers.forEach(function (c) {
+      var f = F(w.customer_facts[c.id][m]);
+      var flag = w.variances.filter(function (v) { return v.customer_id === c.id; })[0];
+      var mflag = w.variances.some(function (v) { return v.customer_id === c.id && v.metric === m; });
+      html += '<div class="spark"><div class="n"><span>' + esc(c.name) + "</span>" + (flag ? '<span class="tag ' + tagCls(flag.tag) + '">' + flag.tag + "</span>" : '<span class="tag ok">Steady</span>') + "</div>" +
+        '<div class="val">' + esc(f.value_fmt) + refs([f.id]) + '</div><div class="ind">' + esc(c.industry) + " &middot; " + esc(f.base_mv_fmt) + " vs baseline</div>" +
+        sparkSvg(D.series[c.id][m], w.index, mflag) + "</div>";
+    });
+    $("sparks").innerHTML = html;
+  }
+
+  function pct(v, kind) {
+    if (kind === "rel") return (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+    if (kind === "pp") return (v >= 0 ? "+" : "") + v.toFixed(1) + " pp";
+    return (v >= 0 ? "+" : "") + v.toFixed(0);
+  }
+  function renderTable() {
+    var vs = W().variances;
+    if (!vs.length) { $("vartable").innerHTML = "<tr><td>No customer breached a threshold this week.</td></tr>"; return; }
+    var h = '<thead><tr><th>#</th><th>Customer</th><th>KPI</th><th class="num">This week</th><th class="num">Baseline</th><th class="num">vs base</th><th class="num">WoW</th><th class="num">z</th><th class="num">Score</th><th>Tag</th></tr></thead><tbody>';
+    vs.forEach(function (v) {
+      h += '<tr><td class="rk">' + v.rank + "</td><td>" + esc(v.customer) + "</td><td>" + esc(v.label) + (v.favourable ? " &#9650;" : " &#9660;") + '</td><td class="num">' + esc(v.value_fmt) + refs([v.fact]) +
+        '</td><td class="num">' + esc(v.baseline_fmt) + '</td><td class="num">' + pct(v.vs_base, v.kind) + '</td><td class="num">' + pct(v.wow, v.kind) +
+        '</td><td class="num">' + v.z.toFixed(1) + '</td><td class="num">' + v.score.toFixed(1) + '</td><td class="tagc"><span class="tag ' + tagCls(v.tag) + '">' + v.tag + "</span> " +
+        '<span class="tag ' + (v.favourable ? "ok" : "bad") + '">' + (v.favourable ? "favourable" : "adverse") + "</span></td></tr>";
+    });
+    $("vartable").innerHTML = h + "</tbody>";
+  }
+
+  function renderBrief() {
+    var w = W(), b = w.brief;
+    $("panel-brief").innerHTML = '<div class="word"><div class="word-bar"><span class="ic">W</span>Weekly account brief ' + esc(w.week) + '.docx <span class="tag ' + (state.approved[w.week] ? "ok" : "warn") + '">' + (state.approved[w.week] ? "Approved" : "Draft") + "</span></div>" +
+      '<div class="page"><h2>Weekly account brief, ' + esc(w.week) + '</h2><div class="meta">Contoso Logistics &middot; top six customers &middot; week ending ' + esc(w.week_end) + " &middot; drafted from the governed Power BI dataset</div>" +
+      "<p><strong>" + sent(b.headline) + "</strong></p><p>" + sent(b.summary) + "</p>" +
+      "<h4>Three things that matter</h4><ul>" + b.things.map(function (s) { return "<li>" + sent(s) + "</li>"; }).join("") + "</ul>" +
+      "<h4>Customer callouts</h4><ul>" + b.callouts.map(function (s) { return "<li>" + sent(s) + "</li>"; }).join("") + "</ul>" +
+      "<h4>Actions</h4><ul>" + b.actions.map(function (s) { return "<li>" + sent(s) + "</li>"; }).join("") + "</ul></div></div>";
+  }
+  function renderSlides() {
+    $("panel-slides").innerHTML = '<div class="slides">' + W().slides.map(function (s) {
+      return '<div class="slide"><span class="no">Slide ' + s.n + "</span><h4>" + esc(s.title) + '</h4><div class="vis">Visual: ' + esc(s.visual) + "</div><ul>" +
+        s.bullets.map(function (b) { return "<li>" + sent(b) + "</li>"; }).join("") + "</ul></div>";
+    }).join("") + "</div>";
+  }
+  function renderTeams() {
+    var w = W(), t = w.teams, ok = state.approved[w.week];
+    $("panel-teams").innerHTML = '<div class="teams"><div class="tmsg"><img src="../assets/brand/hampy-agent-icon.png" alt=""><div class="tbody">' +
+      '<div class="who">Briefing agent &middot; ' + (ok ? "posted to Leadership weekly channel after analyst approval (simulated)" : "draft in analyst chat, not posted") + "</div>" +
+      "<h4>" + esc(t.title) + "</h4><p>" + sent(t.lines[0]) + "</p><ul>" + t.lines.slice(1).map(function (s) { return "<li>" + sent(s) + "</li>"; }).join("") + "</ul>" +
+      '<div class="foot">' + esc(t.footer) + "</div>" +
+      '<div class="tacts">' + (ok ? '<span class="tag ok">Approved and posted</span>' : '<button class="btn" type="button" id="approveBtn">Approve and post</button><button class="btn secondary" type="button" id="editBtn">Edit draft</button>') + "</div></div></div></div>";
+    var a = $("approveBtn"); if (a) a.addEventListener("click", function () { handle("Approve and post to Teams"); });
+    var e = $("editBtn"); if (e) e.addEventListener("click", function () { setTab("brief"); bot("Opened the Word draft for edits. Change any sentence you like; the source tags stay so reviewers can check the numbers."); });
+  }
+  function renderStatus() {
+    $("status").innerHTML = state.approved[state.week] ? '<span class="tag ok">Approved and posted</span>' : '<span class="tag warn">Draft, awaiting approval</span>';
+  }
+  function render() {
+    $("week").value = state.week;
+    renderKpis(); renderSparks(); renderTable(); renderBrief(); renderSlides(); renderTeams(); renderStatus(); renderSuggest();
+    $("factbox").innerHTML = 'Click any blue source tag (for example <span class="ref">' + W().brief.headline.refs[0] + "</span>) to see the measure and number behind a sentence.";
+  }
+
+  // ---------------------------------------------------------------- source tags
+  document.addEventListener("click", function (e) {
+    var r = e.target.closest && e.target.closest(".ref[data-ref]");
+    if (!r) return;
+    var f = F(r.dataset.ref); if (!f) return;
+    document.querySelectorAll(".ref.on").forEach(function (x) { x.classList.remove("on"); });
+    r.classList.add("on");
+    var html = "<strong>" + f.id + "</strong> &middot; measure <code>[" + esc(f.measure) + "]</code> &middot; " + esc(f.customer) + " &middot; " + esc(f.week) + "<br>Value " + esc(f.value_fmt);
+    if (f.baseline_fmt) html += " &middot; baseline " + esc(f.baseline_fmt);
+    if (f.prev_fmt) html += " &middot; last week " + esc(f.prev_fmt);
+    if (f.z !== undefined) html += " &middot; z " + f.z.toFixed(1);
+    if (f.tag) html += ' &middot; <span class="tag ' + tagCls(f.tag) + '">' + f.tag + "</span>";
+    $("factbox").innerHTML = html;
+    if (!r.closest(".app")) $("factbox").scrollIntoView({ block: "nearest" });
+  });
+
+  // ---------------------------------------------------------------- agent (deterministic)
+  function bot(html, cite) {
+    var d = document.createElement("div"); d.className = "msg bot";
+    d.innerHTML = html + (cite ? '<span class="cite">' + cite + "</span>" : "");
+    $("log").appendChild(d); $("log").scrollTop = $("log").scrollHeight;
+  }
+  function user(t) { var d = document.createElement("div"); d.className = "msg user"; d.textContent = t; $("log").appendChild(d); }
+  function topMarginCustomer() {
+    var w = W(), best = null, bv = -1;
+    D.customers.forEach(function (c) { var f = F(w.customer_facts[c.id].margin_pct); var a = Math.abs(f.value - f.baseline); if (a > bv) { bv = a; best = c; } });
+    return best;
+  }
+  function findCustomer(q) {
+    q = q.toLowerCase();
+    return D.customers.filter(function (c) { return c.name.toLowerCase().split(" ").some(function (t) { return q.indexOf(t) >= 0; }); })[0];
+  }
+  var src = "Source: Power BI semantic model, weekly variance export";
+
+  function intentBrief() {
+    var b = W().brief;
+    bot("<strong>Weekly brief " + esc(state.week) + "</strong> drafted in Word (draft, not sent).<br>" + sent(b.headline) + "<ul>" + b.things.map(function (s) { return "<li>" + sent(s) + "</li>"; }).join("") + "</ul>" +
+      "Actions:<ul>" + b.actions.map(function (s) { return "<li>" + sent(s) + "</li>"; }).join("") + "</ul>", src + ". Every line carries its fact ids.");
+    setTab("brief");
+  }
+  function intentMargin(c) {
+    c = c || topMarginCustomer();
+    var w = W(), f = F(w.customer_facts[c.id].margin_pct), br = w.bridges[c.id].facts;
+    var rps = F(br.rps), cps = F(br.cps), rate = F(br.rate), cost = F(br.cost);
+    var driver = Math.abs(cost.value) >= Math.abs(rate.value) ? "cost to serve" : "price and mix (revenue per shipment)";
+    bot("<strong>" + esc(c.name) + " margin " + esc(state.week) + "</strong><br>Margin " + esc(f.value_fmt) + ", " + esc(f.base_mv_fmt) + " against the eight-week baseline of " + esc(f.baseline_fmt) + refs([f.id]) +
+      (f.flagged ? ' <span class="tag ' + tagCls(f.tag) + '">' + f.tag + "</span>" : ' <span class="tag ok">within threshold</span>') +
+      "<ul><li>Revenue per shipment " + esc(rps.value_fmt) + " against " + esc(rps.baseline_fmt) + ": rate effect " + esc(rate.dir) + " " + esc(rate.value_fmt) + refs([rps.id, rate.id]) + "</li>" +
+      "<li>Cost to serve " + esc(cps.value_fmt) + " per shipment against " + esc(cps.baseline_fmt) + ": cost effect " + esc(cost.dir) + " " + esc(cost.value_fmt) + refs([cps.id, cost.id]) + "</li></ul>" +
+      "Main driver: <strong>" + driver + "</strong>. Bridge uses pooled eight-week revenue and cost per shipment, so it sums exactly to the pooled margin change.",
+      "Measures: [Margin %], [Revenue per Shipment], [Cost to Serve per Shipment], [Margin Rate Effect pp], [Margin Cost Effect pp]");
+  }
+  function intentSlides() {
+    bot("<strong>Slide outline " + esc(state.week) + "</strong> for PowerPoint (5 slides):<ul>" + W().slides.map(function (s) { return "<li>" + s.n + ". " + esc(s.title) + " <em>(" + esc(s.visual) + ")</em></li>"; }).join("") + "</ul>Bullets are on the Slide outline tab, each with source tags.", src);
+    setTab("slides");
+  }
+  function intentCompare() {
+    var w = W(), rows = "";
+    D.customers.forEach(function (c) {
+      var cf = w.customer_facts[c.id], r = F(cf.revenue), m = F(cf.margin_pct), o = F(cf.otp_pct);
+      var sg = function (f) { return (f.vs_base_dir === "down" ? "-" : f.vs_base_dir === "up" ? "+" : "") + f.vs_base_fmt; };
+      rows += "<tr><td>" + esc(c.name) + '</td><td class="num">' + esc(sg(r)) + '</td><td class="num">' + esc(sg(m)) + '</td><td class="num">' + esc(sg(o)) + "</td></tr>";
+    });
+    var top = w.variances[0];
+    bot("<strong>Compare customers " + esc(state.week) + "</strong>, change against eight-week baseline:" +
+      '<table><thead><tr><th>Customer</th><th class="num">Revenue</th><th class="num">Margin</th><th class="num">On-time</th></tr></thead><tbody>' + rows + "</tbody></table>" +
+      (top ? '<div class="mt">Most material: ' + esc(top.customer) + " " + esc(top.label.toLowerCase()) + ' <span class="tag ' + tagCls(top.tag) + '">' + top.tag + "</span>" + refs([top.fact]) + "</div>" : '<div class="mt">No customer breached a threshold.</div>'),
+      "Measures: [Revenue vs Baseline %], [Margin % vs Baseline pp], [OTP % vs Baseline pp]");
+  }
+  function intentApprove() {
+    if (state.approved[state.week]) { bot("The " + esc(state.week) + " brief is already approved and posted."); return; }
+    state.approved[state.week] = true;
+    renderBrief(); renderTeams(); renderStatus(); setTab("teams");
+    bot("Approval recorded for <strong>" + esc(state.week) + "</strong> (analyst, simulated). Posted the summary to the Leadership weekly channel and attached the Word brief and deck outline. In production this is a Power Automate approval; the agent cannot post without it.", "Flow: KPI Brief, Monday run > Approval > Post adaptive card");
+  }
+  function intentWeek(q) {
+    var m = q.match(/w\s?(\d{2})/i); if (!m) return false;
+    var wk = "2026-W" + m[1];
+    if (!D.briefs[wk]) { bot("I only have briefs for " + briefWeeks[0] + " to " + briefWeeks[briefWeeks.length - 1] + " (each needs an eight-week baseline)."); return true; }
+    state.week = wk; render(); bot("Switched to " + wk + "."); return true;
+  }
+
+  function handle(q) {
+    user(q);
+    var s = q.toLowerCase();
+    if (/\bw\s?\d{2}\b/.test(s) && !/margin|compare|slide|brief/.test(s)) { if (intentWeek(q)) return; }
+    else if (/\bw\s?\d{2}\b/.test(s)) intentWeek(q);
+    if (/approve|post|send|publish/.test(s)) return intentApprove();
+    if (/margin|why/.test(s)) return intentMargin(findCustomer(s));
+    if (/slide|deck|outline|powerpoint|ppt/.test(s)) return intentSlides();
+    if (/compare|versus|\bvs\b|rank|league/.test(s)) return intentCompare();
+    if (/brief|summary|weekly|story|headline/.test(s)) return intentBrief();
+    bot("I can: draft the <strong>weekly brief</strong>, explain <strong>why margin moved</strong> for a customer, <strong>build the slide outline</strong>, <strong>compare customers</strong>, or <strong>approve and post</strong> to Teams. Mention a week like W32 to switch.");
+  }
+  function renderSuggest() {
+    var c = topMarginCustomer();
+    var items = ["Weekly brief", "Why did margin move for " + c.name + "?", "Build slide outline", "Compare customers", "Approve and post to Teams"];
+    $("suggest").innerHTML = items.map(function (t) { return '<button type="button">' + esc(t) + "</button>"; }).join("");
+    $("suggest").querySelectorAll("button").forEach(function (b) { b.addEventListener("click", function () { handle(b.textContent); }); });
+  }
+  $("ask").addEventListener("submit", function (e) { e.preventDefault(); var q = $("q").value.trim(); if (q) { handle(q); $("q").value = ""; } });
+
+  // ---------------------------------------------------------------- start (+ hash states for screenshots)
+  var hp = {}; location.hash.replace(/^#/, "").split("&").forEach(function (kv) { var p = kv.split("="); if (p[0]) hp[p[0]] = decodeURIComponent(p[1] || ""); });
+  if (hp.week && D.briefs[hp.week]) state.week = hp.week;
+  if (hp.metric && D.metrics[hp.metric]) { state.metric = hp.metric; }
+  $("metric").value = state.metric;
+  render();
+  bot("Morning. The Monday flow has exported " + W().variances.length + " flagged variance" + (W().variances.length === 1 ? "" : "s") + " for " + esc(state.week) + ". I drafted the brief; nothing is sent until you approve. Try a suggestion below.");
+  if (hp.tab) setTab(hp.tab);
+  var asks = { brief: "Weekly brief", margin: "Why did margin move for " + topMarginCustomer().name + "?", slides: "Build slide outline", compare: "Compare customers", approve: "Approve and post to Teams" };
+  (hp.ask || "").split(",").forEach(function (a) { if (asks[a]) handle(asks[a]); });
+  if (hp.tab) setTab(hp.tab);
+  // screenshot helper: #hide=intro,overview collapses sections so a later state is visible without scrolling
+  (hp.hide || "").split(",").forEach(function (id) { if (id && $(id)) $(id).hidden = true; });
+})();
+</script>
+</body>
+</html>

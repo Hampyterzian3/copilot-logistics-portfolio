@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="t d">
+  <title id="t">Inbound Risk Early-Warning Agent architecture</title>
+  <desc id="d">Tracking events flow from a TMS or visibility API through a scheduled Power Automate flow to an Azure Function that scores risk, into Dataverse, out to Teams adaptive cards, a Copilot Studio agent and a Power BI dashboard.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ff6b35"/></marker>
+    <style>
+      .bx{fill:#244139;stroke:rgba(255,253,248,.22);stroke-width:1.5}
+      .h{font:600 22px 'Space Grotesk',Arial,sans-serif;fill:#fffdf8}
+      .t{font:400 16px Inter,Arial,sans-serif;fill:rgba(255,253,248,.85)}
+      .ms{font:600 13px 'Space Grotesk',Arial,sans-serif;fill:#0c2c23}
+      .ln{stroke:#ff6b35;stroke-width:3;fill:none;marker-end:url(#a)}
+      .lb{font:500 14px Inter,Arial,sans-serif;fill:#fffdf8}
+    </style>
+  </defs>
+  <rect width="1200" height="675" fill="#0c2c23"/>
+  <text x="40" y="58" style="font:600 32px 'Space Grotesk',Arial,sans-serif;fill:#fffdf8">Inbound Risk Early-Warning Agent</text>
+  <text x="40" y="90" class="t">Score every in-transit shipment every 30 minutes, alert before the promise is missed</text>
+
+  <!-- sources -->
+  <rect class="bx" x="40" y="140" width="230" height="150" rx="12"/>
+  <text x="60" y="178" class="h">TMS / visibility</text>
+  <text x="60" y="206" class="t">Scan events, ETAs,</text>
+  <text x="60" y="228" class="t">customs status</text>
+  <rect x="60" y="248" width="150" height="26" rx="13" fill="#b0c6e8"/><text x="72" y="266" class="ms">Custom connector</text>
+
+  <rect class="bx" x="40" y="340" width="230" height="150" rx="12"/>
+  <text x="60" y="378" class="h">Closed history</text>
+  <text x="60" y="406" class="t">12 months: lane delay,</text>
+  <text x="60" y="428" class="t">area loss, carrier on-time</text>
+  <rect x="60" y="448" width="96" height="26" rx="13" fill="#b0c6e8"/><text x="72" y="466" class="ms">Dataverse</text>
+
+  <!-- flow -->
+  <rect class="bx" x="340" y="140" width="250" height="150" rx="12"/>
+  <text x="360" y="178" class="h">Scheduled flow</text>
+  <text x="360" y="206" class="t">Every 30 minutes, pulls</text>
+  <text x="360" y="228" class="t">new events per shipment</text>
+  <rect x="360" y="248" width="138" height="26" rx="13" fill="#81cfb3"/><text x="372" y="266" class="ms">Power Automate</text>
+
+  <!-- scoring -->
+  <rect class="bx" x="340" y="340" width="250" height="150" rx="12"/>
+  <text x="360" y="378" class="h">Risk score 0-100</text>
+  <text x="360" y="406" class="t">7 weighted factors, top</text>
+  <text x="360" y="428" class="t">reasons in plain words</text>
+  <rect x="360" y="448" width="196" height="26" rx="13" fill="#81cfb3"/><text x="372" y="466" class="ms">Azure Function (Python)</text>
+
+  <!-- dataverse store -->
+  <rect class="bx" x="660" y="240" width="220" height="150" rx="12"/>
+  <text x="680" y="278" class="h">Risk tables</text>
+  <text x="680" y="306" class="t">Score, band, reasons,</text>
+  <text x="680" y="328" class="t">alerts and actions</text>
+  <rect x="680" y="348" width="96" height="26" rx="13" fill="#b0c6e8"/><text x="692" y="366" class="ms">Dataverse</text>
+
+  <!-- outputs -->
+  <rect class="bx" x="950" y="110" width="210" height="140" rx="12"/>
+  <text x="970" y="146" class="h">Alert card</text>
+  <text x="970" y="174" class="t">Acknowledge, draft</text>
+  <text x="970" y="196" class="t">update, escalate</text>
+  <rect x="970" y="212" width="168" height="26" rx="13" fill="#e8d67d"/><text x="982" y="230" class="ms">Teams, Adaptive Card</text>
+
+  <rect class="bx" x="950" y="275" width="210" height="150" rx="12"/>
+  <text x="970" y="311" class="h">Risk agent</text>
+  <text x="970" y="339" class="t">"Which shipments for</text>
+  <text x="970" y="361" class="t">customer X, and why?"</text>
+  <rect x="970" y="381" width="122" height="26" rx="13" fill="#da81a7"/><text x="982" y="399" class="ms">Copilot Studio</text>
+
+  <rect class="bx" x="950" y="450" width="210" height="140" rx="12"/>
+  <text x="970" y="486" class="h">Risk dashboard</text>
+  <text x="970" y="514" class="t">Bands, areas, backtest</text>
+  <text x="970" y="536" class="t">precision and recall</text>
+  <rect x="970" y="552" width="86" height="26" rx="13" fill="#e8d67d"/><text x="982" y="570" class="ms">Power BI</text>
+
+  <!-- arrows -->
+  <path class="ln" d="M270 215H332"/>
+  <path class="ln" d="M465 290V332"/>
+  <path class="ln" d="M270 415H332"/>
+  <path class="ln" d="M590 415H620V340H652"/>
+  <path class="ln" d="M880 290H915V180H942"/>
+  <path class="ln" d="M880 330H942"/>
+  <path class="ln" d="M880 360H915V520H942"/>
+  <text x="600" y="330" class="lb">write</text>
+  <text x="890" y="160" class="lb">critical</text>
+
+  <rect x="40" y="540" width="840" height="90" rx="12" fill="none" stroke="rgba(255,253,248,.22)" stroke-dasharray="6 6"/>
+  <text x="60" y="574" class="t">Planner approves every customer update and carrier escalation before it is sent.</text>
+  <text x="60" y="602" class="t">Monthly backtest re-checks thresholds against actual delivery outcomes.</text>
+</svg>

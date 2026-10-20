@@ -1,0 +1,70 @@
+kind: AdaptiveDialog
+modelDescription: Lists a customer's in-transit inbound shipments that are critical or at risk, highest score first, with the top reason for each.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: At-risk shipments for a customer
+    triggerQueries:
+      - which shipments for Adventure Works are at risk
+      - at-risk shipments for a customer
+      - show critical shipments for this account
+      - is anything late for Coho Winery
+      - which inbound deliveries might miss the promised date
+
+  actions:
+    - kind: Question
+      id: askCustomer
+      variable: Topic.CustomerName
+      prompt: Which customer account should I check?
+      entity: StringPrebuiltEntity
+      alwaysPrompt: false
+
+    - kind: InvokeFlowAction
+      id: getAtRisk
+      flowId: 00000000-0000-0000-0000-000000000000  # "Inbound Risk - Get at-risk shipments" (see power-automate/agent-actions.md)
+      input:
+        binding:
+          customerName: =Topic.CustomerName
+          minimumBand: ="at_risk"
+      output:
+        binding:
+          matchedCustomer: Topic.MatchedCustomer
+          inTransit: Topic.InTransit
+          critical: Topic.Critical
+          atRisk: Topic.AtRisk
+          watch: Topic.Watch
+          shipmentLines: Topic.ShipmentLines
+          scoredAt: Topic.ScoredAt
+
+    - kind: ConditionGroup
+      id: found
+      conditions:
+        - id: noCustomer
+          condition: =IsBlank(Topic.MatchedCustomer)
+          actions:
+            - kind: SendActivity
+              id: notFound
+              activity: I could not find a customer called {Topic.CustomerName}. Please check the account name.
+            - kind: EndDialog
+              id: endNotFound
+
+        - id: noneAtRisk
+          condition: =Topic.Critical + Topic.AtRisk = 0
+          actions:
+            - kind: SendActivity
+              id: allClear
+              activity: "{Topic.MatchedCustomer} has {Topic.InTransit} shipments in transit and none at risk (scored at {Topic.ScoredAt}). {Topic.Watch} are on watch."
+            - kind: EndDialog
+              id: endClear
+
+    - kind: SendActivity
+      id: listAtRisk
+      activity: |-
+        {Topic.MatchedCustomer}: {Topic.InTransit} shipments in transit, scored at {Topic.ScoredAt}.
+        Critical {Topic.Critical}, at risk {Topic.AtRisk}, watch {Topic.Watch}.
+        {Topic.ShipmentLines}
+
+    - kind: SendActivity
+      id: offerNext
+      activity: Ask "why is <shipment> at risk", or I can draft a customer update or escalate to the carrier.

@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img" aria-labelledby="t d">
+  <title id="t">Tender Desk Copilot architecture</title>
+  <desc id="d">A new RFQ folder in SharePoint triggers a Power Automate flow that calls the Python RFQ checker as an Azure Function, stores results in Dataverse, posts to Teams and writes a summary file. A Copilot Studio agent answers questions from SharePoint and Dataverse; Microsoft 365 Copilot in Word and PowerPoint drafts the clarification letter and solution outline.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#81cfb3"/>
+    </marker>
+    <style>
+      .bx { fill: #244139; stroke: rgba(255,253,248,0.22); stroke-width: 1.5; }
+      .hot { stroke: #ff6b35; stroke-width: 2.5; }
+      .h { font: 600 20px 'Space Grotesk', Arial, sans-serif; fill: #fffdf8; }
+      .s { font: 400 16px Inter, Arial, sans-serif; fill: rgba(255,253,248,0.82); }
+      .k { font: 600 13px 'Space Grotesk', Arial, sans-serif; fill: #0c2c23; }
+      .ln { stroke: #81cfb3; stroke-width: 2.5; fill: none; marker-end: url(#a); }
+      .dash { stroke-dasharray: 7 6; }
+      .lbl { font: 500 14px Inter, Arial, sans-serif; fill: #81cfb3; }
+    </style>
+  </defs>
+  <rect width="1200" height="675" fill="#0c2c23"/>
+  <text x="40" y="52" style="font: 600 28px 'Space Grotesk', Arial, sans-serif; fill: #fffdf8">Tender Desk Copilot</text>
+  <text x="40" y="80" class="s">RFQ pack in, gaps, questions and a solution outline out</text>
+  <rect x="1012" y="34" width="148" height="28" rx="14" fill="#ff6b35"/>
+  <text x="1086" y="53" text-anchor="middle" class="k">Contoso Logistics</text>
+
+  <!-- Row 1 -->
+  <rect class="bx" x="40" y="115" width="250" height="115" rx="12"/>
+  <text x="60" y="152" class="h">Solution designer</text>
+  <text x="60" y="180" class="s">creates RFQ folder,</text>
+  <text x="60" y="202" class="s">asks the agent in Teams</text>
+
+  <rect class="bx" x="330" y="115" width="250" height="115" rx="12"/>
+  <rect x="350" y="129" width="92" height="22" rx="11" fill="#81a3da"/><text x="396" y="145" text-anchor="middle" class="k">SharePoint</text>
+  <text x="350" y="180" class="h">RFQ Library</text>
+  <text x="350" y="206" class="s">lanes.csv, requirements.md</text>
+
+  <rect class="bx" x="620" y="115" width="250" height="115" rx="12"/>
+  <rect x="640" y="129" width="130" height="22" rx="11" fill="#81a3da"/><text x="705" y="145" text-anchor="middle" class="k">Power Automate</text>
+  <text x="640" y="180" class="h">Run RFQ check</text>
+  <text x="640" y="206" class="s">trigger: new RFQ folder</text>
+
+  <rect class="bx hot" x="910" y="115" width="250" height="115" rx="12"/>
+  <rect x="930" y="129" width="200" height="22" rx="11" fill="#ff6b35"/><text x="1030" y="145" text-anchor="middle" class="k">Azure Function + connector</text>
+  <text x="930" y="180" class="h">rfq_checker.py</text>
+  <text x="930" y="206" class="s">9 rules, pytest covered</text>
+
+  <path class="ln" d="M290 172 H326"/>
+  <path class="ln" d="M580 172 H616"/>
+  <path class="ln" d="M870 160 H906"/>
+  <path class="ln" d="M910 190 H874"/>
+  <text x="890" y="250" text-anchor="middle" class="lbl">JSON result</text>
+
+  <!-- Row 2 -->
+  <path class="ln" d="M745 230 V296"/>
+  <path class="ln" d="M745 262 H455 V296"/>
+  <path class="ln" d="M745 262 H1035 V296"/>
+
+  <rect class="bx" x="330" y="300" width="250" height="120" rx="12"/>
+  <rect x="350" y="314" width="88" height="22" rx="11" fill="#81a3da"/><text x="394" y="330" text-anchor="middle" class="k">Dataverse</text>
+  <text x="350" y="366" class="h">Tender, Lane, Gap,</text>
+  <text x="350" y="392" class="h">Question tables</text>
+
+  <rect class="bx" x="620" y="300" width="250" height="120" rx="12"/>
+  <rect x="640" y="314" width="64" height="22" rx="11" fill="#81a3da"/><text x="672" y="330" text-anchor="middle" class="k">Teams</text>
+  <text x="640" y="366" class="h">Adaptive card</text>
+  <text x="640" y="392" class="s">New RFQs channel</text>
+
+  <rect class="bx" x="910" y="300" width="250" height="120" rx="12"/>
+  <rect x="930" y="314" width="92" height="22" rx="11" fill="#81a3da"/><text x="976" y="330" text-anchor="middle" class="k">SharePoint</text>
+  <text x="930" y="366" class="h">rfq-summary.md</text>
+  <text x="930" y="392" class="s">scope, gaps, questions</text>
+
+  <!-- Row 3 -->
+  <rect class="bx" x="40" y="490" width="330" height="130" rx="12"/>
+  <rect x="60" y="504" width="124" height="22" rx="11" fill="#81cfb3"/><text x="122" y="520" text-anchor="middle" class="k">Copilot Studio</text>
+  <text x="60" y="556" class="h">Tender Desk agent</text>
+  <text x="60" y="582" class="s">Check new RFQ, Explain a gap,</text>
+  <text x="60" y="604" class="s">Draft questions, Summarise scope</text>
+
+  <rect class="bx" x="420" y="490" width="240" height="130" rx="12"/>
+  <rect x="440" y="504" width="172" height="22" rx="11" fill="#81cfb3"/><text x="526" y="520" text-anchor="middle" class="k">M365 Copilot in Word</text>
+  <text x="440" y="556" class="h">Clarification letter</text>
+  <text x="440" y="582" class="s">questions by theme</text>
+
+  <rect class="bx" x="690" y="490" width="240" height="130" rx="12"/>
+  <rect x="710" y="504" width="204" height="22" rx="11" fill="#81cfb3"/><text x="812" y="520" text-anchor="middle" class="k">M365 Copilot in PowerPoint</text>
+  <text x="710" y="556" class="h">Solution outline</text>
+  <text x="710" y="582" class="s">FTL, road-rail, groupage</text>
+
+  <rect class="bx" x="960" y="490" width="200" height="130" rx="12"/>
+  <text x="980" y="530" class="h">Customer</text>
+  <text x="980" y="558" class="s">Northwind</text>
+  <text x="980" y="580" class="s">Components</text>
+  <text x="980" y="602" class="s">(fictional)</text>
+
+  <!-- Knowledge and drafting links -->
+  <path class="ln dash" d="M120 230 V486"/>
+  <text x="130" y="300" class="lbl">chat in Teams</text>
+  <path class="ln" d="M330 360 H250 V486"/>
+  <text x="258" y="460" class="lbl">knowledge</text>
+  <path class="ln" d="M1035 420 V455 H540 V486"/>
+  <path class="ln" d="M810 455 V486"/>
+  <text x="900" y="448" class="lbl">grounding file</text>
+  <path class="ln" d="M540 620 V645 H1060 V624"/>
+  <text x="800" y="664" text-anchor="middle" class="lbl">letter and presentation sent after review</text>
+</svg>

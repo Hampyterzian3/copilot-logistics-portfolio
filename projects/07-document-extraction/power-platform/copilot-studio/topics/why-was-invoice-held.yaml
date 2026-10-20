@@ -1,0 +1,86 @@
+kind: AdaptiveDialog
+modelDescription: Explains why a specific invoice was sent to the exception queue, using the reason codes stored on the Invoice row, and suggests the next step.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Why was this invoice held
+    triggerQueries:
+      - Why was this invoice held
+      - Why is invoice 003-20264597 in exceptions
+      - Why did invoice_027 fail
+      - What is wrong with this invoice
+      - Explain the exception on this invoice
+
+  actions:
+    - kind: Question
+      id: askInvoice
+      variable: Topic.InvoiceRef
+      prompt: Which invoice? Give the invoice number or the file name.
+      entity: StringPrebuiltEntity
+      skipQuestionMode: SkipOnFirstExecutionIfVariableHasValue
+
+    - kind: InvokeFlowAction
+      id: getInvoice
+      flowId: ap_GetInvoiceByReference
+      input:
+        binding:
+          reference: =Topic.InvoiceRef
+      output:
+        binding:
+          found: Topic.Found
+          status: Topic.Status
+          vendorName: Topic.VendorName
+          invoiceNumber: Topic.InvoiceNumber
+          totalAmount: Topic.TotalAmount
+          reasonsText: Topic.ReasonsText
+          firstReasonCode: Topic.FirstCode
+
+    - kind: ConditionGroup
+      id: foundCheck
+      conditions:
+        - id: notFound
+          condition: =Topic.Found = false
+          actions:
+            - kind: SendActivity
+              id: sayNotFound
+              activity: I could not find invoice {Topic.InvoiceRef}. Check the number or try the file name.
+            - kind: EndDialog
+              id: endNotFound
+
+        - id: approved
+          condition: =Topic.Status = "Approved"
+          actions:
+            - kind: SendActivity
+              id: sayApproved
+              activity: "{Topic.InvoiceNumber} from {Topic.VendorName} was not held. Every check passed and it went straight to the register."
+            - kind: EndDialog
+              id: endApproved
+
+    - kind: SetVariable
+      id: setAdvice
+      variable: Topic.Advice
+      value: |-
+        =Switch(Topic.FirstCode,
+          "UNKNOWN_VENDOR", "Check whether the supplier should be onboarded; until then return the invoice to the sender.",
+          "MISSING_PO", "Ask the requester for the PO number, or confirm it is a non-PO spend category.",
+          "PO_NOT_FOUND", "Probably a typo in the PO number. Confirm the correct PO with the buyer.",
+          "PO_VENDOR_MISMATCH", "The PO belongs to another supplier. Ask the vendor to correct the reference.",
+          "AMOUNT_MISMATCH", "Confirm the price change or extra quantity with the buyer before releasing.",
+          "VAT_MISMATCH", "Ask the vendor for a corrected invoice.",
+          "TOTAL_MISMATCH", "The invoice arithmetic is wrong. Request a credit note and corrected invoice.",
+          "DUPLICATE", "Reject it: the same invoice number from this vendor is already in the register.",
+          "LOW_CONFIDENCE", "Open the PDF and confirm the highlighted fields.",
+          "Open the PDF and complete the missing fields.")
+
+    - kind: SendActivity
+      id: sayReasons
+      activity: |-
+        **{Topic.InvoiceNumber}** from {Topic.VendorName} (EUR {Text(Topic.TotalAmount, "#,##0.00")}) is held because:
+        {Topic.ReasonsText}
+
+        Next step: {Topic.Advice}
+
+    - kind: SendActivity
+      id: offerRelease
+      activity: If the blocking reason is resolved, say "release {Topic.InvoiceNumber}".

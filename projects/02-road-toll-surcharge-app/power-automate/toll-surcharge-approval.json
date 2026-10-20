@@ -1,0 +1,93 @@
+{
+  "_note": "Definition sketch of the TollSurchargeApproval flow (Logic Apps workflow schema as used by Power Automate). Connection references and some inputs are simplified.",
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "cl_TierAutoMaxPct": { "type": "String", "defaultValue": "3.5" },
+      "cl_TierCmMaxPct": { "type": "String", "defaultValue": "5.0" },
+      "cl_SteeringCommitteeChair": { "type": "String", "defaultValue": "steering.chair@contoso.example" }
+    },
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "PowerAppV2",
+        "inputs": { "schema": { "type": "object", "properties": { "text": { "title": "ProposalId", "type": "string" } }, "required": ["text"] } }
+      }
+    },
+    "actions": {
+      "Get_proposal": {
+        "type": "OpenApiConnection",
+        "inputs": {
+          "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "GetItem", "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps" },
+          "parameters": { "entityName": "cl_surchargeproposals", "recordId": "@triggerBody()['text']", "$expand": "cl_customer($select=cl_code,cl_name,_cl_accountowner_value)" }
+        }
+      },
+      "Tier": {
+        "type": "Compose",
+        "runAfter": { "Get_proposal": ["Succeeded"] },
+        "inputs": "@outputs('Get_proposal')?['body/cl_tier@OData.Community.Display.V1.FormattedValue']"
+      },
+      "Route_by_tier": {
+        "type": "Switch",
+        "runAfter": { "Tier": ["Succeeded"] },
+        "expression": "@outputs('Tier')",
+        "cases": {
+          "Auto": {
+            "case": "Auto-approved",
+            "actions": {
+              "Set_approved": {
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "UpdateRecord", "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps" },
+                  "parameters": { "entityName": "cl_surchargeproposals", "recordId": "@triggerBody()['text']", "item/cl_status": 3, "item/cl_approvalcomments": "Approved by policy (under auto thresholds)" }
+                }
+              }
+            }
+          },
+          "Manager": {
+            "case": "Commercial manager",
+            "actions": {
+              "Approval_CM": {
+                "type": "OpenApiConnectionWebhook",
+                "inputs": {
+                  "host": { "connectionName": "shared_approvals", "operationId": "StartAndWaitForAnApproval", "apiId": "/providers/Microsoft.PowerApps/apis/shared_approvals" },
+                  "parameters": {
+                    "approvalType": "Basic",
+                    "WebhookApprovalCreationInput/title": "Toll surcharge @{outputs('Get_proposal')?['body/cl_name']}",
+                    "WebhookApprovalCreationInput/assignedTo": "@{outputs('Get_owner')?['body/internalemailaddress']}",
+                    "WebhookApprovalCreationInput/details": "@{outputs('Facts')}"
+                  }
+                }
+              },
+              "Write_outcome_CM": {
+                "type": "OpenApiConnection",
+                "runAfter": { "Approval_CM": ["Succeeded"] },
+                "inputs": {
+                  "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "UpdateRecord", "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps" },
+                  "parameters": { "entityName": "cl_surchargeproposals", "recordId": "@triggerBody()['text']", "item/cl_status": "@if(equals(outputs('Approval_CM')?['body/outcome'], 'Approve'), 3, 4)" }
+                }
+              }
+            }
+          }
+        },
+        "default": {
+          "actions": {
+            "Approval_stage1_manager": { "type": "OpenApiConnectionWebhook", "inputs": { "host": { "connectionName": "shared_approvals", "operationId": "StartAndWaitForAnApproval" }, "parameters": { "approvalType": "Basic", "WebhookApprovalCreationInput/assignedTo": "@{outputs('Get_owner')?['body/internalemailaddress']}" } } },
+            "Approval_stage2_steering": {
+              "type": "OpenApiConnectionWebhook",
+              "runAfter": { "Approval_stage1_manager": ["Succeeded"] },
+              "inputs": { "host": { "connectionName": "shared_approvals", "operationId": "StartAndWaitForAnApproval" }, "parameters": { "approvalType": "Basic", "WebhookApprovalCreationInput/assignedTo": "@parameters('cl_SteeringCommitteeChair')" } }
+            }
+          }
+        }
+      },
+      "Respond_to_app": {
+        "type": "Response",
+        "kind": "PowerApp",
+        "runAfter": { "Route_by_tier": ["Succeeded"] },
+        "inputs": { "statusCode": 200, "body": { "status": "@outputs('Tier')" } }
+      }
+    }
+  }
+}

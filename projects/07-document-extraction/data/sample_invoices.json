@@ -1,0 +1,39 @@
+{
+  "_note": "12 invoices copied from the Invoice Intake Agent synthetic demo set (data/ground_truth.csv, seed 7) plus the matching vendor master and purchase order rows. All names, VAT numbers and amounts are fictional. The sample is weighted to show every exception reason once.",
+  "vendors": [
+    { "vendor_id": "V001", "vendor_name": "Northwind Office Supplies B.V.", "vat_id": "NL812345671B01" },
+    { "vendor_id": "V002", "vendor_name": "Delta Freight Services B.V.", "vat_id": "NL823456782B01" },
+    { "vendor_id": "V003", "vendor_name": "Kestrel IT Solutions B.V.", "vat_id": "NL834567893B01" },
+    { "vendor_id": "V004", "vendor_name": "Harbourline Facility Care", "vat_id": "NL845678904B01" },
+    { "vendor_id": "V007", "vendor_name": "Polder Energy Partners B.V.", "vat_id": "NL878901237B01" },
+    { "vendor_id": "V008", "vendor_name": "Ironbridge Security Services", "vat_id": "NL889012348B01" },
+    { "vendor_id": "V009", "vendor_name": "Canalside Legal Advisory", "vat_id": "NL890123459B01" },
+    { "vendor_id": "V010", "vendor_name": "Lumen Cloud Hosting B.V.", "vat_id": "NL801234560B01" },
+    { "vendor_id": "V011", "vendor_name": "Greenfield Waste Solutions", "vat_id": "NL811223344B01" }
+  ],
+  "purchase_orders": [
+    { "po_number": "PO-4500100", "vendor_id": "V001", "net_amount": 3295.27 },
+    { "po_number": "PO-4500101", "vendor_id": "V002", "net_amount": 1631.17 },
+    { "po_number": "PO-4500107", "vendor_id": "V008", "net_amount": 5061.53 },
+    { "po_number": "PO-4500109", "vendor_id": "V010", "net_amount": 4351.67 },
+    { "po_number": "PO-4500126", "vendor_id": "V003", "net_amount": 3147.60 },
+    { "po_number": "PO-4500127", "vendor_id": "V004", "net_amount": 8031.14 },
+    { "po_number": "PO-4500132", "vendor_id": "V009", "net_amount": 5449.30 },
+    { "po_number": "PO-4500142", "vendor_id": "V007", "net_amount": 7821.93 },
+    { "po_number": "PO-4500146", "vendor_id": "V011", "net_amount": 5232.39 }
+  ],
+  "invoices": [
+    { "file": "invoice_001.pdf", "layout": "A", "vendor_name": "Northwind Office Supplies B.V.", "vendor_vat_id": "NL812345671B01", "invoice_number": "001-20268767", "invoice_date": "2026-10-15", "po_number": "PO-4500100", "net_amount": 3295.27, "vat_amount": 692.01, "total_amount": 3987.28, "expected": "AUTO_APPROVED" },
+    { "file": "invoice_002.pdf", "layout": "B", "vendor_name": "Delta Freight Services B.V.", "vendor_vat_id": "NL823456782B01", "invoice_number": "002-20262918", "invoice_date": "2026-10-02", "po_number": "PO-4500101", "net_amount": 1630.67, "vat_amount": 342.44, "total_amount": 1973.11, "expected": "AUTO_APPROVED" },
+    { "file": "invoice_008.pdf", "layout": "B", "vendor_name": "Ironbridge Security Services", "vendor_vat_id": "NL889012348B01", "invoice_number": "008-20266571", "invoice_date": "2026-10-09", "po_number": "PO-4500107", "net_amount": 5061.53, "vat_amount": 1062.92, "total_amount": 6124.45, "expected": "AUTO_APPROVED" },
+    { "file": "invoice_010.pdf", "layout": "A", "vendor_name": "Shadowbrook Consulting Ltd", "vendor_vat_id": "GB999888777", "invoice_number": "010-20265132", "invoice_date": "2026-09-23", "po_number": "PO-4500109", "net_amount": 4351.67, "vat_amount": 913.85, "total_amount": 5265.52, "expected": "EXCEPTION", "seeded": "UNKNOWN_VENDOR" },
+    { "file": "invoice_026.pdf", "layout": "B", "vendor_name": "Delta Freight Services B.V.", "vendor_vat_id": "NL823456782B01", "invoice_number": "002-20265960", "invoice_date": "2026-09-08", "po_number": "PO-4599025", "net_amount": 1313.16, "vat_amount": 275.76, "total_amount": 1588.92, "expected": "EXCEPTION", "seeded": "PO_NOT_FOUND" },
+    { "file": "invoice_027.pdf", "layout": "C", "vendor_name": "Kestrel IT Solutions B.V.", "vendor_vat_id": "NL834567893B01", "invoice_number": "003-20264597", "invoice_date": "2026-09-07", "po_number": "PO-4500126", "net_amount": 3389.55, "vat_amount": 305.06, "total_amount": 3694.61, "expected": "EXCEPTION", "seeded": "AMOUNT_MISMATCH" },
+    { "file": "invoice_028.pdf", "layout": "A", "vendor_name": "Harbourline Facility Care", "vendor_vat_id": "NL845678904B01", "invoice_number": "004-20266556", "invoice_date": "2026-09-27", "po_number": "PO-4500127", "net_amount": 8031.14, "vat_amount": 831.22, "total_amount": 8862.36, "expected": "EXCEPTION", "seeded": "VAT_MISMATCH" },
+    { "file": "invoice_033.pdf", "layout": "C", "vendor_name": "Canalside Legal Advisory", "vendor_vat_id": "NL890123459B01", "invoice_number": "009-20267844", "invoice_date": "2026-09-18", "po_number": "PO-4500132", "net_amount": 5449.30, "vat_amount": 1144.35, "total_amount": 6593.65, "expected": "AUTO_APPROVED" },
+    { "file": "invoice_035.pdf", "layout": "B", "vendor_name": "Canalside Legal Advisory", "vendor_vat_id": "NL890123459B01", "invoice_number": "009-20267844", "invoice_date": "2026-09-18", "po_number": "PO-4500132", "net_amount": 5449.30, "vat_amount": 1144.35, "total_amount": 6593.65, "expected": "EXCEPTION", "seeded": "DUPLICATE" },
+    { "file": "invoice_037.pdf", "layout": "A", "vendor_name": "Northwind Office Supplies B.V.", "vendor_vat_id": "NL812345671B01", "invoice_number": "001-20269110", "invoice_date": "2026-10-05", "po_number": null, "net_amount": 6725.45, "vat_amount": 605.29, "total_amount": 7330.74, "expected": "EXCEPTION", "seeded": "MISSING_PO" },
+    { "file": "invoice_043.pdf", "layout": "A", "vendor_name": "Polder Energy Partners B.V.", "vendor_vat_id": "NL878901237B01", "invoice_number": "007-20267545", "invoice_date": "2026-10-08", "po_number": "PO-4500142", "net_amount": 7841.77, "vat_amount": 1646.77, "total_amount": 9498.54, "expected": "EXCEPTION", "seeded": "TOTAL_MISMATCH" },
+    { "file": "invoice_044.pdf", "layout": "B", "vendor_name": "Ironbridge Security Services", "vendor_vat_id": "NL889012348B01", "invoice_number": "008-20267381", "invoice_date": "2026-09-21", "po_number": "PO-4500146", "net_amount": 6904.33, "vat_amount": 1449.91, "total_amount": 8354.24, "expected": "EXCEPTION", "seeded": "PO_VENDOR_MISMATCH" }
+  ]
+}

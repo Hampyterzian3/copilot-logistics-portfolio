@@ -1,0 +1,86 @@
+{
+  "id": "04",
+  "slug": "inbound-risk-agent",
+  "title": "Inbound Risk Early-Warning Agent",
+  "outcome": "Flags late inbound shipments in transit; critical band 97% precise in backtest.",
+  "summary": "Delayed or lost inbound shipments were noticed too late, often by the customer. A transparent 0-100 risk score with plain-word reasons, Teams alerts and a Copilot Studio agent warns the control tower while there is still time to act.",
+  "stack": [
+    "Copilot Studio",
+    "Power Automate",
+    "Azure Functions",
+    "Dataverse",
+    "Microsoft Teams",
+    "Power BI",
+    "GitHub Copilot"
+  ],
+  "cv": "Inspired by: inbound-risk dashboard sustaining 99% on-time through COVID-19; lost-shipment postcode analysis cutting lost shipments 64%.",
+  "demo": "demos/04-inbound-risk-agent.html",
+  "repo": "projects/04-inbound-risk-agent",
+  "cards": [
+    {
+      "type": "image",
+      "title": "300 shipments, scored every 30 minutes",
+      "caption": "Each in-transit shipment gets a 0-100 score from seven weighted factors, sorted by risk and filterable by customer and carrier.",
+      "src": "media/04/01-risk-list.png",
+      "alt": "Inbound risk monitor listing shipments by score with critical, at risk and watch tags and KPI tiles"
+    },
+    {
+      "type": "diagram",
+      "title": "Architecture",
+      "caption": "A scheduled flow pulls tracking events, an Azure Function scores them, Dataverse stores scores and reasons, Teams, Copilot Studio and Power BI use them.",
+      "src": "media/04/architecture.svg",
+      "alt": "Architecture diagram from TMS events through Power Automate and Azure Function to Dataverse, Teams, Copilot Studio and Power BI"
+    },
+    {
+      "type": "code",
+      "title": "Every point is explainable",
+      "caption": "Each factor is a straight line between no concern and full concern, times a fixed weight. Weights sum to 100.",
+      "lang": "python",
+      "code": "    return {\n        \"lane\": clamp01((f[\"lane_delay_rate\"] - 0.06) / 0.24),\n        \"area\": clamp01((f[\"area_loss_rate\"] - 0.004) / 0.016),\n        \"carrier\": clamp01((0.95 - f[\"carrier_on_time\"]) / 0.20),\n        \"dwell\": clamp01((ratio - 1.0) / 2.0),\n        \"customs\": 1.0 if f[\"customs_status\"] == \"held\" else 0.5 if f[\"customs_status\"] == \"pending\" else 0.0,\n        \"slack\": clamp01((1.0 - slack) / 2.0),\n        \"calendar\": cal,\n    }"
+    },
+    {
+      "type": "image",
+      "title": "Reasons and a Teams alert",
+      "caption": "Clicking a shipment shows its top reasons, points per factor, scan history and the Adaptive Card 1.5 posted to the control tower channel.",
+      "src": "media/04/02-shipment-card.png",
+      "alt": "Shipment detail with ranked reasons, factor bars and a Teams adaptive card preview with Acknowledge, Draft customer update and Escalate buttons"
+    },
+    {
+      "type": "metric",
+      "title": "Backtest on later shipments",
+      "caption": "Rates learned before 1 August 2026, then tested on 1,772 later closed shipments (synthetic) against what actually happened.",
+      "metrics": [
+        {
+          "value": "96.9%",
+          "label": "critical precision"
+        },
+        {
+          "value": "49.0%",
+          "label": "late shipments caught at risk or above"
+        },
+        {
+          "value": "2",
+          "label": "high-loss postcode areas found from history"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "title": "Customer update, drafted",
+      "caption": "The agent explains a score and drafts a customer email using only customer-safe causes, for a planner to approve.",
+      "src": "media/04/03-agent-draft.png",
+      "alt": "Agent panel with a drafted customer update email"
+    },
+    {
+      "type": "text",
+      "title": "GitHub Copilot ready",
+      "caption": "Code drafted with AI pair programming and verified by 28 pytest tests and a parity check on all 300 risk scores. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
+    },
+    {
+      "type": "demo",
+      "title": "Try it",
+      "caption": "Sort and filter the list, open a critical shipment and click through the agent suggestions in under a minute.",
+      "href": "demos/04-inbound-risk-agent.html"
+    }
+  ]
+}

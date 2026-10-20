@@ -1,0 +1,73 @@
+kind: AdaptiveDialog
+modelDescription: Runs the RFQ checker on a folder in the SharePoint RFQ library and reports gaps by severity.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Check new RFQ
+    triggerQueries:
+      - check a new RFQ
+      - run the RFQ checker
+      - what is missing in this tender
+      - check the Northwind RFQ
+      - find gaps in the lane file
+
+  actions:
+    - kind: Question
+      id: askFolder
+      variable: Topic.RfqFolder
+      prompt: Which RFQ folder in the RFQ Library should I check?
+      entity: StringPrebuiltEntity
+      alwaysPrompt: false
+
+    - kind: InvokeFlowAction
+      id: runChecker
+      flowId: 00000000-0000-0000-0000-000000000000  # "Tender Desk - Run RFQ check" (see power-automate/run-rfq-check.md)
+      input:
+        binding:
+          rfqFolder: =Topic.RfqFolder
+      output:
+        binding:
+          tenderId: Topic.TenderId
+          lanes: Topic.LaneCount
+          gapsHigh: Topic.GapsHigh
+          gapsMedium: Topic.GapsMedium
+          gapsLow: Topic.GapsLow
+          readinessPct: Topic.ReadinessPct
+          topGaps: Topic.TopGaps
+
+    - kind: ConditionGroup
+      id: anyHigh
+      conditions:
+        - id: hasHigh
+          condition: =Topic.GapsHigh > 0
+          actions:
+            - kind: SendActivity
+              id: reportHigh
+              activity: |-
+                I checked {Topic.LaneCount} lanes in {Topic.RfqFolder}. {Topic.ReadinessPct}% are ready to price.
+                Gaps: {Topic.GapsHigh} high, {Topic.GapsMedium} medium, {Topic.GapsLow} low. Fix these first:
+                {Topic.TopGaps}
+                Source: lanes.csv and requirements.md in the RFQ Library.
+      elseActions:
+        - kind: SendActivity
+          id: reportClean
+          activity: |-
+            I checked {Topic.LaneCount} lanes in {Topic.RfqFolder}. No high-severity gaps:
+            {Topic.GapsMedium} medium and {Topic.GapsLow} low. The pack is close to ready for pricing.
+
+    - kind: Question
+      id: askNext
+      variable: Topic.Next
+      prompt: Shall I draft the clarification questions?
+      entity: BooleanPrebuiltEntity
+
+    - kind: ConditionGroup
+      id: goDraft
+      conditions:
+        - id: yesDraft
+          condition: =Topic.Next = true
+          actions:
+            - kind: BeginDialog
+              id: toDraft
+              dialog: cr7a1_tenderDesk.topic.DraftClarificationQuestions

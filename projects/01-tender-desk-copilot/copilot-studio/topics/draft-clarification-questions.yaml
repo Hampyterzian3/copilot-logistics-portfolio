@@ -1,0 +1,39 @@
+kind: AdaptiveDialog
+modelDescription: Builds the clarification letter from the checker questions and saves it as a Word draft in the RFQ folder.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Draft clarification questions
+    triggerQueries:
+      - draft clarification email
+      - write the clarification letter
+      - what should we ask the customer
+      - prepare questions for the shipper
+
+  actions:
+    - kind: Question
+      id: askFolder
+      variable: Topic.RfqFolder
+      prompt: Which RFQ folder is the letter for?
+      entity: StringPrebuiltEntity
+      alwaysPrompt: false
+
+    - kind: InvokeFlowAction
+      id: buildLetter
+      flowId: 00000000-0000-0000-0000-000000000001  # "Tender Desk - Create clarification draft"
+      input:
+        binding:
+          rfqFolder: =Topic.RfqFolder
+      output:
+        binding:
+          questionCount: Topic.QuestionCount
+          themes: Topic.Themes
+          draftUrl: Topic.DraftUrl
+
+    - kind: SendActivity
+      id: done
+      activity: |-
+        I drafted {Topic.QuestionCount} clarification questions in these themes: {Topic.Themes}.
+        Open the draft in Word: {Topic.DraftUrl}
+        Tip: ask Copilot in Word to "make this more concise and keep the numbered questions".

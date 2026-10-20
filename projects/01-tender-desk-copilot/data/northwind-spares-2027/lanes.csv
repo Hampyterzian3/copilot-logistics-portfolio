@@ -1,0 +1,19 @@
+lane_id,origin_country,origin_city,dest_country,dest_city,distance_km,mode_requested,annual_shipments,pallets_per_shipment,pallet_length_cm,pallet_width_cm,pallet_height_cm,weight_kg_per_pallet,incoterm,hazardous,un_number,required_transit_days
+SP-001,PL,Poznan,CZ,Pilsen,480,Any,52,5,120,80,120,360,FCA,N,,1
+SP-002,PL,Poznan,IT,Milan,1200,Any,12,5,120,80,120,590,EXW,N,,4
+SP-003,PL,Poznan,BE,Antwerp,1090,Road LTL,48,6,120,80,100,530,CPT,N,,3
+SP-004,PL,Poznan,ES,Valencia,2440,Any,156,7,120,80,100,410,EXW,N,,6
+SP-005,PL,Poznan,NL,Rotterdam,1060,Road LTL,104,2,120,100,120,690,FCA,N,,3
+SP-006,PL,Poznan,DE,Hamburg,600,Any,24,19,120,80,160,310,FCA,N,,3
+SP-007,IT,Bologna,ES,Barcelona,1030,Road LTL,104,2,120,80,120,460,DAP,N,,3
+SP-008,PL,Poznan,SK,Kosice,640,Any,260,7,120,80,,660,DAP,N,,1
+SP-009,PL,Poznan,ES,Barcelona,2070,Road LTL,52,18,120,80,120,380,EXW,N,,6
+SP-010,PL,Poznan,FR,Lyon,1430,Road LTL,104,3,120,100,110,530,CPT,N,,5
+SP-011,IT,Bologna,FR,Lyon,660,Road LTL,260,9,120,80,120,360,FCA,N,,3
+SP-012,PL,Poznan,HU,Gyor,660,Road LTL,52,3,120,100,140,700,DAP,N,,2
+SP-013,IT,Bologna,CZ,Pilsen,760,Any,48,7,120,100,120,550,EXW,Y,,3
+SP-014,IT,Bologna,BE,Antwerp,1140,Road LTL,24,8,120,80,160,390,EXW,N,,3
+SP-015,IT,Bologna,IT,Milan,250,Road LTL,78,16,120,80,110,640,DDP,N,,3
+SP-016,PL,Poznan,FR,Bordeaux,1910,Road LTL,260,10,120,80,100,390,FCA,N,,5
+SP-017,IT,Bologna,FR,Lille,1150,Any,208,6,120,80,140,320,CPT,N,,3
+SP-018,IT,Bologna,IT,Turin,370,Road LTL,156,9,120,80,120,650,DAP,N,,3

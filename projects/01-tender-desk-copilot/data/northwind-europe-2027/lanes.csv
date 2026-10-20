@@ -1,0 +1,41 @@
+lane_id,origin_country,origin_city,dest_country,dest_city,distance_km,mode_requested,annual_shipments,pallets_per_shipment,pallet_length_cm,pallet_width_cm,pallet_height_cm,weight_kg_per_pallet,incoterm,hazardous,un_number,required_transit_days
+NW-001,PL,Wroclaw,DE,Hamburg,690,Any,208,18,120,100,110,490,DDP,N,,2
+NW-002,HU,Gyor,FR,Lyon,1250,Any,78,6,120,80,160,600,DAP,N,,2
+NW-003,CZ,Pilsen,BE,Antwerp,820,Road LTL,24,21,120,80,120,560,DDP,N,,2
+NW-004,HU,Gyor,DE,Munich,570,Any,,17,120,80,120,470,DAP,N,,3
+NW-005,CZ,Pilsen,DE,Munich,280,Road LTL,78,2,120,100,110,340,DDP,N,,3
+NW-006,CZ,Pilsen,PT,Porto,2440,Any,78,13,120,80,120,420,DAP,Y,,2
+NW-007,CZ,Pilsen,SE,Gothenburg,1110,Road FTL,12,25,120,80,,270,EXW,N,,2
+NW-008,CZ,Pilsen,RO,Cluj,1030,Road FTL,78,28,120,80,160,420,CPT,N,,3
+NW-009,PL,Wroclaw,ES,Seville,2960,Road FTL,78,32,120,100,100,370,TBC,Y,UN3480,3
+NW-010,PL,Wroclaw,FR,Lyon,1350,Road LTL,104,20,120,80,140,490,EXW,N,,3
+NW-011,DE,Stuttgart,SK,Kosice,1110,Road FTL,260,24,120,100,120,370,DAP,Y,UN3082,2
+NW-012,HU,Gyor,FR,Lille,1380,Road FTL,24,,120,80,120,370,FCA,N,,3
+NW-013,CZ,Pilsen,FR,Lille,930,Any,24,4,120,80,140,400,CPT,N,,4
+NW-014,DE,Stuttgart,NL,Rotterdam,600,Road FTL,208,29,120,80,140,370,EXW,N,,1
+NW-015,HU,Gyor,ES,Barcelona,1760,Road FTL,260,33,120,80,100,390,DAP,N,,5
+NW-016,PL,Wroclaw,BE,Ghent,1160,Any,208,2,,,100,690,DAP,N,,3
+NW-017,HU,Gyor,BE,Antwerp,1290,Road FTL,24,31,120,80,120,270,DDP,N,,2
+NW-018,HU,Gyor,IT,Turin,1020,Any,48,14,120,100,110,340,DDU,N,,4
+NW-019,HU,Gyor,SK,Kosice,370,Road FTL,260,22,120,80,160,660,FCA,Y,UN3480,1
+NW-020,PL,Wroclaw,SE,Gothenburg,1000,Any,52,17,120,100,120,660,EXW,Y,1263,2
+NW-021,CZ,Pilsen,DE,Munich,280,Any,52,2,120,100,110,340,DDP,N,,3
+NW-022,PL,Wroclaw,SK,Kosice,500,Road LTL,24,20,120,80,120,410,DDP,N,,2
+NW-023,DE,Stuttgart,PT,Porto,2040,Any,260,2,120,80,110,630,EXW/FCA,N,,6
+NW-024,DE,Stuttgart,IT,Milan,460,Any,104,7,120,80,160,320,EXW,N,,1
+NW-025,HU,Gyor,IT,Bologna,750,Road FTL,208,23,120,100,100,670,CPT,N,,2
+NW-026,HU,Gyor,ES,Seville,2790,Road LTL,,,120,80,110,440,CPT,N,,3
+NW-027,HU,Gyor,AT,Vienna,140,Any,156,16,120,80,100,480,CPT,N,,3
+NW-028,PL,Wroclaw,SK,Bratislava,410,Any,12,7,120,100,110,560,DAP,N,,3
+NW-029,CZ,Pilsen,SK,Kosice,730,Road FTL,260,27,120,80,140,330,,N,,2
+NW-030,DE,Stuttgart,FR,Bordeaux,1080,Road FTL,260,30,120,80,110,560,EXW,N,,4
+NW-031,HU,Gyor,SE,Gothenburg,1470,Road FTL,104,29,120,80,,260,DDP,N,,5
+NW-032,PL,Wroclaw,RO,Bucharest,1260,Road FTL,208,33,120,80,120,330,DDP,N,,4
+NW-033,HU,Gyor,SK,Bratislava,80,Road FTL,24,29,120,100,100,540,FOB Hamburg,N,,3
+NW-034,DE,Stuttgart,ES,Valencia,1600,Any,156,5,120,100,140,490,DAP,N,,4
+NW-035,HU,Gyor,ES,Valencia,2140,Road FTL,260,30,,,,380,DAP,Y,UN3480,4
+NW-036,DE,Stuttgart,PL,Poznan,850,Any,24,9,120,100,160,690,CPT,Y,TBC,4
+NW-037,DE,Stuttgart,SE,Gothenburg,1260,Road FTL,260,29,120,80,100,580,FCA,N,,3
+NW-038,HU,Gyor,NL,Rotterdam,1320,Road FTL,78,30,120,80,160,330,CIF,N,,3
+NW-039,CZ,Pilsen,ES,Valencia,1970,Road LTL,52,12,120,80,120,370,FCA,N,,5
+NW-040,DE,Stuttgart,NL,Rotterdam,600,Road LTL,208,12,120,80,140,370,EXW,N,,1

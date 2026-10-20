@@ -1,0 +1,113 @@
+swagger: "2.0"
+# Power Platform custom connectors import OpenAPI 2.0. Host is a placeholder.
+info:
+  title: Contoso Network Scenarios
+  description: Runs inbound network scenarios (direct, milk-run, cross-dock, best mix) for the OEM plant network.
+  version: "1.0"
+host: contoso-network-scenarios.azurewebsites.net
+basePath: /api
+schemes: [https]
+consumes: [application/json]
+produces: [application/json]
+securityDefinitions:
+  functionKey:
+    type: apiKey
+    in: header
+    name: x-functions-key
+security:
+  - functionKey: []
+paths:
+  /scenarios:
+    post:
+      operationId: RunScenario
+      summary: Run a network scenario
+      description: Evaluates the three pure designs and the best per-supplier mix for one set of parameters. Returns weekly cost, CO2 and truck movements per design and a recommendation.
+      x-ms-visibility: important
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/ScenarioRequest"
+      responses:
+        "200":
+          description: Scenario results
+          schema:
+            $ref: "#/definitions/ScenarioResult"
+        "400":
+          description: Invalid parameters
+          schema:
+            type: object
+            properties:
+              error: { type: string }
+definitions:
+  ScenarioRequest:
+    type: object
+    properties:
+      fuel_index:
+        type: number
+        description: Diesel cost index, 1.0 = base price (0.5 to 2.0)
+        x-ms-summary: Diesel cost index
+        default: 1.0
+      co2_price_t:
+        type: number
+        description: Shadow CO2 price in EUR per tonne (0 to 300)
+        x-ms-summary: CO2 price per tonne
+        default: 0
+      handling_ldm:
+        type: number
+        description: Cross-dock handling cost in EUR per loading metre (0 to 30)
+        x-ms-summary: Cross-dock handling per ldm
+        default: 6
+      max_stops:
+        type: integer
+        description: Maximum pick-up stops per milk-run (1 to 8)
+        x-ms-summary: Milk-run max stops
+        default: 4
+      hubs:
+        type: array
+        description: Active cross-dock hub ids (default all of HUB-IT, HUB-CZ, HUB-FR)
+        x-ms-summary: Active hubs
+        items: { type: string }
+  DesignResult:
+    type: object
+    properties:
+      cost_week: { type: number, description: EUR per week }
+      co2_t_week: { type: number, description: Tonnes CO2 per week }
+      trucks_week: { type: integer, description: Truck trips per week, all legs }
+      plant_arrivals_week: { type: integer, description: Trucks arriving at the plant per week }
+      vkm_week: { type: number, description: Vehicle km per week }
+      objective: { type: number, description: Cost plus CO2 price }
+      mode_counts:
+        type: object
+        properties:
+          direct: { type: integer }
+          milkrun: { type: integer }
+          crossdock: { type: integer }
+  ScenarioResult:
+    type: object
+    properties:
+      params: { type: object, description: Full parameter set used }
+      designs:
+        type: object
+        properties:
+          direct: { $ref: "#/definitions/DesignResult" }
+          milkrun: { $ref: "#/definitions/DesignResult" }
+          crossdock: { $ref: "#/definitions/DesignResult" }
+          bestmix: { $ref: "#/definitions/DesignResult" }
+      recommendation:
+        type: object
+        properties:
+          design: { type: string }
+          best_pure_design: { type: string }
+          saving_vs_best_pure_eur_week: { type: number }
+          saving_vs_best_pure_pct: { type: number }
+          text: { type: string, x-ms-summary: Recommendation text }
+      supplier_modes:
+        type: array
+        items:
+          type: object
+          properties:
+            supplier_id: { type: string }
+            mode: { type: string }
+            hub_id: { type: string }

@@ -1,0 +1,43 @@
+kind: AdaptiveDialog
+modelDescription: Explains why the agent recommends the best mix, which suppliers go direct, by milk-run or via a hub, and what the trade-off is.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Explain recommendation
+    triggerQueries:
+      - Explain the recommendation
+      - Why do you recommend this mix
+      - Why is supplier S12 on a milk-run
+      - Which suppliers go through a hub
+
+  actions:
+    - kind: InvokeConnectorAction
+      id: callRunScenario
+      connectionReference: cr_contosonetworkscenarios
+      connectionProperties:
+        mode: Invoker
+      operationId: RunScenario
+      input:
+        binding:
+          body: ={ }
+      output:
+        binding:
+          designs: Topic.Designs
+          recommendation: Topic.Recommendation
+          supplier_modes: Topic.SupplierModes
+
+    - kind: SetVariable
+      id: crossdockList
+      variable: Topic.ViaHub
+      value: =Concat(Filter(Topic.SupplierModes, mode = "crossdock"), supplier_id & " (" & hub_id & ")", ", ")
+
+    - kind: SendActivity
+      id: sendExplain
+      activity: |-
+        I recommend the best mix: EUR {Text(Topic.Designs.bestmix.cost_week, "#,##0")} and {Text(Topic.Designs.bestmix.co2_t_week, "0.0")} t CO2 a week.
+        {Topic.Recommendation.text}
+        - Direct: {Topic.Designs.bestmix.mode_counts.direct} suppliers whose volume fills trucks.
+        - Milk-run: {Topic.Designs.bestmix.mode_counts.milkrun} suppliers with part loads that share a daily truck by region.
+        - Cross-dock: {Topic.ViaHub}.
+        The engine picks the mode per supplier that lowers network cost plus CO2 price; it never does worse than the best single design.

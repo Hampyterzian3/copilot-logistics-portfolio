@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" font-family="Inter, Arial, sans-serif">
+  <title>Network Scenario Agent architecture</title>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#81cfb3"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="675" fill="#0c2c23"/>
+  <text x="48" y="64" fill="#fffdf8" font-family="Space Grotesk, Arial" font-size="34" font-weight="600">Network Scenario Agent</text>
+  <text x="48" y="98" fill="#fffdf8" opacity=".8" font-size="19">Direct, milk-run or cross-dock per supplier: cost, CO2 and truck movements</text>
+
+  <g font-size="17" fill="#fffdf8">
+    <!-- Row 1 -->
+    <rect x="48" y="150" width="230" height="120" rx="12" fill="#244139"/>
+    <text x="68" y="188" font-family="Space Grotesk, Arial" font-size="21" font-weight="600">Planner</text>
+    <text x="68" y="216">Teams or Power Apps</text>
+    <text x="68" y="240">sliders and chat</text>
+
+    <rect x="338" y="150" width="270" height="120" rx="12" fill="#244139" stroke="#ff6b35" stroke-width="2"/>
+    <text x="358" y="188" font-family="Space Grotesk, Arial" font-size="21" font-weight="600">Copilot Studio</text>
+    <text x="358" y="216">agent: 4 topics</text>
+    <text x="358" y="240">explains trade-offs</text>
+
+    <rect x="668" y="150" width="230" height="120" rx="12" fill="#244139"/>
+    <text x="688" y="188" font-family="Space Grotesk, Arial" font-size="21" font-weight="600">Custom connector</text>
+    <text x="688" y="216">Power Platform</text>
+    <text x="688" y="240">from openapi.yaml</text>
+
+    <rect x="958" y="150" width="200" height="120" rx="12" fill="#244139"/>
+    <text x="978" y="188" font-family="Space Grotesk, Arial" font-size="21" font-weight="600">Azure Function</text>
+    <text x="978" y="216">POST /scenarios</text>
+    <text x="978" y="240">Python, HTTP</text>
+
+    <!-- Row 2 -->
+    <rect x="338" y="350" width="270" height="120" rx="12" fill="#244139"/>
+    <text x="358" y="388" font-family="Space Grotesk, Arial" font-size="21" font-weight="600">Power Automate</text>
+    <text x="358" y="416">agent flow logs</text>
+    <text x="358" y="440">each scenario run</text>
+
+    <rect x="668" y="350" width="230" height="120" rx="12" fill="#244139"/>
+    <text x="688" y="388" font-family="Space Grotesk, Arial" font-size="21" font-weight="600">Dataverse</text>
+    <text x="688" y="416">scenarios, results,</text>
+    <text x="688" y="440">supplier modes</text>
+
+    <rect x="958" y="350" width="200" height="120" rx="12" fill="#244139"/>
+    <text x="978" y="388" font-family="Space Grotesk, Arial" font-size="21" font-weight="600">network_engine</text>
+    <text x="978" y="416">routes, cost, CO2,</text>
+    <text x="978" y="440">best mix, pytest</text>
+
+    <!-- Row 3 -->
+    <rect x="668" y="530" width="230" height="100" rx="12" fill="#244139"/>
+    <text x="688" y="568" font-family="Space Grotesk, Arial" font-size="21" font-weight="600">Power BI</text>
+    <text x="688" y="596">flow map per design</text>
+
+    <rect x="958" y="530" width="200" height="100" rx="12" fill="#81cfb3"/>
+    <text x="978" y="568" fill="#0c2c23" font-family="Space Grotesk, Arial" font-size="21" font-weight="600">GitHub Copilot</text>
+    <text x="978" y="596" fill="#0c2c23">built the engine</text>
+  </g>
+
+  <g stroke="#81cfb3" stroke-width="2.5" fill="none" marker-end="url(#a)">
+    <path d="M278 210H332"/>
+    <path d="M608 210H662"/>
+    <path d="M898 210H952"/>
+    <path d="M1058 270V344"/>
+    <path d="M473 270V344"/>
+    <path d="M608 410H662"/>
+    <path d="M783 470V524"/>
+    <path d="M1058 530V476"/>
+  </g>
+  <g font-size="14" fill="#fffdf8" opacity=".85">
+    <text x="284" y="200">ask</text>
+    <text x="612" y="200">tool call</text>
+    <text x="1066" y="314">runs</text>
+    <text x="481" y="314">log</text>
+    <text x="791" y="504">reads</text>
+  </g>
+  <text x="48" y="560" fill="#fffdf8" opacity=".8" font-size="16">Synthetic data: 60 suppliers, 3 hubs,</text>
+  <text x="48" y="584" fill="#fffdf8" opacity=".8" font-size="16">1 OEM plant. Fictional Contoso Logistics.</text>
+</svg>

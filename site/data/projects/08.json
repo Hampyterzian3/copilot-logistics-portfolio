@@ -1,0 +1,92 @@
+{
+  "id": "08",
+  "slug": "wedding-photo-album",
+  "title": "Live Wedding Website with AI Photo Album",
+  "outcome": "Guests sign in by phone and see the wedding photos face recognition finds them in.",
+  "summary": "Wedding guests had no private, easy way to find the photos they appear in. A live wedding website, now in production, combines SMS sign-in, guest uploads, manager moderation and an AI photo album that groups faces into people for the couple to link to guests.",
+  "stack": [
+    "Astro",
+    "Fastify",
+    "PostgreSQL + pgvector",
+    "Immich (InsightFace)",
+    "Twilio Verify",
+    "Docker",
+    "Cloudflare Tunnel"
+  ],
+  "cv": "Side project outside the CV roles: a production web platform, self-hosted end to end.",
+  "demo": null,
+  "repo": "projects/08-wedding-photo-album",
+  "cards": [
+    {
+      "type": "image",
+      "title": "Each guest sees only their photos",
+      "caption": "Guests sign in with an SMS code, then browse a gallery filtered to what their access allows. Photos: Wikimedia Commons, CC0 / CC BY, see credits.",
+      "src": "media/08/02-gallery.jpg",
+      "alt": "Guest photo gallery of a sample wedding with a caption bar explaining visibility",
+      "href": "projects/08-wedding-photo-album/README.md#photo-credits"
+    },
+    {
+      "type": "image",
+      "title": "AI faces: \"Who is this?\"",
+      "caption": "Faces detected by InsightFace are clustered into people in pgvector. A manager links each person to a guest, ranked by similarity, or hides bystanders. Photos: Wikimedia Commons, CC0 / CC BY, see credits.",
+      "src": "media/08/06-faces.jpg",
+      "alt": "Face review dialog listing guests with similarity percentages for an unnamed person",
+      "href": "projects/08-wedding-photo-album/README.md#photo-credits"
+    },
+    {
+      "type": "diagram",
+      "title": "Architecture",
+      "caption": "Astro SSR web and a Fastify API over Postgres with pgvector, a headless Immich backend for storage and face detection, and Twilio Verify for sign-in, self-hosted behind a Cloudflare Tunnel.",
+      "src": "media/08/architecture.svg",
+      "alt": "Architecture diagram: guest and manager, Cloudflare Tunnel, Astro web, Fastify API, Postgres, Immich, Twilio, and a six-step face pipeline"
+    },
+    {
+      "type": "code",
+      "title": "One access rule, in SQL",
+      "caption": "The single visibility predicate: a guest sees a photo only if a manager linked them to a face in it, or granted them its category. Selfie matches never grant access.",
+      "lang": "ts",
+      "code": "  const taggedIn = sql`EXISTS (\n    SELECT 1 FROM asset_faces af\n    JOIN face_clusters fc ON fc.id = af.cluster_id\n    WHERE af.immich_asset_id = ${t}.immich_asset_id\n      AND af.wedding_id = ${weddingId}\n      AND fc.guest_id = ${viewer.guestId}\n      AND fc.guest_link_source = 'manager'\n  )`;\n  return sql`(${base} AND (${taggedIn} OR ${inTickedCategory}))`;"
+    },
+    {
+      "type": "metric",
+      "title": "Engineering discipline",
+      "caption": "Counted from the repository: decision records, design specs, test files and API modules. CI checks format, lint ratchet, types, tests and build on every push.",
+      "metrics": [
+        {
+          "value": "9",
+          "label": "architecture decision records"
+        },
+        {
+          "value": "12",
+          "label": "design specs"
+        },
+        {
+          "value": "142",
+          "label": "test files"
+        },
+        {
+          "value": "14",
+          "label": "API modules"
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "title": "Walkthrough",
+      "caption": "28 seconds of the real web build: gallery, people pages and face review. Sample photos from Wikimedia Commons, fictional names.",
+      "src": "media/08/clip.mp4",
+      "poster": "media/08/poster.jpg"
+    },
+    {
+      "type": "text",
+      "title": "AI pair programming",
+      "caption": "Built spec first with an AI coding agent: 12 specs, agent instructions kept in the repo, test-first house rules and CI gates. Privacy rules were recorded as decision records. The same instruction files work with GitHub Copilot agent mode."
+    },
+    {
+      "type": "demo",
+      "title": "Watch the full flow",
+      "caption": "Gallery, lightbox, people pages and face review in one clip; the screenshots cover sign-in, upload and moderation. Source code is in a private repository.",
+      "href": "media/08/clip.mp4"
+    }
+  ]
+}

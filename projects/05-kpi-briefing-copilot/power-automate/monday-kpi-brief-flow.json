@@ -1,0 +1,83 @@
+{
+  "_comment": "Definition sketch for 'KPI Brief, Monday run'. Connection references and IDs are placeholders.",
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "triggers": {
+      "Recurrence": {
+        "type": "Recurrence",
+        "recurrence": { "frequency": "Week", "interval": 1, "schedule": { "weekDays": ["Monday"], "hours": ["6"], "minutes": [0] }, "timeZone": "W. Europe Standard Time" }
+      }
+    },
+    "actions": {
+      "Get_refresh_history": {
+        "type": "OpenApiConnection",
+        "inputs": { "host": { "connectionName": "shared_powerbi", "operationId": "GetRefreshHistory" },
+                    "parameters": { "groupid": "<workspace-id>", "datasetid": "<dataset-id>", "$top": 1 } },
+        "runAfter": {}
+      },
+      "Refresh_completed": {
+        "type": "If",
+        "expression": { "equals": ["@first(body('Get_refresh_history')?['value'])?['status']", "Completed"] },
+        "actions": {
+          "Run_variance_query": {
+            "type": "OpenApiConnection",
+            "inputs": { "host": { "connectionName": "shared_powerbi", "operationId": "ExecuteDatasetQuery" },
+                        "parameters": { "workspaceType": "Workspace", "groupid": "<workspace-id>", "datasetid": "<dataset-id>",
+                                        "queryRequest/queries/0/query": "<DAX export query from powerbi/semantic-model.md>" } },
+            "retryPolicy": { "type": "exponential", "count": 4, "interval": "PT30S" }
+          },
+          "Filter_flagged": {
+            "type": "Query",
+            "inputs": { "from": "@body('Run_variance_query')?['firstTableRows']", "where": "@equals(item()?['[Flag]'], true)" },
+            "runAfter": { "Run_variance_query": ["Succeeded"] }
+          },
+          "Draft_brief_text": {
+            "type": "OpenApiConnection",
+            "inputs": { "host": { "connectionName": "shared_microsoftcopilotstudio", "operationId": "ExecuteCopilot" },
+                        "parameters": { "Copilot": "<agent-schema-name>", "body/message": "@{string(body('Filter_flagged'))}" } },
+            "runAfter": { "Filter_flagged": ["Succeeded"] }
+          },
+          "Validate_brief": {
+            "type": "Workflow",
+            "inputs": { "host": { "workflowReferenceName": "<child-flow-validate-brief>" },
+                        "body": { "brief": "@body('Draft_brief_text')", "facts": "@body('Filter_flagged')" } },
+            "runAfter": { "Draft_brief_text": ["Succeeded"] }
+          },
+          "Populate_Word_template": {
+            "type": "OpenApiConnection",
+            "inputs": { "host": { "connectionName": "shared_wordonlinebusiness", "operationId": "CreateFileItem" },
+                        "parameters": { "source": "<sharepoint-site>", "drive": "<library>", "file": "/Templates/Weekly brief.dotx",
+                                        "dynamicFileSchema": "@body('Draft_brief_text')" } },
+            "runAfter": { "Validate_brief": ["Succeeded"] }
+          },
+          "Start_and_wait_for_an_approval": {
+            "type": "OpenApiConnectionWebhook",
+            "inputs": { "host": { "connectionName": "shared_approvals", "operationId": "StartAndWaitForAnApproval" },
+                        "parameters": { "approvalType": "Basic", "WebhookApprovalCreationInput/title": "Weekly account brief ready for review",
+                                        "WebhookApprovalCreationInput/assignedTo": "commercial-analysts@contoso.example",
+                                        "WebhookApprovalCreationInput/details": "@{body('Draft_brief_text')?['headline']?['text']}" } },
+            "runAfter": { "Populate_Word_template": ["Succeeded"] }
+          },
+          "Approved": {
+            "type": "If",
+            "expression": { "equals": ["@outputs('Start_and_wait_for_an_approval')?['body/outcome']", "Approve"] },
+            "actions": {
+              "Post_card_to_Leadership_weekly": {
+                "type": "OpenApiConnection",
+                "inputs": { "host": { "connectionName": "shared_teams", "operationId": "PostCardToConversation" },
+                            "parameters": { "poster": "Flow bot", "location": "Channel", "body/recipient/groupId": "<team-id>",
+                                            "body/recipient/channelId": "<leadership-weekly-channel-id>",
+                                            "body/messageBody": "@{body('Draft_brief_text')?['teamsCard']}" } }
+              }
+            },
+            "else": { "actions": {} },
+            "runAfter": { "Start_and_wait_for_an_approval": ["Succeeded"] }
+          }
+        },
+        "else": { "actions": { "Terminate_refresh_not_ready": { "type": "Terminate", "inputs": { "runStatus": "Failed", "runError": { "message": "Dataset refresh not completed" } } } } },
+        "runAfter": { "Get_refresh_history": ["Succeeded"] }
+      }
+    }
+  }
+}

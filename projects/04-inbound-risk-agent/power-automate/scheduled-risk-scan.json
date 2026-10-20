@@ -1,0 +1,131 @@
+{
+  "_note": "Definition sketch of the scheduled scan (Logic Apps workflow definition language, as used by Power Automate). Connection references and the custom connector id are placeholders.",
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "triggers": {
+      "Recurrence": {
+        "type": "Recurrence",
+        "recurrence": { "frequency": "Minute", "interval": 30, "timeZone": "W. Europe Standard Time" },
+        "runtimeConfiguration": { "concurrency": { "runs": 1 } }
+      }
+    },
+    "actions": {
+      "Init_runStart": {
+        "type": "InitializeVariable",
+        "inputs": { "variables": [{ "name": "runStart", "type": "string", "value": "@utcNow()" }] },
+        "runAfter": {}
+      },
+      "Try": {
+        "type": "Scope",
+        "runAfter": { "Init_runStart": ["Succeeded"] },
+        "actions": {
+          "Get_tracking_events": {
+            "type": "OpenApiConnection",
+            "inputs": {
+              "host": { "connectionName": "shared_visibilityapi", "operationId": "GetEventsSince", "apiId": "/providers/Microsoft.PowerApps/apis/shared_visibilityapi" },
+              "parameters": { "since": "@addMinutes(variables('runStart'), -35)", "status": "in_transit" }
+            }
+          },
+          "Upsert_scan_events": {
+            "type": "Foreach",
+            "foreach": "@body('Get_tracking_events')?['events']",
+            "runAfter": { "Get_tracking_events": ["Succeeded"] },
+            "actions": {
+              "Upsert_scanevent": {
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "UpdateRecord", "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps" },
+                  "parameters": {
+                    "entityName": "cr_scanevents",
+                    "recordId": "cr_eventid='@{items('Upsert_scan_events')?['eventId']}'",
+                    "item/cr_shipmentid": "@items('Upsert_scan_events')?['shipmentId']",
+                    "item/cr_eventcode": "@items('Upsert_scan_events')?['code']",
+                    "item/cr_location": "@items('Upsert_scan_events')?['location']",
+                    "item/cr_eventon": "@items('Upsert_scan_events')?['timestamp']"
+                  }
+                }
+              }
+            }
+          },
+          "List_open_shipments": {
+            "type": "OpenApiConnection",
+            "runAfter": { "Upsert_scan_events": ["Succeeded"] },
+            "inputs": {
+              "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "ListRecords", "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps" },
+              "parameters": { "entityName": "cr_shipmentrisks", "$filter": "cr_status eq 'in_transit'" }
+            }
+          },
+          "Score_shipments": {
+            "type": "Http",
+            "runAfter": { "List_open_shipments": ["Succeeded"] },
+            "inputs": {
+              "method": "POST",
+              "uri": "https://contoso-inbound-risk.azurewebsites.net/api/score",
+              "authentication": { "type": "ManagedServiceIdentity", "audience": "api://contoso-inbound-risk" },
+              "body": { "asOf": "@variables('runStart')", "shipments": "@body('List_open_shipments')?['value']" }
+            }
+          },
+          "For_each_result": {
+            "type": "Foreach",
+            "foreach": "@body('Score_shipments')",
+            "runAfter": { "Score_shipments": ["Succeeded"] },
+            "runtimeConfiguration": { "concurrency": { "repetitions": 10 } },
+            "actions": {
+              "Update_risk_row": {
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "UpdateRecord", "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps" },
+                  "parameters": {
+                    "entityName": "cr_shipmentrisks",
+                    "recordId": "cr_shipmentid='@{items('For_each_result')?['shipment_id']}'",
+                    "item/cr_score": "@items('For_each_result')?['score']",
+                    "item/cr_band": "@items('For_each_result')?['band']",
+                    "item/cr_points": "@{string(items('For_each_result')?['points'])}",
+                    "item/cr_scoredon": "@variables('runStart')"
+                  }
+                }
+              },
+              "If_new_critical": {
+                "type": "If",
+                "runAfter": { "Update_risk_row": ["Succeeded"] },
+                "expression": { "and": [
+                  { "equals": ["@items('For_each_result')?['band']", "critical"] },
+                  { "not": { "equals": ["@items('For_each_result')?['previous_band']", "critical"] } }
+                ] },
+                "actions": {
+                  "Post_alert_card": {
+                    "type": "OpenApiConnection",
+                    "inputs": {
+                      "host": { "connectionName": "shared_teams", "operationId": "PostCardToConversation", "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams" },
+                      "parameters": {
+                        "poster": "Flow bot",
+                        "location": "Channel",
+                        "body/recipient/groupId": "<control-tower-team-id>",
+                        "body/recipient/channelId": "<control-tower-channel-id>",
+                        "body/messageBody": "@{items('For_each_result')?['card']}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Catch": {
+        "type": "Scope",
+        "runAfter": { "Try": ["Failed", "TimedOut"] },
+        "actions": {
+          "Notify_failure": {
+            "type": "OpenApiConnection",
+            "inputs": {
+              "host": { "connectionName": "shared_teams", "operationId": "PostMessageToConversation", "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams" },
+              "parameters": { "poster": "Flow bot", "location": "Channel", "body/messageBody": "Inbound risk scan failed at @{variables('runStart')}. Scores shown are from the previous run." }
+            }
+          }
+        }
+      }
+    }
+  }
+}

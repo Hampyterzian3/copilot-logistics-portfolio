@@ -1,0 +1,90 @@
+{
+  "id": "05",
+  "slug": "kpi-briefing-copilot",
+  "title": "Executive KPI Briefing Copilot",
+  "outcome": "Monday account brief drafted from one governed dataset, every sentence traced to a number.",
+  "summary": "Leadership had dashboards but not the story, and analysts wrote the weekly account brief by hand. Built a variance engine with materiality ranking over a Power BI semantic model and an agent that drafts the brief, slide outline and Teams post for analyst approval.",
+  "stack": [
+    "Power BI",
+    "Power Automate",
+    "Copilot Studio",
+    "Microsoft 365 Copilot",
+    "Dataverse",
+    "Teams",
+    "GitHub Copilot"
+  ],
+  "cv": "Inspired by: executive Power BI dashboards consolidating the top six global customers into a single KPI view, and governed single-source datasets replacing fragmented reporting.",
+  "demo": "demos/05-kpi-briefing-copilot.html",
+  "repo": "projects/05-kpi-briefing-copilot",
+  "cards": [
+    {
+      "type": "image",
+      "title": "Dashboard to story",
+      "caption": "Six fictional top customers over 26 weeks: KPI tiles, hand-built sparklines with the eight-week baseline window, and only the variances that pass both threshold and z-score gates.",
+      "src": "media/05/01-weekly-view.png",
+      "alt": "Weekly view with portfolio KPI tiles and customer sparklines for week 2026-W39"
+    },
+    {
+      "type": "diagram",
+      "title": "Architecture",
+      "caption": "A certified Power BI semantic model feeds a Monday Power Automate flow. Copilot Studio and Microsoft 365 Copilot draft in Word, PowerPoint and Teams; an analyst approves before release.",
+      "src": "media/05/architecture.svg",
+      "alt": "Architecture from Power BI semantic model through Power Automate, Dataverse and Copilot Studio to Word, PowerPoint and an approved Teams post"
+    },
+    {
+      "type": "image",
+      "title": "Why did margin move?",
+      "caption": "The agent splits a margin change into a rate effect and a cost effect from pooled revenue and cost per shipment. For the seeded Fabrikam Steel dip it points to cost to serve.",
+      "src": "media/05/02-margin-question.png",
+      "alt": "Variance table, Word-style brief and the agent explaining a margin drop for Fabrikam Steel in 2026-W32"
+    },
+    {
+      "type": "code",
+      "title": "No claim without data",
+      "caption": "Every sentence carries fact refs. The validator rejects a sentence with no source, an unknown source, or any number that is not in its referenced facts.",
+      "lang": "python",
+      "code": "    for s in sentences:\n        if not s[\"refs\"]:\n            problems.append(f\"no refs: {s['text']}\")\n            continue\n        missing = [r for r in s[\"refs\"] if r not in book.facts]\n        if missing:\n            problems.append(f\"unknown refs {missing}: {s['text']}\")\n            continue\n        allowed = set()\n        for r in s[\"refs\"]:\n            for d in book.displays(r):\n                allowed |= number_tokens(d)\n        stray = number_tokens(s[\"text\"]) - allowed\n        if stray:\n            problems.append(f\"unsupported numbers {sorted(stray)}: {s['text']}\")"
+    },
+    {
+      "type": "metric",
+      "title": "Result on synthetic data",
+      "caption": "Computed by src/briefing.py over 18 briefed weeks. All three seeded events ranked first in their weeks; no quiet week raised a High flag.",
+      "metrics": [
+        {
+          "value": "756",
+          "label": "customer x KPI checks"
+        },
+        {
+          "value": "20",
+          "label": "flagged variances"
+        },
+        {
+          "value": "420",
+          "label": "sentences, all traced"
+        },
+        {
+          "value": "17",
+          "label": "pytest tests passing"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "title": "Slides and approval",
+      "caption": "The same facts produce a five-slide outline for PowerPoint and a Teams post that is only released after an analyst approves.",
+      "src": "media/05/03-slides-teams.png",
+      "alt": "Five-slide outline cards and the agent confirming analyst approval for 2026-W35"
+    },
+    {
+      "type": "text",
+      "title": "GitHub Copilot ready",
+      "caption": "Code drafted with AI pair programming and verified by 17 pytest tests, including a check that every sentence in the brief traces to a number. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
+    },
+    {
+      "type": "demo",
+      "title": "Try it",
+      "caption": "Pick a week, click a source tag to see its DAX measure, ask why margin moved, build the slide outline and approve the Teams post.",
+      "href": "demos/05-kpi-briefing-copilot.html"
+    }
+  ]
+}

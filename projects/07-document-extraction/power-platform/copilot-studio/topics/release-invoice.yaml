@@ -1,0 +1,107 @@
+kind: AdaptiveDialog
+modelDescription: Releases an invoice from the exception queue to the register. Only allowed for AMOUNT_MISMATCH, MISSING_PO and PO_NOT_FOUND, always with a reason, and always written to the audit log.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Release invoice
+    triggerQueries:
+      - Release invoice
+      - Release invoice_027
+      - Approve this invoice
+      - Release 003-20264597 to the register
+      - Clear the exception on this invoice
+
+  actions:
+    - kind: Question
+      id: askInvoice
+      variable: Topic.InvoiceRef
+      prompt: Which invoice should I release?
+      entity: StringPrebuiltEntity
+      skipQuestionMode: SkipOnFirstExecutionIfVariableHasValue
+
+    - kind: InvokeFlowAction
+      id: getInvoice
+      flowId: ap_GetInvoiceByReference
+      input:
+        binding:
+          reference: =Topic.InvoiceRef
+      output:
+        binding:
+          found: Topic.Found
+          invoiceId: Topic.InvoiceId
+          status: Topic.Status
+          invoiceNumber: Topic.InvoiceNumber
+          vendorName: Topic.VendorName
+          totalAmount: Topic.TotalAmount
+          reasonCodes: Topic.ReasonCodes
+
+    - kind: ConditionGroup
+      id: guard
+      conditions:
+        - id: notException
+          condition: =Topic.Found = false || Topic.Status <> "Exception"
+          actions:
+            - kind: SendActivity
+              id: sayNotOpen
+              activity: "{Topic.InvoiceRef} is not an open exception, so there is nothing to release."
+            - kind: EndDialog
+              id: endNotOpen
+
+        - id: blocked
+          condition: =CountRows(Filter(Split(Topic.ReasonCodes, ","), Not(Trim(Value) in ["AMOUNT_MISMATCH", "MISSING_PO", "PO_NOT_FOUND"]))) > 0
+          actions:
+            - kind: SendActivity
+              id: sayBlocked
+              activity: |-
+                I cannot release {Topic.InvoiceNumber}. Its reasons ({Topic.ReasonCodes}) need a reviewer in the AP app.
+                I can only release amount differences, missing PO references and PO numbers that were not found, once confirmed.
+            - kind: EndDialog
+              id: endBlocked
+
+    - kind: Question
+      id: askReason
+      variable: Topic.ReleaseReason
+      prompt: Why can it be released?
+      entity:
+        kind: EmbeddedEntity
+        definition:
+          kind: ClosedListEntity
+          items:
+            - id: priceConfirmed
+              displayName: Price change confirmed by buyer
+            - id: extraQty
+              displayName: Extra quantity received and booked
+            - id: poCorrected
+              displayName: PO reference corrected by buyer
+            - id: nonPo
+              displayName: Approved non-PO spend
+
+    - kind: Question
+      id: confirm
+      variable: Topic.Confirmed
+      prompt: "Release {Topic.InvoiceNumber} from {Topic.VendorName}, EUR {Text(Topic.TotalAmount, \"#,##0.00\")}, reason: {Topic.ReleaseReason}?"
+      entity: BooleanPrebuiltEntity
+
+    - kind: ConditionGroup
+      id: doRelease
+      conditions:
+        - id: yes
+          condition: =Topic.Confirmed = true
+          actions:
+            - kind: InvokeFlowAction
+              id: release
+              flowId: ap_DecideInvoice
+              input:
+                binding:
+                  invoiceId: =Topic.InvoiceId
+                  decision: Released
+                  comment: =Topic.ReleaseReason
+                  actor: =Concat(System.User.DisplayName, " (via agent)")
+            - kind: SendActivity
+              id: sayDone
+              activity: Released {Topic.InvoiceNumber} to the register and wrote the audit entry.
+      elseActions:
+        - kind: SendActivity
+          id: sayCancelled
+          activity: OK, I left it in the exception queue.

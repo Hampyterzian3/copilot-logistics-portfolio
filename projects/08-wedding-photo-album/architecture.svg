@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img" aria-labelledby="t d">
+  <title id="t">Wedding photo platform architecture</title>
+  <desc id="d">Guests and managers reach an Astro SSR web app through a Cloudflare Tunnel. The web app calls a Fastify API, which uses Postgres with pgvector, a headless Immich backend with InsightFace face detection, and Twilio Verify for SMS sign-in. A face pipeline clusters faces into people that managers link to guests.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#fffdf8"/></marker>
+    <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ff6b35"/></marker>
+    <style>
+      .h{font:600 30px 'Space Grotesk',Inter,Arial,sans-serif;fill:#fffdf8}
+      .bt{font:600 19px 'Space Grotesk',Inter,Arial,sans-serif;fill:#fffdf8}
+      .s{font:400 14px Inter,Arial,sans-serif;fill:#b0c6e8}
+      .p{font:500 13px Inter,Arial,sans-serif;fill:#0c2c23}
+      .lab{font:600 13px Inter,Arial,sans-serif;fill:#81cfb3;letter-spacing:1.5px}
+      .box{fill:#244139;stroke:#81cfb3;stroke-opacity:.35;stroke-width:1.5}
+      .ln{stroke:#fffdf8;stroke-width:2;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1200" height="675" fill="#0c2c23"/>
+  <text x="40" y="58" class="h">Live wedding website with AI photo album</text>
+  <rect x="40" y="72" width="64" height="4" fill="#ff6b35"/>
+
+  <!-- actors -->
+  <rect x="40" y="150" width="170" height="95" rx="12" class="box"/>
+  <text x="56" y="182" class="bt">Guest</text>
+  <text x="56" y="206" class="s">phone, SMS code</text>
+  <text x="56" y="226" class="s">browse, upload</text>
+  <rect x="40" y="265" width="170" height="95" rx="12" class="box"/>
+  <text x="56" y="297" class="bt">Manager</text>
+  <text x="56" y="321" class="s">couple: moderate,</text>
+  <text x="56" y="341" class="s">link faces to guests</text>
+
+  <!-- tunnel -->
+  <rect x="245" y="150" width="125" height="210" rx="12" class="box"/>
+  <text x="261" y="182" class="bt">Cloudflare</text>
+  <text x="261" y="204" class="bt">Tunnel</text>
+  <text x="261" y="232" class="s">public HTTPS,</text>
+  <text x="261" y="252" class="s">no open ports</text>
+  <text x="261" y="272" class="s">on the host</text>
+
+  <!-- web -->
+  <rect x="405" y="150" width="200" height="210" rx="12" class="box"/>
+  <text x="421" y="182" class="bt">Astro 5 SSR web</text>
+  <text x="421" y="206" class="s">React 19 islands</text>
+  <text x="421" y="226" class="s">ordered page guards</text>
+  <text x="421" y="246" class="s">typed api-client</text>
+  <rect x="421" y="290" width="168" height="50" rx="8" fill="#b0c6e8"/>
+  <text x="433" y="311" class="p">zod contracts shared</text>
+  <text x="433" y="329" class="p">with the API</text>
+
+  <!-- api -->
+  <rect x="640" y="110" width="245" height="300" rx="12" class="box"/>
+  <text x="656" y="142" class="bt">Fastify 5 API</text>
+  <text x="656" y="164" class="s">http / modules / domain</text>
+  <rect x="656" y="180" width="213" height="36" rx="8" fill="#ff6b35"/>
+  <text x="668" y="203" class="p">visibility predicate (one place)</text>
+  <rect x="656" y="224" width="213" height="36" rx="8" fill="#81cfb3"/>
+  <text x="668" y="247" class="p">guest-auth: OTP to session</text>
+  <rect x="656" y="268" width="213" height="36" rx="8" fill="#81cfb3"/>
+  <text x="668" y="291" class="p">uploads: pending, approved</text>
+  <rect x="656" y="312" width="213" height="36" rx="8" fill="#81cfb3"/>
+  <text x="668" y="335" class="p">people-admin: faces, merges</text>
+  <rect x="656" y="356" width="213" height="36" rx="8" fill="#81cfb3"/>
+  <text x="668" y="379" class="p">face-sync: cluster faces</text>
+
+  <!-- data and services -->
+  <rect x="920" y="110" width="245" height="95" rx="12" class="box"/>
+  <text x="936" y="142" class="bt">Postgres 17 + pgvector</text>
+  <text x="936" y="166" class="s">guests, uploads, categories</text>
+  <text x="936" y="186" class="s">face embeddings, clusters</text>
+  <rect x="920" y="220" width="245" height="95" rx="12" class="box"/>
+  <text x="936" y="252" class="bt">Immich (headless)</text>
+  <text x="936" y="276" class="s">one Immich user per wedding</text>
+  <text x="936" y="296" class="s">ML: InsightFace faces, CLIP</text>
+  <rect x="920" y="330" width="245" height="80" rx="12" class="box"/>
+  <text x="936" y="362" class="bt">Twilio Verify</text>
+  <text x="936" y="386" class="s">6-digit SMS codes</text>
+
+  <!-- connectors -->
+  <path class="ln" d="M210 197H243"/>
+  <path class="ln" d="M210 312H243"/>
+  <path class="ln" d="M370 255H403"/>
+  <path class="ln" d="M605 255H638"/>
+  <path class="ln" d="M885 157H918"/>
+  <path class="ln" d="M885 267H918"/>
+  <path class="ln" d="M885 370H918"/>
+
+  <!-- AI pipeline -->
+  <text x="40" y="462" class="lab">AI PHOTO ALBUM: FACE PIPELINE</text>
+  <g>
+    <rect x="40" y="480" width="170" height="80" rx="10" fill="#fffdf8"/>
+    <text x="54" y="510" class="p">1. Photo uploaded</text>
+    <text x="54" y="530" class="p">by manager or guest</text>
+    <rect x="232" y="480" width="170" height="80" rx="10" fill="#b0c6e8"/>
+    <text x="246" y="510" class="p">2. Immich ML detects</text>
+    <text x="246" y="530" class="p">faces (InsightFace)</text>
+    <rect x="424" y="480" width="170" height="80" rx="10" fill="#b0c6e8"/>
+    <text x="438" y="510" class="p">3. Embeddings synced</text>
+    <text x="438" y="530" class="p">to pgvector</text>
+    <rect x="616" y="480" width="170" height="80" rx="10" fill="#81cfb3"/>
+    <text x="630" y="510" class="p">4. Clustered into</text>
+    <text x="630" y="530" class="p">people (cosine 0.6)</text>
+    <rect x="808" y="480" width="170" height="80" rx="10" fill="#e8d67d"/>
+    <text x="822" y="510" class="p">5. Manager confirms</text>
+    <text x="822" y="530" class="p">"Who is this?"</text>
+    <rect x="1000" y="480" width="165" height="80" rx="10" fill="#ff6b35"/>
+    <text x="1014" y="510" class="p">6. Guest sees the</text>
+    <text x="1014" y="530" class="p">photos they are in</text>
+  </g>
+  <g stroke="#ff6b35" stroke-width="2" fill="none" marker-end="url(#ao)">
+    <path d="M210 520H230"/><path d="M402 520H422"/><path d="M594 520H614"/><path d="M786 520H806"/><path d="M978 520H998"/>
+  </g>
+  <text x="40" y="605" class="s">Only a manager link grants access. Selfie matches never do, and hiding a bystander is curation, not an access change.</text>
+  <text x="40" y="630" class="s">Self-hosted on a home NAS with Docker Compose. Photo bytes are served through short-lived signed URLs checked per asset.</text>
+</svg>

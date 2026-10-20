@@ -1,0 +1,75 @@
+kind: AdaptiveDialog
+modelDescription: Prepares a carrier escalation asking for location, next scan and revised ETA within 2 hours, then sends it after the planner confirms.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Escalate to carrier
+    triggerQueries:
+      - escalate to the carrier
+      - chase the carrier for this shipment
+      - ask the carrier where it is
+      - escalate CTL-261556
+      - send an escalation to Tailspin Haulage
+
+  actions:
+    - kind: Question
+      id: askShipment
+      variable: Topic.ShipmentId
+      prompt: Which shipment should I escalate?
+      entity: StringPrebuiltEntity
+      alwaysPrompt: false
+
+    - kind: InvokeFlowAction
+      id: buildEscalation
+      flowId: 00000000-0000-0000-0000-000000000000  # "Inbound Risk - Escalate to carrier" (see power-automate/agent-actions.md)
+      input:
+        binding:
+          shipmentId: =Upper(Trim(Topic.ShipmentId))
+          mode: ="preview"
+      output:
+        binding:
+          found: Topic.Found
+          carrier: Topic.Carrier
+          carrierEmail: Topic.CarrierEmail
+          subject: Topic.Subject
+          body: Topic.Body
+
+    - kind: SendActivity
+      id: preview
+      activity: |-
+        To: {Topic.Carrier} ({Topic.CarrierEmail})
+        Subject: {Topic.Subject}
+
+        {Topic.Body}
+
+    - kind: Question
+      id: confirm
+      variable: Topic.Confirm
+      prompt: Send this escalation now?
+      entity: BooleanPrebuiltEntity
+      alwaysPrompt: true
+
+    - kind: ConditionGroup
+      id: sendOrNot
+      conditions:
+        - id: yes
+          condition: =Topic.Confirm = true
+          actions:
+            - kind: InvokeFlowAction
+              id: send
+              flowId: 00000000-0000-0000-0000-000000000000  # same flow, mode send
+              input:
+                binding:
+                  shipmentId: =Upper(Trim(Topic.ShipmentId))
+                  mode: ="send"
+              output:
+                binding:
+                  dueBy: Topic.DueBy
+            - kind: SendActivity
+              id: sent
+              activity: Sent. The alert is marked Escalated and I will flag it again if there is no new scan by {Topic.DueBy}.
+      elseActions:
+        - kind: SendActivity
+          id: notSent
+          activity: Not sent. The draft is saved on the alert record.

@@ -1,0 +1,51 @@
+kind: AdaptiveDialog
+modelDescription: Lists the open invoice exceptions created today with vendor, amount and reasons, and a count per reason code.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Show today's exceptions
+    triggerQueries:
+      - Show today's exceptions
+      - What is in the exception queue
+      - Which invoices are waiting for review
+      - List open invoice exceptions
+      - How many invoices were held today
+
+  actions:
+    - kind: InvokeFlowAction
+      id: listOpen
+      flowId: ap_ListOpenExceptions
+      input:
+        binding:
+          createdOnOrAfter: =Text(Today(), "yyyy-MM-dd")
+      output:
+        binding:
+          count: Topic.Count
+          totalAmount: Topic.TotalAmount
+          summaryMarkdown: Topic.Summary
+          reasonTally: Topic.Tally
+
+    - kind: ConditionGroup
+      id: anyOpen
+      conditions:
+        - id: none
+          condition: =Topic.Count = 0
+          actions:
+            - kind: SendActivity
+              id: sayNone
+              activity: No open exceptions today. Everything processed so far passed every check.
+            - kind: EndDialog
+              id: endNone
+
+    - kind: SendActivity
+      id: sayList
+      activity: |-
+        **{Topic.Count} open exceptions** today, EUR {Text(Topic.TotalAmount, "#,##0.00")} in total.
+        {Topic.Summary}
+
+        By reason: {Topic.Tally}
+
+    - kind: SendActivity
+      id: sayNext
+      activity: Ask "why was <invoice> held" for details, or open the Exceptions view in the AP app.

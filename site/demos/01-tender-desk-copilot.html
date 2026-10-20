@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tender Desk Copilot</title>
+<meta name="description" content="Simulated demo: an RFQ checker and Copilot Studio agent that finds gaps in a lane spreadsheet and requirements document, drafts clarification questions and suggests a mode per lane.">
+<link rel="icon" type="image/png" href="../assets/brand/hampy-favicon-64.png">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/demo.css">
+<style>
+  .picker { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+  .picker > div { flex: 1 1 220px; min-width: 0; }
+  .picker label { margin-top: 0; }
+  .files { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 0; padding: 0; list-style: none; font-size: 13px; }
+  .files li { background: rgba(12,44,35,.06); border-radius: var(--r-sm); padding: 6px 10px; }
+  .files code { font-size: 12px; }
+  .app .kpis { grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); }
+  .shot .demo-intro, .shot .files { display: none; }
+  .empty { margin: 16px 0 4px; padding: 18px; border: 1px dashed rgba(12,44,35,.3); border-radius: var(--r-xl); font-size: 14px; }
+  .results[hidden] { display: none; }
+  .results { margin-top: 16px; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tabs button { border: 1px solid rgba(12,44,35,.25); background: transparent; color: var(--green); border-radius: var(--r-xl); padding: 6px 12px; font: 600 13px var(--font-heading); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--green); color: var(--offwhite); border-color: var(--green); }
+  .panel[hidden] { display: none; }
+  .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; font-size: 13px; }
+  .toolbar label { display: inline-flex; align-items: center; gap: 6px; margin: 0; font: 500 13px var(--font-body); }
+  .toolbar input { width: auto; }
+  .app td .tag { margin: 1px 2px 1px 0; }
+  .app tr.sev-high td:first-child { box-shadow: inset 4px 0 0 var(--pink); }
+  .app tr.sev-medium td:first-child { box-shadow: inset 4px 0 0 var(--yellow); }
+  .app tr.sev-low td:first-child { box-shadow: inset 4px 0 0 var(--blue); }
+  .app tr.hl td { background: rgba(255,107,53,.12); }
+  .gaplist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .gaplist li { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: start; padding: 8px 10px; border-radius: var(--r-sm); background: rgba(12,44,35,.04); font-size: 13px; }
+  .gaplist .who { font: 600 12px var(--font-heading); }
+  .gaplist button { border: 1px solid rgba(12,44,35,.25); background: transparent; color: var(--green); border-radius: var(--r-xl); padding: 3px 9px; font: 600 11px var(--font-heading); cursor: pointer; }
+  .bands { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; }
+  .band { border-radius: var(--r-xl); padding: 10px 12px; color: var(--green); }
+  .band.b0 { background: var(--lime); } .band.b1 { background: var(--blue-soft); } .band.b2 { background: var(--yellow); } .band.b3 { background: rgba(12,44,35,.08); }
+  .band h4 { margin: 0 0 4px; font-size: 14px; }
+  .band .v { font: 700 22px var(--font-heading); }
+  .band p { margin: 4px 0 0; font-size: 12px; }
+  .word { border: 1px solid rgba(12,44,35,.2); border-radius: var(--r-xl); overflow: hidden; }
+  .word-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 12px; background: var(--blue); color: var(--green); font: 600 13px var(--font-heading); }
+  .word-bar .chip { margin-left: auto; }
+  .word-canvas { background: rgba(12,44,35,.06); padding: 16px; }
+  .word-page { background: #fff; color: var(--green); max-width: 680px; margin: 0 auto; padding: 28px 30px; font-size: 13.5px; line-height: 1.55; box-shadow: 0 1px 4px rgba(12,44,35,.15); }
+  .word-page h3 { font-size: 16px; margin-bottom: 10px; }
+  .word-page h4 { font-size: 13.5px; margin: 14px 0 4px; }
+  .word-page ol { margin: 0; padding-left: 20px; }
+  .word-page .meta { font-size: 12px; opacity: .75; margin-bottom: 14px; }
+  .muted { opacity: .75; font-size: 13px; }
+  .copilot form { display: contents; }
+  @media (min-width: 861px) { .copilot { position: sticky; top: 64px; align-self: start; } }
+  @media (max-width: 480px) { .word-page { padding: 18px 16px; } .word-canvas { padding: 8px; } .gaplist li { grid-template-columns: auto 1fr; } .gaplist li button { grid-column: 2; justify-self: start; } }
+</style>
+</head>
+<body>
+<header class="demo-top">
+  <a class="back" href="../index.html#p01">&larr; Portfolio</a>
+  <img src="../assets/brand/hampy-logo-offwhite.svg" alt="hampy">
+  <span class="demo-badge">Simulated demo</span>
+  <span class="title">Tender Desk Copilot</span>
+</header>
+
+<main class="demo-wrap">
+  <section class="demo-intro">
+    <h1>Tender Desk Copilot</h1>
+    <p>Solution designers at Contoso Logistics receive RFQ packs as a lane spreadsheet plus a requirements document, and lose days finding gaps before pricing can start. Pick a synthetic RFQ from the fictional shipper Northwind Components, run the check, then ask the agent what is missing, draft the clarification letter and get a mode per lane. The rules run in your browser and give the same results as the Python checker.</p>
+  </section>
+
+  <div class="demo-grid">
+    <section class="app" aria-label="RFQ checker">
+      <div class="app-bar"><span class="dot"></span><span class="dot"></span><span>Tender Desk &middot; SharePoint RFQ library</span></div>
+      <div class="app-body">
+        <div class="picker">
+          <div>
+            <label for="pack">Sample RFQ folder</label>
+            <select id="pack"></select>
+          </div>
+          <button class="btn" id="run" type="button">Run check</button>
+        </div>
+        <ul class="files" id="files"></ul>
+
+        <div class="empty" id="empty">No check run yet. The checker reads <code>lanes.csv</code> and <code>requirements.md</code> and applies nine rules (R01 to R09).</div>
+
+        <div class="results" id="results" hidden>
+          <div class="kpis" id="kpis"></div>
+          <div class="tabs" role="tablist" aria-label="Results">
+            <button role="tab" id="tab-lanes" aria-controls="p-lanes" aria-selected="true" data-tab="lanes">Lanes</button>
+            <button role="tab" id="tab-gaps" aria-controls="p-gaps" aria-selected="false" data-tab="gaps">Gaps</button>
+            <button role="tab" id="tab-outline" aria-controls="p-outline" aria-selected="false" data-tab="outline">Solution outline</button>
+            <button role="tab" id="tab-letter" aria-controls="p-letter" aria-selected="false" data-tab="letter">Draft letter</button>
+          </div>
+
+          <div class="panel" id="p-lanes" role="tabpanel" aria-labelledby="tab-lanes">
+            <div class="toolbar">
+              <span id="lane-count" class="muted"></span>
+              <label><input type="checkbox" id="only-gaps"> Only lanes with gaps</label>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th>Lane</th><th>Origin</th><th>Destination</th><th class="num">km</th><th class="num">Pallets/yr</th><th>Incoterm</th><th>Suggested mode</th><th>Flags</th></tr></thead>
+                <tbody id="lanes"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel" id="p-gaps" role="tabpanel" aria-labelledby="tab-gaps" hidden>
+            <ul class="gaplist" id="gaps"></ul>
+          </div>
+
+          <div class="panel" id="p-outline" role="tabpanel" aria-labelledby="tab-outline" hidden>
+            <div class="bands" id="bands"></div>
+            <h4>Next steps</h4>
+            <ol id="steps"></ol>
+            <p class="muted">In production, Microsoft 365 Copilot in PowerPoint builds the customer solution outline from this summary file.</p>
+          </div>
+
+          <div class="panel" id="p-letter" role="tabpanel" aria-labelledby="tab-letter" hidden>
+            <div class="word">
+              <div class="word-bar"><span>Word &middot; Clarification letter (draft)</span><span class="chip">Drafted with Copilot</span></div>
+              <div class="word-canvas"><article class="word-page" id="letter"></article></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="copilot" aria-label="Tender Desk agent">
+      <div class="copilot-head"><img src="../assets/brand/hampy-agent-icon.png" alt=""><span>Tender Desk agent</span><span class="chip yellow" style="margin-left:auto">Simulation</span></div>
+      <div class="copilot-log" id="log" aria-live="polite"></div>
+      <div class="suggest" id="suggest">
+        <button type="button" data-q="What is missing?">What is missing?</button>
+        <button type="button" data-q="Draft clarification email">Draft clarification email</button>
+        <button type="button" data-q="Suggest mode per lane">Suggest mode per lane</button>
+        <button type="button" data-q="Summarise scope">Summarise scope</button>
+        <button type="button" data-q="Explain a gap">Explain a gap</button>
+      </div>
+      <form id="ask" class="copilot-input-form">
+        <div class="copilot-input">
+          <label class="sr-only" for="q">Ask the agent</label>
+          <input id="q" autocomplete="off" placeholder="Ask, e.g. explain NW-006">
+          <button class="btn" type="submit">Send</button>
+        </div>
+      </form>
+    </aside>
+  </div>
+
+  <section class="stack-note">
+    <strong>How this maps to Microsoft 365 in production.</strong>
+    <ul>
+      <li><strong>Sample RFQ folder</strong>: a document library in SharePoint, one folder per RFQ with <code>lanes.csv</code> and <code>requirements.md</code>.</li>
+      <li><strong>Run check</strong>: a Power Automate flow triggered when a new RFQ folder is created calls the Python checker (Azure Function behind a custom connector), stores lanes and gaps in Dataverse and posts an adaptive card to the Tender Desk channel in Teams.</li>
+      <li><strong>Lanes, gaps and outline tabs</strong>: the checker output. In this page the same nine rules run in JavaScript and are tested for identical results against the Python version.</li>
+      <li><strong>Agent panel</strong>: a Copilot Studio agent with the RFQ library as knowledge and topics "Check new RFQ", "Explain a gap", "Draft clarification questions" and "Summarise scope". Here it is simulated with keyword intents.</li>
+      <li><strong>Draft letter and solution outline</strong>: Microsoft 365 Copilot in Word and PowerPoint, prompted with the generated summary file.</li>
+    </ul>
+  </section>
+</main>
+
+<!--DATA-START--><script type="application/json" id="rfq-packs">[{"meta":{"id":"northwind-europe-2027","shipper":"Northwind Components","title":"European road network 2027","received":"2026-10-12","response_due":"2026-11-06"},"rows":[{"lane_id":"NW-001","origin_country":"PL","origin_city":"Wroclaw","dest_country":"DE","dest_city":"Hamburg","distance_km":"690","mode_requested":"Any","annual_shipments":"208","pallets_per_shipment":"18","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"110","weight_kg_per_pallet":"490","incoterm":"DDP","hazardous":"N","un_number":"","required_transit_days":"2"},{"lane_id":"NW-002","origin_country":"HU","origin_city":"Gyor","dest_country":"FR","dest_city":"Lyon","distance_km":"1250","mode_requested":"Any","annual_shipments":"78","pallets_per_shipment":"6","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"160","weight_kg_per_pallet":"600","incoterm":"DAP","hazardous":"N","un_number":"","required_transit_days":"2"},{"lane_id":"NW-003","origin_country":"CZ","origin_city":"Pilsen","dest_country":"BE","dest_city":"Antwerp","distance_km":"820","mode_requested":"Road LTL","annual_shipments":"24","pallets_per_shipment":"21","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"560","incoterm":"DDP","hazardous":"N","un_number":"","required_transit_days":"2"},{"lane_id":"NW-004","origin_country":"HU","origin_city":"Gyor","dest_country":"DE","dest_city":"Munich","distance_km":"570","mode_requested":"Any","annual_shipments":"","pallets_per_shipment":"17","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"470","incoterm":"DAP","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-005","origin_country":"CZ","origin_city":"Pilsen","dest_country":"DE","dest_city":"Munich","distance_km":"280","mode_requested":"Road LTL","annual_shipments":"78","pallets_per_shipment":"2","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"110","weight_kg_per_pallet":"340","incoterm":"DDP","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-006","origin_country":"CZ","origin_city":"Pilsen","dest_country":"PT","dest_city":"Porto","distance_km":"2440","mode_requested":"Any","annual_shipments":"78","pallets_per_shipment":"13","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"420","incoterm":"DAP","hazardous":"Y","un_number":"","required_transit_days":"2"},{"lane_id":"NW-007","origin_country":"CZ","origin_city":"Pilsen","dest_country":"SE","dest_city":"Gothenburg","distance_km":"1110","mode_requested":"Road FTL","annual_shipments":"12","pallets_per_shipment":"25","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"","weight_kg_per_pallet":"270","incoterm":"EXW","hazardous":"N","un_number":"","required_transit_days":"2"},{"lane_id":"NW-008","origin_country":"CZ","origin_city":"Pilsen","dest_country":"RO","dest_city":"Cluj","distance_km":"1030","mode_requested":"Road FTL","annual_shipments":"78","pallets_per_shipment":"28","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"160","weight_kg_per_pallet":"420","incoterm":"CPT","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-009","origin_country":"PL","origin_city":"Wroclaw","dest_country":"ES","dest_city":"Seville","distance_km":"2960","mode_requested":"Road FTL","annual_shipments":"78","pallets_per_shipment":"32","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"100","weight_kg_per_pallet":"370","incoterm":"TBC","hazardous":"Y","un_number":"UN3480","required_transit_days":"3"},{"lane_id":"NW-010","origin_country":"PL","origin_city":"Wroclaw","dest_country":"FR","dest_city":"Lyon","distance_km":"1350","mode_requested":"Road LTL","annual_shipments":"104","pallets_per_shipment":"20","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"140","weight_kg_per_pallet":"490","incoterm":"EXW","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-011","origin_country":"DE","origin_city":"Stuttgart","dest_country":"SK","dest_city":"Kosice","distance_km":"1110","mode_requested":"Road FTL","annual_shipments":"260","pallets_per_shipment":"24","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"120","weight_kg_per_pallet":"370","incoterm":"DAP","hazardous":"Y","un_number":"UN3082","required_transit_days":"2"},{"lane_id":"NW-012","origin_country":"HU","origin_city":"Gyor","dest_country":"FR","dest_city":"Lille","distance_km":"1380","mode_requested":"Road FTL","annual_shipments":"24","pallets_per_shipment":"","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"370","incoterm":"FCA","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-013","origin_country":"CZ","origin_city":"Pilsen","dest_country":"FR","dest_city":"Lille","distance_km":"930","mode_requested":"Any","annual_shipments":"24","pallets_per_shipment":"4","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"140","weight_kg_per_pallet":"400","incoterm":"CPT","hazardous":"N","un_number":"","required_transit_days":"4"},{"lane_id":"NW-014","origin_country":"DE","origin_city":"Stuttgart","dest_country":"NL","dest_city":"Rotterdam","distance_km":"600","mode_requested":"Road FTL","annual_shipments":"208","pallets_per_shipment":"29","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"140","weight_kg_per_pallet":"370","incoterm":"EXW","hazardous":"N","un_number":"","required_transit_days":"1"},{"lane_id":"NW-015","origin_country":"HU","origin_city":"Gyor","dest_country":"ES","dest_city":"Barcelona","distance_km":"1760","mode_requested":"Road FTL","annual_shipments":"260","pallets_per_shipment":"33","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"100","weight_kg_per_pallet":"390","incoterm":"DAP","hazardous":"N","un_number":"","required_transit_days":"5"},{"lane_id":"NW-016","origin_country":"PL","origin_city":"Wroclaw","dest_country":"BE","dest_city":"Ghent","distance_km":"1160","mode_requested":"Any","annual_shipments":"208","pallets_per_shipment":"2","pallet_length_cm":"","pallet_width_cm":"","pallet_height_cm":"100","weight_kg_per_pallet":"690","incoterm":"DAP","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-017","origin_country":"HU","origin_city":"Gyor","dest_country":"BE","dest_city":"Antwerp","distance_km":"1290","mode_requested":"Road FTL","annual_shipments":"24","pallets_per_shipment":"31","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"270","incoterm":"DDP","hazardous":"N","un_number":"","required_transit_days":"2"},{"lane_id":"NW-018","origin_country":"HU","origin_city":"Gyor","dest_country":"IT","dest_city":"Turin","distance_km":"1020","mode_requested":"Any","annual_shipments":"48","pallets_per_shipment":"14","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"110","weight_kg_per_pallet":"340","incoterm":"DDU","hazardous":"N","un_number":"","required_transit_days":"4"},{"lane_id":"NW-019","origin_country":"HU","origin_city":"Gyor","dest_country":"SK","dest_city":"Kosice","distance_km":"370","mode_requested":"Road FTL","annual_shipments":"260","pallets_per_shipment":"22","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"160","weight_kg_per_pallet":"660","incoterm":"FCA","hazardous":"Y","un_number":"UN3480","required_transit_days":"1"},{"lane_id":"NW-020","origin_country":"PL","origin_city":"Wroclaw","dest_country":"SE","dest_city":"Gothenburg","distance_km":"1000","mode_requested":"Any","annual_shipments":"52","pallets_per_shipment":"17","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"120","weight_kg_per_pallet":"660","incoterm":"EXW","hazardous":"Y","un_number":"1263","required_transit_days":"2"},{"lane_id":"NW-021","origin_country":"CZ","origin_city":"Pilsen","dest_country":"DE","dest_city":"Munich","distance_km":"280","mode_requested":"Any","annual_shipments":"52","pallets_per_shipment":"2","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"110","weight_kg_per_pallet":"340","incoterm":"DDP","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-022","origin_country":"PL","origin_city":"Wroclaw","dest_country":"SK","dest_city":"Kosice","distance_km":"500","mode_requested":"Road LTL","annual_shipments":"24","pallets_per_shipment":"20","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"410","incoterm":"DDP","hazardous":"N","un_number":"","required_transit_days":"2"},{"lane_id":"NW-023","origin_country":"DE","origin_city":"Stuttgart","dest_country":"PT","dest_city":"Porto","distance_km":"2040","mode_requested":"Any","annual_shipments":"260","pallets_per_shipment":"2","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"110","weight_kg_per_pallet":"630","incoterm":"EXW/FCA","hazardous":"N","un_number":"","required_transit_days":"6"},{"lane_id":"NW-024","origin_country":"DE","origin_city":"Stuttgart","dest_country":"IT","dest_city":"Milan","distance_km":"460","mode_requested":"Any","annual_shipments":"104","pallets_per_shipment":"7","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"160","weight_kg_per_pallet":"320","incoterm":"EXW","hazardous":"N","un_number":"","required_transit_days":"1"},{"lane_id":"NW-025","origin_country":"HU","origin_city":"Gyor","dest_country":"IT","dest_city":"Bologna","distance_km":"750","mode_requested":"Road FTL","annual_shipments":"208","pallets_per_shipment":"23","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"100","weight_kg_per_pallet":"670","incoterm":"CPT","hazardous":"N","un_number":"","required_transit_days":"2"},{"lane_id":"NW-026","origin_country":"HU","origin_city":"Gyor","dest_country":"ES","dest_city":"Seville","distance_km":"2790","mode_requested":"Road LTL","annual_shipments":"","pallets_per_shipment":"","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"110","weight_kg_per_pallet":"440","incoterm":"CPT","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-027","origin_country":"HU","origin_city":"Gyor","dest_country":"AT","dest_city":"Vienna","distance_km":"140","mode_requested":"Any","annual_shipments":"156","pallets_per_shipment":"16","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"100","weight_kg_per_pallet":"480","incoterm":"CPT","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-028","origin_country":"PL","origin_city":"Wroclaw","dest_country":"SK","dest_city":"Bratislava","distance_km":"410","mode_requested":"Any","annual_shipments":"12","pallets_per_shipment":"7","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"110","weight_kg_per_pallet":"560","incoterm":"DAP","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-029","origin_country":"CZ","origin_city":"Pilsen","dest_country":"SK","dest_city":"Kosice","distance_km":"730","mode_requested":"Road FTL","annual_shipments":"260","pallets_per_shipment":"27","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"140","weight_kg_per_pallet":"330","incoterm":"","hazardous":"N","un_number":"","required_transit_days":"2"},{"lane_id":"NW-030","origin_country":"DE","origin_city":"Stuttgart","dest_country":"FR","dest_city":"Bordeaux","distance_km":"1080","mode_requested":"Road FTL","annual_shipments":"260","pallets_per_shipment":"30","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"110","weight_kg_per_pallet":"560","incoterm":"EXW","hazardous":"N","un_number":"","required_transit_days":"4"},{"lane_id":"NW-031","origin_country":"HU","origin_city":"Gyor","dest_country":"SE","dest_city":"Gothenburg","distance_km":"1470","mode_requested":"Road FTL","annual_shipments":"104","pallets_per_shipment":"29","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"","weight_kg_per_pallet":"260","incoterm":"DDP","hazardous":"N","un_number":"","required_transit_days":"5"},{"lane_id":"NW-032","origin_country":"PL","origin_city":"Wroclaw","dest_country":"RO","dest_city":"Bucharest","distance_km":"1260","mode_requested":"Road FTL","annual_shipments":"208","pallets_per_shipment":"33","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"330","incoterm":"DDP","hazardous":"N","un_number":"","required_transit_days":"4"},{"lane_id":"NW-033","origin_country":"HU","origin_city":"Gyor","dest_country":"SK","dest_city":"Bratislava","distance_km":"80","mode_requested":"Road FTL","annual_shipments":"24","pallets_per_shipment":"29","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"100","weight_kg_per_pallet":"540","incoterm":"FOB Hamburg","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-034","origin_country":"DE","origin_city":"Stuttgart","dest_country":"ES","dest_city":"Valencia","distance_km":"1600","mode_requested":"Any","annual_shipments":"156","pallets_per_shipment":"5","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"140","weight_kg_per_pallet":"490","incoterm":"DAP","hazardous":"N","un_number":"","required_transit_days":"4"},{"lane_id":"NW-035","origin_country":"HU","origin_city":"Gyor","dest_country":"ES","dest_city":"Valencia","distance_km":"2140","mode_requested":"Road FTL","annual_shipments":"260","pallets_per_shipment":"30","pallet_length_cm":"","pallet_width_cm":"","pallet_height_cm":"","weight_kg_per_pallet":"380","incoterm":"DAP","hazardous":"Y","un_number":"UN3480","required_transit_days":"4"},{"lane_id":"NW-036","origin_country":"DE","origin_city":"Stuttgart","dest_country":"PL","dest_city":"Poznan","distance_km":"850","mode_requested":"Any","annual_shipments":"24","pallets_per_shipment":"9","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"160","weight_kg_per_pallet":"690","incoterm":"CPT","hazardous":"Y","un_number":"TBC","required_transit_days":"4"},{"lane_id":"NW-037","origin_country":"DE","origin_city":"Stuttgart","dest_country":"SE","dest_city":"Gothenburg","distance_km":"1260","mode_requested":"Road FTL","annual_shipments":"260","pallets_per_shipment":"29","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"100","weight_kg_per_pallet":"580","incoterm":"FCA","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-038","origin_country":"HU","origin_city":"Gyor","dest_country":"NL","dest_city":"Rotterdam","distance_km":"1320","mode_requested":"Road FTL","annual_shipments":"78","pallets_per_shipment":"30","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"160","weight_kg_per_pallet":"330","incoterm":"CIF","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"NW-039","origin_country":"CZ","origin_city":"Pilsen","dest_country":"ES","dest_city":"Valencia","distance_km":"1970","mode_requested":"Road LTL","annual_shipments":"52","pallets_per_shipment":"12","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"370","incoterm":"FCA","hazardous":"N","un_number":"","required_transit_days":"5"},{"lane_id":"NW-040","origin_country":"DE","origin_city":"Stuttgart","dest_country":"NL","dest_city":"Rotterdam","distance_km":"600","mode_requested":"Road LTL","annual_shipments":"208","pallets_per_shipment":"12","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"140","weight_kg_per_pallet":"370","incoterm":"EXW","hazardous":"N","un_number":"","required_transit_days":"1"}],"requirements":"# Northwind Components: European road network 2027\n\n## Scope\nNorthwind Components invites tenders for road transport between its four European plants and its customer and port locations listed in lanes.csv. Volumes are 2026 actuals unless stated.\n\n## Contract period\nThree years from 1 April 2027, with an annual rate review.\n\n## Service levels and KPIs\n- On-time delivery of 97% or better, measured against the agreed delivery window.\n- Track and trace events for collection, departure and delivery.\n- Monthly KPI report, format TBC.\n\n## Pricing format\nRate card per lane in EUR per shipment and EUR per pallet. Use the lane IDs in lanes.csv.\n\n## Dangerous goods\nSome flows carry ADR goods. Carriers must hold valid ADR certification.\n\n## Liability and insurance\nCMR liability as a minimum. Additional cargo insurance requirement TBC.\n\n## Submission\nReturn the completed rate card and a solution description by the response date.\n"},{"meta":{"id":"northwind-spares-2027","shipper":"Northwind Components","title":"Aftermarket spares distribution 2027","received":"2026-10-15","response_due":"2026-11-13"},"rows":[{"lane_id":"SP-001","origin_country":"PL","origin_city":"Poznan","dest_country":"CZ","dest_city":"Pilsen","distance_km":"480","mode_requested":"Any","annual_shipments":"52","pallets_per_shipment":"5","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"360","incoterm":"FCA","hazardous":"N","un_number":"","required_transit_days":"1"},{"lane_id":"SP-002","origin_country":"PL","origin_city":"Poznan","dest_country":"IT","dest_city":"Milan","distance_km":"1200","mode_requested":"Any","annual_shipments":"12","pallets_per_shipment":"5","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"590","incoterm":"EXW","hazardous":"N","un_number":"","required_transit_days":"4"},{"lane_id":"SP-003","origin_country":"PL","origin_city":"Poznan","dest_country":"BE","dest_city":"Antwerp","distance_km":"1090","mode_requested":"Road LTL","annual_shipments":"48","pallets_per_shipment":"6","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"100","weight_kg_per_pallet":"530","incoterm":"CPT","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"SP-004","origin_country":"PL","origin_city":"Poznan","dest_country":"ES","dest_city":"Valencia","distance_km":"2440","mode_requested":"Any","annual_shipments":"156","pallets_per_shipment":"7","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"100","weight_kg_per_pallet":"410","incoterm":"EXW","hazardous":"N","un_number":"","required_transit_days":"6"},{"lane_id":"SP-005","origin_country":"PL","origin_city":"Poznan","dest_country":"NL","dest_city":"Rotterdam","distance_km":"1060","mode_requested":"Road LTL","annual_shipments":"104","pallets_per_shipment":"2","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"120","weight_kg_per_pallet":"690","incoterm":"FCA","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"SP-006","origin_country":"PL","origin_city":"Poznan","dest_country":"DE","dest_city":"Hamburg","distance_km":"600","mode_requested":"Any","annual_shipments":"24","pallets_per_shipment":"19","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"160","weight_kg_per_pallet":"310","incoterm":"FCA","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"SP-007","origin_country":"IT","origin_city":"Bologna","dest_country":"ES","dest_city":"Barcelona","distance_km":"1030","mode_requested":"Road LTL","annual_shipments":"104","pallets_per_shipment":"2","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"460","incoterm":"DAP","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"SP-008","origin_country":"PL","origin_city":"Poznan","dest_country":"SK","dest_city":"Kosice","distance_km":"640","mode_requested":"Any","annual_shipments":"260","pallets_per_shipment":"7","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"","weight_kg_per_pallet":"660","incoterm":"DAP","hazardous":"N","un_number":"","required_transit_days":"1"},{"lane_id":"SP-009","origin_country":"PL","origin_city":"Poznan","dest_country":"ES","dest_city":"Barcelona","distance_km":"2070","mode_requested":"Road LTL","annual_shipments":"52","pallets_per_shipment":"18","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"380","incoterm":"EXW","hazardous":"N","un_number":"","required_transit_days":"6"},{"lane_id":"SP-010","origin_country":"PL","origin_city":"Poznan","dest_country":"FR","dest_city":"Lyon","distance_km":"1430","mode_requested":"Road LTL","annual_shipments":"104","pallets_per_shipment":"3","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"110","weight_kg_per_pallet":"530","incoterm":"CPT","hazardous":"N","un_number":"","required_transit_days":"5"},{"lane_id":"SP-011","origin_country":"IT","origin_city":"Bologna","dest_country":"FR","dest_city":"Lyon","distance_km":"660","mode_requested":"Road LTL","annual_shipments":"260","pallets_per_shipment":"9","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"360","incoterm":"FCA","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"SP-012","origin_country":"PL","origin_city":"Poznan","dest_country":"HU","dest_city":"Gyor","distance_km":"660","mode_requested":"Road LTL","annual_shipments":"52","pallets_per_shipment":"3","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"140","weight_kg_per_pallet":"700","incoterm":"DAP","hazardous":"N","un_number":"","required_transit_days":"2"},{"lane_id":"SP-013","origin_country":"IT","origin_city":"Bologna","dest_country":"CZ","dest_city":"Pilsen","distance_km":"760","mode_requested":"Any","annual_shipments":"48","pallets_per_shipment":"7","pallet_length_cm":"120","pallet_width_cm":"100","pallet_height_cm":"120","weight_kg_per_pallet":"550","incoterm":"EXW","hazardous":"Y","un_number":"","required_transit_days":"3"},{"lane_id":"SP-014","origin_country":"IT","origin_city":"Bologna","dest_country":"BE","dest_city":"Antwerp","distance_km":"1140","mode_requested":"Road LTL","annual_shipments":"24","pallets_per_shipment":"8","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"160","weight_kg_per_pallet":"390","incoterm":"EXW","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"SP-015","origin_country":"IT","origin_city":"Bologna","dest_country":"IT","dest_city":"Milan","distance_km":"250","mode_requested":"Road LTL","annual_shipments":"78","pallets_per_shipment":"16","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"110","weight_kg_per_pallet":"640","incoterm":"DDP","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"SP-016","origin_country":"PL","origin_city":"Poznan","dest_country":"FR","dest_city":"Bordeaux","distance_km":"1910","mode_requested":"Road LTL","annual_shipments":"260","pallets_per_shipment":"10","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"100","weight_kg_per_pallet":"390","incoterm":"FCA","hazardous":"N","un_number":"","required_transit_days":"5"},{"lane_id":"SP-017","origin_country":"IT","origin_city":"Bologna","dest_country":"FR","dest_city":"Lille","distance_km":"1150","mode_requested":"Any","annual_shipments":"208","pallets_per_shipment":"6","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"140","weight_kg_per_pallet":"320","incoterm":"CPT","hazardous":"N","un_number":"","required_transit_days":"3"},{"lane_id":"SP-018","origin_country":"IT","origin_city":"Bologna","dest_country":"IT","dest_city":"Turin","distance_km":"370","mode_requested":"Road LTL","annual_shipments":"156","pallets_per_shipment":"9","pallet_length_cm":"120","pallet_width_cm":"80","pallet_height_cm":"120","weight_kg_per_pallet":"650","incoterm":"DAP","hazardous":"N","un_number":"","required_transit_days":"3"}],"requirements":"# Northwind Components: Aftermarket spares distribution 2027\n\n## Scope\nDistribution of aftermarket spare parts from two regional warehouses to dealers and service centres listed in lanes.csv.\n\n## Contract period\nTwo years from 1 May 2027.\n\n## Service levels and KPIs\n- Next-day or two-day delivery as stated per lane.\n- Proof of delivery within 24 hours.\n\n## Pricing format\nRate card per lane, EUR per pallet, with a minimum charge per shipment.\n\n## Fuel mechanism\nMonthly fuel surcharge indexed to the published diesel price, base month TBC.\n\n## Liability and insurance\nCMR liability as a minimum.\n\n## Invoicing and payment\nMonthly consolidated invoice, payment 60 days from invoice date.\n"}]</script><!--DATA-END-->
+
+<script>
+// RULES-START
+// JavaScript port of projects/01-tender-desk-copilot/src/rfq_checker.py. Keep in step:
+// src/check_parity.js asserts identical output on every sample pack.
+const INCOTERMS_2020 = new Set(["EXW", "FCA", "CPT", "CIP", "DAP", "DPU", "DDP", "FAS", "FOB", "CFR", "CIF"]);
+const SEA_ONLY = new Set(["FAS", "FOB", "CFR", "CIF"]);
+const ROAD_KM_PER_DAY = 650;
+const FTL_MIN_PALLETS = 22;
+const MULTIMODAL_MIN_KM = 1100;
+const MULTIMODAL_MIN_SHIPMENTS = 52;
+const DIM_FIELDS = ["pallet_length_cm", "pallet_width_cm", "pallet_height_cm"];
+const SEVERITIES = ["high", "medium", "low"];
+const RULES = {
+  R01: ["Missing annual volume", "high", "Volumes and forecasts"],
+  R02: ["Missing pallet dimensions", "medium", "Packaging and handling"],
+  R03: ["Unclear Incoterm", "medium", "Commercial terms"],
+  R04: ["Sea-only Incoterm on a road lane", "low", "Commercial terms"],
+  R05: ["Hazardous goods without UN number", "high", "Dangerous goods"],
+  R06: ["Unrealistic transit time", "high", "Service levels"],
+  R07: ["Duplicate lane", "medium", "Lane data quality"],
+  R08: ["Requirements section missing", "medium", "Requirements document"],
+  R09: ["Open item marked TBC", "low", "Requirements document"],
+};
+const RULE_IDS = Object.keys(RULES);
+const THEMES = ["Volumes and forecasts", "Packaging and handling", "Dangerous goods", "Service levels",
+  "Commercial terms", "Lane data quality", "Requirements document"];
+const REQUIRED_SECTIONS = [
+  ["Contract period", ["contract period", "contract term"]],
+  ["Service levels", ["service level", "kpi"]],
+  ["Pricing format", ["pricing", "rate card"]],
+  ["Fuel mechanism", ["fuel"]],
+  ["Liability and insurance", ["liability", "insurance"]],
+  ["Invoicing and payment", ["invoic", "payment"]],
+];
+const BANDS = ["FTL", "Multimodal (road-rail)", "LTL/groupage", "Pending data"];
+const BAND_RATIONALE = {
+  "FTL": `${FTL_MIN_PALLETS}+ pallets per shipment: dedicated or contracted full trucks.`,
+  "Multimodal (road-rail)": `Full loads over ${MULTIMODAL_MIN_KM} km at least weekly: test road-rail for cost and CO2.`,
+  "LTL/groupage": `Under ${FTL_MIN_PALLETS} pallets per shipment: consolidate through groupage hubs.`,
+  "Pending data": "Volume missing: band assigned once the shipper confirms volumes.",
+};
+
+function toInt(v) {
+  const s = (v == null ? "" : String(v)).trim();
+  return /^\d+$/.test(s) ? parseInt(s, 10) : null;
+}
+function minTransitDays(km) { return Math.max(1, Math.ceil(km / ROAD_KM_PER_DAY)); }
+function str(v) { return (v == null ? "" : String(v)).trim(); }
+
+function makeGap(ruleId, laneId, field, message, detail = null) {
+  const [rule, severity, theme] = RULES[ruleId];
+  return { rule_id: ruleId, rule, severity, theme, lane_id: laneId, field, message, detail };
+}
+
+function laneGaps(row, seen) {
+  const lid = str(row.lane_id);
+  const gaps = [];
+  let missing = ["annual_shipments", "pallets_per_shipment"].filter((f) => !toInt(row[f]));
+  if (missing.length) gaps.push(makeGap("R01", lid, missing.join(", "), `No usable annual volume (${missing.join(", ")} blank).`));
+  missing = DIM_FIELDS.filter((f) => !toInt(row[f]));
+  if (missing.length) gaps.push(makeGap("R02", lid, missing.join(", "), `Pallet dimensions incomplete (${missing.join(", ")} blank).`));
+
+  const raw = str(row.incoterm);
+  const token = raw ? raw.split(/\s+/)[0].toUpperCase() : "";
+  if (!raw) gaps.push(makeGap("R03", lid, "incoterm", "Incoterm blank."));
+  else if (!INCOTERMS_2020.has(token)) gaps.push(makeGap("R03", lid, "incoterm", `Incoterm '${raw}' is not a valid Incoterms 2020 rule.`));
+  else if (SEA_ONLY.has(token)) gaps.push(makeGap("R04", lid, "incoterm", `Incoterm ${token} is for sea and inland waterway only; this lane moves by road.`));
+
+  const hazardous = ["Y", "YES"].includes(str(row.hazardous).toUpperCase());
+  const unRaw = str(row.un_number);
+  if (hazardous && !/^UN\d{4}$/.test(unRaw.toUpperCase())) {
+    gaps.push(makeGap("R05", lid, "un_number", !unRaw ? "Hazardous goods flagged but UN number blank."
+      : `Hazardous goods flagged but UN number '${unRaw}' is not in UNnnnn format.`));
+  }
+
+  const km = toInt(row.distance_km), days = toInt(row.required_transit_days);
+  if (km !== null && days !== null && days < minTransitDays(km)) {
+    gaps.push(makeGap("R06", lid, "required_transit_days",
+      `${days} day(s) requested for ${km} km; road minimum is about ${minTransitDays(km)} day(s) at ${ROAD_KM_PER_DAY} km per day.`));
+  }
+
+  const oc = str(row.origin_country).toUpperCase(), ocity = str(row.origin_city);
+  const dc = str(row.dest_country).toUpperCase(), dcity = str(row.dest_city);
+  const key = [oc, ocity.toLowerCase(), dc, dcity.toLowerCase()].join("|");
+  if (seen.has(key)) gaps.push(makeGap("R07", lid, "lane", `Same corridor as ${seen.get(key)} (${ocity} to ${dcity}).`, seen.get(key)));
+  else seen.set(key, lid);
+  return gaps;
+}
+
+function documentGaps(text) {
+  const lines = text.replace(/\r\n/g, "\n").split("\n");
+  const headings = [];
+  for (const line of lines) {
+    const m = line.match(/^#{1,6}\s+(.*)$/);
+    if (m) headings.push(m[1].trim().toLowerCase());
+  }
+  const gaps = [];
+  for (const [name, keywords] of REQUIRED_SECTIONS) {
+    if (!headings.some((h) => keywords.some((k) => h.includes(k)))) {
+      gaps.push(makeGap("R08", null, "requirements", `No section covering ${name.toLowerCase()}.`, name));
+    }
+  }
+  for (const line of lines) {
+    if (/\b(TBC|TBD)\b/.test(line)) {
+      const snippet = line.trim().replace(/^[-*#\s]+/, "");
+      gaps.push(makeGap("R09", null, "requirements", `Open item: "${snippet}"`, snippet));
+    }
+  }
+  return gaps;
+}
+
+function suggestMode(km, shipments, pps) {
+  if (!shipments || !pps) return "Pending data";
+  if (pps >= FTL_MIN_PALLETS && (km || 0) >= MULTIMODAL_MIN_KM && shipments >= MULTIMODAL_MIN_SHIPMENTS) return "Multimodal (road-rail)";
+  if (pps >= FTL_MIN_PALLETS) return "FTL";
+  return "LTL/groupage";
+}
+
+function buildQuestions(gaps) {
+  const ids = (r) => gaps.filter((g) => g.rule_id === r).map((g) => g.lane_id).join(", ");
+  const out = [];
+  for (const theme of THEMES) {
+    const tg = gaps.filter((g) => g.theme === theme);
+    const rules = RULE_IDS.filter((r) => tg.some((g) => g.rule_id === r));
+    const qs = [];
+    for (const r of rules) {
+      if (r === "R01") qs.push(`Please confirm annual shipments and average pallets per shipment for lanes ${ids(r)}. A forecast by quarter would help us size capacity.`);
+      else if (r === "R02") qs.push(`Please share pallet length, width and height for lanes ${ids(r)}, and confirm whether the loads are stackable.`);
+      else if (r === "R03") qs.push(`Please confirm the Incoterms 2020 rule and named place for lanes ${ids(r)}.`);
+      else if (r === "R04") qs.push(`Lanes ${ids(r)} use a sea-only Incoterm on a road movement. Would FCA or DAP reflect the intended handover point?`);
+      else if (r === "R05") qs.push(`Lanes ${ids(r)} are flagged as hazardous. Please provide the UN number, ADR class and packing group for each product.`);
+      else if (r === "R06") qs.push(`The transit times requested on lanes ${ids(r)} are shorter than a single-driver road service allows. Can these be relaxed, or should we price a double-manned option?`);
+      else if (r === "R07") {
+        for (const g of tg) if (g.rule_id === r) qs.push(`Lane ${g.lane_id} appears to repeat lane ${g.detail}. Should these be merged, or do they differ in product or service?`);
+      } else if (r === "R08") {
+        const names = tg.filter((g) => g.rule_id === r).map((g) => g.detail.toLowerCase()).join(", ");
+        qs.push(`The requirements document has no section on ${names}. Please share your expectations so we can reflect them in our offer.`);
+      } else if (r === "R09") {
+        const items = tg.filter((g) => g.rule_id === r).map((g) => g.detail).join("; ");
+        qs.push(`Please confirm the open items in the requirements: ${items}`);
+      }
+    }
+    if (qs.length) out.push({ theme, questions: qs });
+  }
+  return out;
+}
+
+function checkRfq(rows, requirements) {
+  const seen = new Map();
+  const gaps = [], lanes = [];
+  for (const row of rows) {
+    const lg = laneGaps(row, seen);
+    gaps.push(...lg);
+    const km = toInt(row.distance_km), shipments = toInt(row.annual_shipments), pps = toInt(row.pallets_per_shipment);
+    const oc = str(row.origin_country).toUpperCase(), dc = str(row.dest_country).toUpperCase();
+    lanes.push({
+      lane_id: str(row.lane_id),
+      origin: `${str(row.origin_city)}, ${oc}`,
+      destination: `${str(row.dest_city)}, ${dc}`,
+      corridor: `${oc}-${dc}`,
+      distance_km: km,
+      annual_shipments: shipments,
+      pallets_per_shipment: pps,
+      annual_pallets: shipments && pps ? shipments * pps : null,
+      hazardous: ["Y", "YES"].includes(str(row.hazardous).toUpperCase()),
+      incoterm: str(row.incoterm),
+      mode_requested: str(row.mode_requested),
+      required_transit_days: toInt(row.required_transit_days),
+      mode_suggested: suggestMode(km, shipments, pps),
+      flags: lg.map((g) => g.rule_id),
+      worst: SEVERITIES.find((s) => lg.some((g) => g.severity === s)) || null,
+    });
+  }
+  gaps.push(...documentGaps(requirements));
+
+  const origins = [...new Set(lanes.map((l) => l.corridor.split("-")[0]))].sort();
+  const dests = [...new Set(lanes.map((l) => l.corridor.split("-")[1]))].sort();
+  const modes = {};
+  for (const l of lanes) modes[l.mode_requested] = (modes[l.mode_requested] || 0) + 1;
+  const cp = {};
+  for (const l of lanes) if (l.annual_pallets) cp[l.corridor] = (cp[l.corridor] || 0) + l.annual_pallets;
+  const top = Object.entries(cp).sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)).slice(0, 5);
+  const distances = lanes.map((l) => l.distance_km).filter((d) => d !== null);
+  const sum = (arr, f) => arr.reduce((t, x) => t + (f(x) || 0), 0);
+  const scope = {
+    lane_count: lanes.length,
+    countries: [...new Set([...origins, ...dests])].sort(),
+    origin_countries: origins,
+    destination_countries: dests,
+    modes_requested: modes,
+    lanes_with_volume: lanes.filter((l) => l.annual_pallets).length,
+    annual_pallets_known: sum(lanes, (l) => l.annual_pallets),
+    annual_shipments_known: sum(lanes, (l) => l.annual_shipments),
+    hazardous_lanes: lanes.filter((l) => l.hazardous).length,
+    distance_km_min: distances.length ? Math.min(...distances) : null,
+    distance_km_max: distances.length ? Math.max(...distances) : null,
+    top_corridors: top.map(([corridor, annual_pallets]) => ({ corridor, annual_pallets })),
+  };
+
+  const counts = {};
+  for (const s of SEVERITIES) counts[s] = gaps.filter((g) => g.severity === s).length;
+  const byRule = {};
+  for (const r of RULE_IDS) byRule[r] = gaps.filter((g) => g.rule_id === r).length;
+  const flagged = lanes.filter((l) => l.flags.length).length;
+  const summary = {
+    gaps_total: gaps.length, gaps_by_severity: counts, gaps_by_rule: byRule,
+    lanes_with_gaps: flagged, clean_lanes: lanes.length - flagged,
+    readiness_pct: lanes.length ? Math.floor((100 * (lanes.length - flagged)) / lanes.length) : 0,
+    document_gaps: gaps.filter((g) => g.lane_id === null).length,
+  };
+
+  const bands = BANDS.map((b) => {
+    const bl = lanes.filter((l) => l.mode_suggested === b);
+    return { band: b, lane_count: bl.length, annual_pallets: sum(bl, (l) => l.annual_pallets), lanes: bl.map((l) => l.lane_id), rationale: BAND_RATIONALE[b] };
+  });
+  const byBand = Object.fromEntries(bands.map((b) => [b.band, b.lane_count]));
+  const steps = [];
+  if (counts.high) steps.push(`Resolve ${counts.high} high-severity gaps with the shipper before pricing.`);
+  if (byBand["FTL"]) steps.push(`Price ${byBand["FTL"]} FTL lanes on contracted capacity with round-trip matching.`);
+  if (byBand["Multimodal (road-rail)"]) steps.push(`Test road-rail on ${byBand["Multimodal (road-rail)"]} long-haul lanes against an FTL baseline.`);
+  if (byBand["LTL/groupage"]) steps.push(`Consolidate ${byBand["LTL/groupage"]} part-load lanes through groupage hubs.`);
+  if (scope.hazardous_lanes) steps.push(`Confirm ADR-certified capacity for ${scope.hazardous_lanes} hazardous lanes.`);
+
+  return { scope, summary, lanes, gaps, questions: buildQuestions(gaps), outline: { bands, next_steps: steps } };
+}
+// RULES-END
+
+// ---------- UI (not part of the parity check) ----------
+const PACKS = JSON.parse(document.getElementById("rfq-packs").textContent);
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = (n) => n == null ? "&ndash;" : Number(n).toLocaleString("en-GB");
+const SEV_TAG = { high: "bad", medium: "warn", low: "info" };
+const CITE = "Source: lanes.csv and requirements.md, SharePoint RFQ library (simulated)";
+let current = null; // { pack, result }
+
+function pack() { return PACKS[$("pack").selectedIndex]; }
+
+function renderPicker() {
+  $("pack").innerHTML = PACKS.map((p) => `<option value="${esc(p.meta.id)}">${esc(p.meta.shipper)}: ${esc(p.meta.title)}</option>`).join("");
+  renderFiles();
+}
+function renderFiles() {
+  const p = pack();
+  const lines = p.requirements.split("\n").filter((l) => l.trim()).length;
+  $("files").innerHTML = `<li><code>lanes.csv</code> &middot; ${p.rows.length} rows</li><li><code>requirements.md</code> &middot; ${lines} lines</li><li>Received ${esc(p.meta.received)} &middot; due ${esc(p.meta.response_due)}</li>`;
+}
+
+function run() {
+  const p = pack();
+  current = { pack: p, result: checkRfq(p.rows, p.requirements) };
+  const r = current.result, s = r.scope, sm = r.summary;
+  $("empty").hidden = true;
+  $("results").hidden = false;
+  $("kpis").innerHTML = [
+    [s.lane_count, "lanes checked"],
+    [s.countries.length, "countries"],
+    [fmt(s.annual_pallets_known), "pallets a year (known)"],
+    [sm.gaps_by_severity.high, "high-severity gaps"],
+    [sm.readiness_pct + "%", "lanes ready to price"],
+  ].map(([v, l]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+  renderLanes();
+  $("gaps").innerHTML = r.gaps.map((g, i) => `<li><span class="tag ${SEV_TAG[g.severity]}">${g.severity}</span><span><span class="who">${g.rule_id} &middot; ${esc(g.lane_id || "requirements.md")}</span><br>${esc(g.message)}</span><button type="button" data-gap="${i}">Explain</button></li>`).join("");
+  $("bands").innerHTML = r.outline.bands.map((b, i) => `<div class="band b${i}"><h4>${esc(b.band)}</h4><div class="v">${b.lane_count} lanes</div><p>${fmt(b.annual_pallets)} pallets a year</p><p>${esc(b.rationale)}</p></div>`).join("");
+  $("steps").innerHTML = r.outline.next_steps.map((x) => `<li>${esc(x)}</li>`).join("");
+  renderLetter();
+  return r;
+}
+
+function renderLanes(highlight) {
+  const r = current.result, only = $("only-gaps").checked;
+  const rows = r.lanes.filter((l) => !only || l.flags.length);
+  $("lane-count").textContent = `${rows.length} of ${r.lanes.length} lanes, ${r.summary.lanes_with_gaps} with gaps`;
+  $("lanes").innerHTML = rows.map((l) => {
+    const flags = l.flags.length
+      ? l.flags.map((f) => `<span class="tag ${SEV_TAG[RULES[f][1]]}" title="${esc(RULES[f][0])}">${f}</span>`).join("")
+      : `<span class="tag ok">OK</span>`;
+    const cls = [l.worst ? "sev-" + l.worst : "", highlight && highlight.includes(l.lane_id) ? "hl" : ""].join(" ").trim();
+    return `<tr class="${cls}"><td><strong>${esc(l.lane_id)}</strong>${l.hazardous ? ' <span class="tag warn" title="Hazardous">ADR</span>' : ""}</td><td>${esc(l.origin)}</td><td>${esc(l.destination)}</td><td class="num">${fmt(l.distance_km)}</td><td class="num">${fmt(l.annual_pallets)}</td><td>${esc(l.incoterm) || "&ndash;"}</td><td>${esc(l.mode_suggested)}</td><td>${flags}</td></tr>`;
+  }).join("");
+}
+
+function renderLetter() {
+  const { pack: p, result: r } = current;
+  const n = r.questions.reduce((t, q) => t + q.questions.length, 0);
+  $("letter").innerHTML = `
+    <div class="meta">To: ${esc(p.meta.shipper)}, Procurement &middot; From: Contoso Logistics, Solution Design &middot; DRAFT</div>
+    <h3>Clarification questions: ${esc(p.meta.title)}</h3>
+    <p>Dear ${esc(p.meta.shipper)} procurement team,</p>
+    <p>Thank you for inviting Contoso Logistics to tender for the ${esc(p.meta.title)} contract. We have reviewed the ${r.scope.lane_count} lanes and the requirements document. To price accurately, we would be grateful for answers to the ${n} questions below by ${esc(p.meta.response_due)} or earlier, so we can keep to the response date.</p>
+    ${r.questions.map((t) => `<h4>${esc(t.theme)}</h4><ol>${t.questions.map((q) => `<li>${esc(q)}</li>`).join("")}</ol>`).join("")}
+    <p style="margin-top:14px">We are happy to walk through these on a short call.</p>
+    <p>Kind regards,<br>Solution Design team<br>Contoso Logistics</p>`;
+}
+
+function showTab(name) {
+  document.querySelectorAll(".tabs button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
+  ["lanes", "gaps", "outline", "letter"].forEach((t) => { $("p-" + t).hidden = t !== name; });
+}
+
+// ---------- Simulated agent ----------
+function say(cls, html) {
+  const d = document.createElement("div");
+  d.className = "msg " + cls;
+  d.innerHTML = html;
+  $("log").appendChild(d);
+  $("log").scrollTop = $("log").scrollHeight;
+}
+
+function intent(q) {
+  const t = q.toLowerCase();
+  const lane = q.match(/\b(NW|SP)-\d{3}\b/i);
+  if (lane) return ["lane", lane[0].toUpperCase()];
+  const rule = q.match(/\bR0\d\b/i);
+  if (rule) return ["rule", rule[0].toUpperCase()];
+  if (/explain/.test(t)) return ["explain"];
+  if (/email|letter|clarif|question|draft/.test(t)) return ["letter"];
+  if (/mode|ftl|ltl|groupage|rail|multimodal|solution|outline/.test(t)) return ["mode"];
+  if (/scope|summar|countr|volume|pallet|corridor/.test(t)) return ["scope"];
+  if (/miss|gap|wrong|issue|problem|check/.test(t)) return ["gaps"];
+  return ["help"];
+}
+
+function explainGap(g) {
+  const where = g.lane_id ? `lane ${esc(g.lane_id)}` : "the requirements document";
+  const why = {
+    R01: "Without shipments and pallets per shipment the lane cannot be banded or priced.",
+    R02: "Pallet dimensions drive loading metres, stackability and the truck count.",
+    R03: "The Incoterm decides who pays for which leg and where risk passes.",
+    R04: "FOB, CFR, CIF and FAS apply to sea and inland waterway; road lanes normally use FCA, DAP or DDP.",
+    R05: "Carriers need the UN number to apply ADR rules, choose equipment and quote correctly.",
+    R06: `Road planning assumes about ${ROAD_KM_PER_DAY} km a day for a single driver under EU driving-time rules.`,
+    R07: "Duplicate lanes double-count volume and confuse the rate card.",
+    R08: "Missing sections become assumptions in the offer, which is a commercial risk.",
+    R09: "Open items marked TBC must be closed before the offer is final.",
+  }[g.rule_id];
+  return `<strong>${g.rule_id} ${esc(g.rule)}</strong> (${g.severity}) on ${where}.<br>${esc(g.message)}<br>${why}<span class="cite">Topic: Explain a gap. ${CITE}</span>`;
+}
+
+function answer(q) {
+  say("user", esc(q));
+  if (!current) { run(); say("bot", `I ran the check on <strong>${esc(current.pack.meta.title)}</strong> first.`); }
+  const r = current.result, s = r.scope, sm = r.summary;
+  const [kind, arg] = intent(q);
+  if (kind === "gaps") {
+    showTab("gaps");
+    const high = r.gaps.filter((g) => g.severity === "high");
+    renderLanes(high.map((g) => g.lane_id));
+    say("bot", `I found <strong>${sm.gaps_total} gaps</strong>: ${sm.gaps_by_severity.high} high, ${sm.gaps_by_severity.medium} medium, ${sm.gaps_by_severity.low} low. ${sm.lanes_with_gaps} of ${s.lane_count} lanes are affected and ${sm.document_gaps} gaps are in the requirements document.${high.length ? " Fix these first:" : ""}<ul>${high.slice(0, 6).map((g) => `<li>${esc(g.lane_id)}: ${esc(g.rule)}</li>`).join("")}</ul><span class="cite">Topic: Check new RFQ. ${CITE}</span>`);
+  } else if (kind === "letter") {
+    showTab("letter");
+    const n = r.questions.reduce((t, x) => t + x.questions.length, 0);
+    say("bot", `I drafted a clarification letter with <strong>${n} questions</strong> in ${r.questions.length} themes: ${r.questions.map((t) => esc(t.theme)).join(", ")}. It is open in Word for you to edit before sending.<span class="cite">Topic: Draft clarification questions. Microsoft 365 Copilot in Word refines the tone.</span>`);
+  } else if (kind === "mode") {
+    showTab("outline");
+    say("bot", `Suggested mode per lane band:<ul>${r.outline.bands.filter((b) => b.lane_count).map((b) => `<li><strong>${esc(b.band)}</strong>: ${b.lane_count} lanes, ${fmt(b.annual_pallets)} pallets a year</li>`).join("")}</ul>Rule of thumb: ${FTL_MIN_PALLETS}+ pallets per shipment is FTL; over ${MULTIMODAL_MIN_KM} km and weekly or more, test road-rail.<span class="cite">Microsoft 365 Copilot in PowerPoint turns this into the solution outline.</span>`);
+  } else if (kind === "scope") {
+    say("bot", `<strong>${esc(current.pack.meta.shipper)}, ${esc(current.pack.meta.title)}</strong>: ${s.lane_count} lanes from ${s.origin_countries.join(", ")} to ${s.destination_countries.length} destination countries, ${fmt(s.distance_km_min)} to ${fmt(s.distance_km_max)} km. Known volume ${fmt(s.annual_pallets_known)} pallets in ${fmt(s.annual_shipments_known)} shipments a year (${s.lanes_with_volume} lanes with volume). ${s.hazardous_lanes} lanes carry hazardous goods.<br>Top corridors:<ul>${s.top_corridors.map((c) => `<li>${esc(c.corridor)}: ${fmt(c.annual_pallets)} pallets</li>`).join("")}</ul><span class="cite">Topic: Summarise scope. ${CITE}</span>`);
+  } else if (kind === "lane") {
+    const lg = r.gaps.filter((g) => g.lane_id === arg);
+    const lane = r.lanes.find((l) => l.lane_id === arg);
+    showTab("lanes"); renderLanes([arg]);
+    if (!lane) say("bot", `I cannot find lane ${esc(arg)} in this RFQ.`);
+    else if (!lg.length) say("bot", `Lane ${esc(arg)} (${esc(lane.origin)} to ${esc(lane.destination)}) has no gaps. Suggested mode: ${esc(lane.mode_suggested)}.`);
+    else lg.forEach((g) => say("bot", explainGap(g)));
+  } else if (kind === "rule") {
+    const rg = r.gaps.filter((g) => g.rule_id === arg);
+    say("bot", RULES[arg] ? `<strong>${arg} ${esc(RULES[arg][0])}</strong> (${RULES[arg][1]}): ${rg.length} hit(s)${rg.length ? ": " + rg.map((g) => esc(g.lane_id || "requirements.md")).join(", ") : ""}.` : `There is no rule ${esc(arg)}; rules run from R01 to R09.`);
+  } else if (kind === "explain") {
+    const g = r.gaps.find((x) => x.severity === "high") || r.gaps[0];
+    if (!g) say("bot", "There are no gaps to explain in this RFQ.");
+    else { if (g.lane_id) { showTab("lanes"); renderLanes([g.lane_id]); } say("bot", explainGap(g)); }
+  } else {
+    say("bot", `I can check the RFQ, explain a gap (try a lane ID such as ${esc(r.lanes[0].lane_id)}), draft clarification questions, suggest a mode per lane or summarise the scope.`);
+  }
+}
+
+// ---------- Wiring ----------
+renderPicker();
+say("bot", "Hello, I am the Tender Desk agent (simulated). Pick an RFQ folder and run the check, or use a suggestion below.");
+$("pack").addEventListener("change", () => { renderFiles(); current = null; $("results").hidden = true; $("empty").hidden = false; });
+$("run").addEventListener("click", () => {
+  const r = run(); showTab("lanes");
+  say("bot", `Check complete for <strong>${esc(current.pack.meta.title)}</strong>: ${r.summary.gaps_total} gaps across ${r.summary.lanes_with_gaps} lanes, ${r.summary.readiness_pct}% of lanes ready to price. A summary card was posted to the Tender Desk channel in Teams.<span class="cite">Flow: When a new RFQ folder is created</span>`);
+});
+$("only-gaps").addEventListener("change", () => renderLanes());
+document.querySelector(".tabs").addEventListener("click", (e) => { if (e.target.dataset.tab) showTab(e.target.dataset.tab); });
+$("suggest").addEventListener("click", (e) => { if (e.target.dataset.q) answer(e.target.dataset.q); });
+$("gaps").addEventListener("click", (e) => {
+  const i = e.target.dataset.gap;
+  if (i !== undefined) { const g = current.result.gaps[+i]; say("user", `Explain ${esc(g.lane_id || g.rule_id)}`); say("bot", explainGap(g)); }
+});
+$("ask").addEventListener("submit", (e) => { e.preventDefault(); const q = $("q").value.trim(); if (q) { answer(q); $("q").value = ""; } });
+
+// Deep links for screenshots, e.g. #state=result, #state=letter, #state=mode, #state=gaps&pack=1&shot=1 (shot hides the intro for screenshots)
+(function fromHash() {
+  const h = new URLSearchParams(location.hash.slice(1));
+  const state = h.get("state");
+  if (!state) return;
+  if (h.get("shot")) document.body.classList.add("shot");
+  const idx = +(h.get("pack") || 0);
+  if (PACKS[idx]) { $("pack").selectedIndex = idx; renderFiles(); }
+  $("run").click();
+  const q = { gaps: "What is missing?", letter: "Draft clarification email", mode: "Suggest mode per lane", scope: "Summarise scope", explain: "Explain a gap" }[state];
+  if (q) answer(q);
+})();
+</script>
+</body>
+</html>

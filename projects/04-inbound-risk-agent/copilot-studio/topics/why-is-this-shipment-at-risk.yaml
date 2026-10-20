@@ -1,0 +1,58 @@
+kind: AdaptiveDialog
+modelDescription: Explains one shipment's risk score using the stored reasons and points per factor. Never invents reasons.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Why is this shipment at risk
+    triggerQueries:
+      - why is this shipment at risk
+      - why is CTL-261556 critical
+      - explain the risk score
+      - what is wrong with this delivery
+      - why was this shipment flagged
+
+  actions:
+    - kind: Question
+      id: askShipment
+      variable: Topic.ShipmentId
+      prompt: Which shipment number? It starts with CTL-.
+      entity: StringPrebuiltEntity
+      alwaysPrompt: false
+
+    - kind: InvokeFlowAction
+      id: getReasons
+      flowId: 00000000-0000-0000-0000-000000000000  # "Inbound Risk - Get shipment reasons" (see power-automate/agent-actions.md)
+      input:
+        binding:
+          shipmentId: =Upper(Trim(Topic.ShipmentId))
+      output:
+        binding:
+          found: Topic.Found
+          score: Topic.Score
+          bandLabel: Topic.BandLabel
+          reasonLines: Topic.ReasonLines
+          lastScan: Topic.LastScan
+          promised: Topic.Promised
+          scoredAt: Topic.ScoredAt
+
+    - kind: ConditionGroup
+      id: checkFound
+      conditions:
+        - id: missing
+          condition: =Topic.Found = false
+          actions:
+            - kind: SendActivity
+              id: notFound
+              activity: I cannot find {Topic.ShipmentId} among in-transit shipments. It may be delivered already, or the number may be mistyped.
+            - kind: EndDialog
+              id: endMissing
+
+    - kind: SendActivity
+      id: explain
+      activity: |-
+        {Topic.ShipmentId} is {Topic.BandLabel} with a score of {Topic.Score}/100 (scored at {Topic.ScoredAt}).
+        Main reasons:
+        {Topic.ReasonLines}
+        Last scan: {Topic.LastScan}. Promised: {Topic.Promised}.
+        The rest of the score comes from smaller factors. All seven factors are shown on the shipment record.

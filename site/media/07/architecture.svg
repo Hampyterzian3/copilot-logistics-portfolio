@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="t d">
+  <title id="t">Document data extraction architecture</title>
+  <desc id="d">Top: the built Python invoice intake pipeline. Bottom: the same steps mapped to Microsoft Power Platform components.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#fffdf8"/></marker>
+    <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff6b35"/></marker>
+    <style>
+      .h{font:600 26px 'Space Grotesk',Arial,sans-serif;fill:#fffdf8}
+      .s{font:600 15px 'Space Grotesk',Arial,sans-serif;fill:#81cfb3;letter-spacing:.06em}
+      .s2{font:600 15px 'Space Grotesk',Arial,sans-serif;fill:#b0c6e8;letter-spacing:.06em}
+      .bt{font:600 17px 'Space Grotesk',Arial,sans-serif;fill:#fffdf8}
+      .b{font:400 13.5px Inter,Arial,sans-serif;fill:rgba(255,253,248,.85)}
+      .bx{fill:#244139;stroke:rgba(255,253,248,.18)}
+      .ms{fill:#b0c6e8}
+      .mt{font:600 15px 'Space Grotesk',Arial,sans-serif;fill:#0c2c23}
+      .mb{font:400 12.5px Inter,Arial,sans-serif;fill:#0c2c23}
+      .ln{stroke:#fffdf8;stroke-width:2;fill:none}
+      .map{stroke:rgba(255,253,248,.35);stroke-width:1.5;stroke-dasharray:4 5;fill:none}
+    </style>
+  </defs>
+  <rect width="1200" height="675" fill="#0c2c23"/>
+  <text x="40" y="52" class="h">Document data extraction: built pipeline and Power Platform mapping</text>
+
+  <text x="40" y="96" class="s">BUILT AND BENCHMARKED: PYTHON INVOICE INTAKE AGENT</text>
+  <g>
+    <rect class="bx" x="40" y="112" width="190" height="120" rx="12"/>
+    <text x="58" y="142" class="bt">PDF inbox</text>
+    <text x="58" y="166" class="b">data/inbox or upload</text>
+    <text x="58" y="186" class="b">3 invoice layouts</text>
+    <text x="58" y="206" class="b">synthetic, seeded</text>
+
+    <rect class="bx" x="270" y="112" width="210" height="120" rx="12"/>
+    <text x="288" y="142" class="bt">Extract</text>
+    <text x="288" y="166" class="b">ClaudeExtractor (schema JSON)</text>
+    <text x="288" y="186" class="b">RuleExtractor (pdfplumber)</text>
+    <text x="288" y="206" class="b">offline fallback</text>
+
+    <rect class="bx" x="520" y="112" width="220" height="120" rx="12"/>
+    <text x="538" y="142" class="bt">Validate</text>
+    <text x="538" y="166" class="b">vendor master + POs</text>
+    <text x="538" y="186" class="b">1% tolerance, VAT, totals</text>
+    <text x="538" y="206" class="b">duplicates, 9 reason codes</text>
+
+    <rect class="bx" x="790" y="104" width="180" height="62" rx="12"/>
+    <text x="806" y="130" class="bt">Register</text>
+    <text x="806" y="152" class="b">SQLite, CSV / Excel</text>
+    <rect class="bx" x="790" y="178" width="180" height="62" rx="12"/>
+    <text x="806" y="204" class="bt">Exception queue</text>
+    <text x="806" y="226" class="b">Streamlit reviewer</text>
+
+    <rect class="bx" x="1010" y="112" width="150" height="120" rx="12"/>
+    <text x="1026" y="142" class="bt">Audit log</text>
+    <text x="1026" y="166" class="b">append-only</text>
+    <text x="1026" y="186" class="b">who, when, why</text>
+
+    <path class="ln" d="M230 172H266" marker-end="url(#a)"/>
+    <path class="ln" d="M480 172H516" marker-end="url(#a)"/>
+    <path class="ln" d="M740 160L786 136" marker-end="url(#a)"/>
+    <path d="M740 184L786 208" stroke="#ff6b35" stroke-width="2" fill="none" marker-end="url(#ao)"/>
+    <path class="ln" d="M970 136L1006 160" marker-end="url(#a)"/>
+    <path class="ln" d="M970 208L1006 184" marker-end="url(#a)"/>
+    <text x="40" y="262" class="b">Benchmark, 50 invoices offline: 8 of 8 seeded errors caught, 0 false approvals, 50 of 50 key fields exact, about 1.5 s.</text>
+  </g>
+
+  <path class="map" d="M135 280V350M375 280V350M630 280V350M880 280V350M1085 280V350"/>
+  <text x="600" y="322" class="b" text-anchor="middle" style="fill:#e8d67d">same steps, Microsoft components</text>
+
+  <text x="40" y="378" class="s2">DESIGN: MICROSOFT POWER PLATFORM VERSION</text>
+  <g>
+    <rect class="ms" x="40" y="394" width="190" height="130" rx="12"/>
+    <text x="58" y="424" class="mt">SharePoint / Outlook</text>
+    <text x="58" y="448" class="mb">library upload or shared</text>
+    <text x="58" y="466" class="mb">AP mailbox attachment</text>
+    <text x="58" y="490" class="mb">Power Automate trigger</text>
+
+    <rect class="ms" x="270" y="394" width="210" height="130" rx="12"/>
+    <text x="288" y="424" class="mt">AI Builder</text>
+    <text x="288" y="448" class="mb">prebuilt invoice processing</text>
+    <text x="288" y="466" class="mb">or custom document model</text>
+    <text x="288" y="490" class="mb">field confidence scores</text>
+
+    <rect class="ms" x="520" y="394" width="220" height="130" rx="12"/>
+    <text x="538" y="424" class="mt">Power Automate rules</text>
+    <text x="538" y="448" class="mb">Dataverse lookups vendor, PO</text>
+    <text x="538" y="466" class="mb">same 9 reason codes</text>
+    <text x="538" y="490" class="mb">+ low-confidence check</text>
+
+    <rect class="ms" x="790" y="386" width="180" height="66" rx="12"/>
+    <text x="806" y="412" class="mt">Dataverse Invoice</text>
+    <text x="806" y="434" class="mb">status Approved, to ERP</text>
+    <rect class="ms" x="790" y="464" width="180" height="66" rx="12"/>
+    <text x="806" y="490" class="mt">Exception queue</text>
+    <text x="806" y="512" class="mb">model-driven app + Teams</text>
+
+    <rect class="ms" x="1010" y="394" width="150" height="130" rx="12"/>
+    <text x="1026" y="424" class="mt">Dataverse</text>
+    <text x="1026" y="448" class="mb">Audit Event table</text>
+    <text x="1026" y="466" class="mb">+ auditing on</text>
+
+    <path class="ln" d="M230 459H266" marker-end="url(#a)"/>
+    <path class="ln" d="M480 459H516" marker-end="url(#a)"/>
+    <path class="ln" d="M740 446L786 420" marker-end="url(#a)"/>
+    <path d="M740 472L786 496" stroke="#ff6b35" stroke-width="2" fill="none" marker-end="url(#ao)"/>
+    <path class="ln" d="M970 420L1006 444" marker-end="url(#a)"/>
+    <path class="ln" d="M970 496L1006 472" marker-end="url(#a)"/>
+  </g>
+
+  <rect class="bx" x="520" y="560" width="640" height="80" rx="12"/>
+  <text x="538" y="590" class="bt">Copilot Studio exception assistant</text>
+  <text x="538" y="614" class="b">Why was this invoice held, release invoice (policy-limited, reason required), show today's exceptions</text>
+  <path d="M880 530V556" stroke="#ff6b35" stroke-width="2" fill="none" marker-end="url(#ao)"/>
+  <text x="40" y="596" class="b">Built: Python, pdfplumber, Anthropic SDK, RapidFuzz, SQLite, Streamlit, pytest.</text>
+  <text x="40" y="618" class="b">Power Platform version: design and specs, not deployed.</text>
+</svg>

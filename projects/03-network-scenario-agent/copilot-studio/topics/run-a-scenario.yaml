@@ -1,0 +1,73 @@
+kind: AdaptiveDialog
+modelDescription: Runs an inbound network scenario with the parameters the user gives and summarises cost, CO2 and truck movements per design.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Run a scenario
+    triggerQueries:
+      - Run a scenario
+      - Run the network model
+      - What does the network cost with max 6 stops
+      - Calculate the inbound network for a CO2 price of 100
+      - Run it with handling at 4 euro per loading metre
+
+  actions:
+    - kind: Question
+      id: askFuel
+      variable: Topic.FuelIndex
+      prompt: Which diesel cost index should I use? 1.0 is today's price.
+      entity: NumberPrebuiltEntity
+      defaultValue: 1
+      skipQuestionMode: SkipOnFirstExecutionIfVariableHasValue
+
+    - kind: SetVariable
+      id: setDefaults
+      variable: Topic.Co2Price
+      value: =If(IsBlank(Topic.Co2Price), 0, Topic.Co2Price)
+
+    - kind: InvokeConnectorAction
+      id: callRunScenario
+      connectionReference: cr_contosonetworkscenarios
+      connectionProperties:
+        mode: Invoker
+      operationId: RunScenario
+      input:
+        binding:
+          body: |-
+            ={
+              fuel_index: Topic.FuelIndex,
+              co2_price_t: Topic.Co2Price,
+              handling_ldm: If(IsBlank(Topic.Handling), 6, Topic.Handling),
+              max_stops: If(IsBlank(Topic.MaxStops), 4, Topic.MaxStops)
+            }
+      output:
+        binding:
+          designs: Topic.Designs
+          recommendation: Topic.Recommendation
+
+    - kind: SetVariable
+      id: keepForFollowUps
+      variable: Global.LastScenario
+      value: =Topic.Designs
+
+    - kind: BeginDialog
+      id: logScenario
+      dialog: cr_networkagent.action.LogScenarioToDataverse
+      input:
+        binding:
+          FuelIndex: =Topic.FuelIndex
+          Co2Price: =Topic.Co2Price
+          BestMixCost: =Topic.Designs.bestmix.cost_week
+          BestMixCo2: =Topic.Designs.bestmix.co2_t_week
+          BestMixTrucks: =Topic.Designs.bestmix.trucks_week
+
+    - kind: SendActivity
+      id: sendSummary
+      activity: |-
+        Scenario run. Per week:
+        - Direct full-load: EUR {Text(Topic.Designs.direct.cost_week, "#,##0")}, {Text(Topic.Designs.direct.co2_t_week, "0.0")} t CO2, {Topic.Designs.direct.trucks_week} trips
+        - Regional milk-run: EUR {Text(Topic.Designs.milkrun.cost_week, "#,##0")}, {Text(Topic.Designs.milkrun.co2_t_week, "0.0")} t CO2, {Topic.Designs.milkrun.trucks_week} trips
+        - Cross-dock: EUR {Text(Topic.Designs.crossdock.cost_week, "#,##0")}, {Text(Topic.Designs.crossdock.co2_t_week, "0.0")} t CO2, {Topic.Designs.crossdock.trucks_week} trips
+        - Best mix: EUR {Text(Topic.Designs.bestmix.cost_week, "#,##0")}, {Text(Topic.Designs.bestmix.co2_t_week, "0.0")} t CO2, {Topic.Designs.bestmix.trucks_week} trips
+        {Topic.Recommendation.text}

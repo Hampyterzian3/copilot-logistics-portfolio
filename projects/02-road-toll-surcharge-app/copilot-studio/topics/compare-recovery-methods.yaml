@@ -1,0 +1,54 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Compare recovery methods
+    triggerQueries:
+      - Compare recovery methods
+      - Flat or percentage surcharge
+      - Which surcharge method is best
+      - Per km surcharge versus percentage of freight
+
+  actions:
+    - kind: Question
+      id: askCustomer
+      variable: Topic.CustomerCode
+      prompt: Which customer code?
+      entity: StringPrebuiltEntity
+      skipQuestionMode: SkipOnFirstExecutionIfVariableHasValue
+
+    - kind: Question
+      id: askRecovery
+      variable: Topic.RecoveryPct
+      prompt: What share of the toll do you want to recover (0 to 120%)?
+      entity: NumberPrebuiltEntity
+      defaultValue: 100
+
+    - kind: InvokeFlowAction
+      id: getImpact
+      flowId: 00000000-0000-0000-0000-000000000201
+      input:
+        binding:
+          customerCode: =Topic.CustomerCode
+      output:
+        binding:
+          shipments: Topic.Shipments
+          tollEur: Topic.TollEur
+          revenueEur: Topic.RevenueEur
+          km: Topic.Km
+
+    - kind: SetVariable
+      id: setTarget
+      variable: Topic.Target
+      value: =Topic.TollEur * Topic.RecoveryPct / 100
+
+    - kind: SendActivity
+      id: sayOptions
+      activity: |-
+        Recovering {Topic.RecoveryPct}% (EUR {Text(Topic.Target, "#,##0.00")}) for **{Topic.CustomerCode}**:
+        - Flat: EUR {Text(Round(Topic.Target / Topic.Shipments, 2), "0.00")} per shipment
+        - % of freight: {Text(Round(Topic.Target / Topic.RevenueEur * 100, 2), "0.00")}%
+        - Per km: EUR {Text(Round(Topic.Target / Topic.Km, 3), "0.000")} per km
+        Flat favours customers with large loads, % of freight follows price, per km follows distance.
+        Submit the chosen option in the app to start the approval.
