@@ -1,20 +1,21 @@
 <!doctype html>
-<html lang="en-GB">
+<html lang="en-GB" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Network Scenario Agent</title>
-<meta name="description" content="Simulated Copilot Studio agent that compares direct full-load, regional milk-run and cross-dock designs for an automotive inbound network on cost, CO2 and truck movements.">
+<meta name="description" content="Simulated agent comparing direct full-load, milk-run and cross-dock designs for an automotive inbound network on cost, CO2 and truck trips.">
 <link rel="icon" type="image/png" href="../assets/brand/hampy-favicon-64.png">
-<link rel="stylesheet" href="../assets/css/tokens.css">
-<link rel="stylesheet" href="../assets/css/demo.css">
+<link rel="stylesheet" href="../assets/css/tokens.css?v=th20261021m">
+<link rel="stylesheet" href="../assets/css/demo.css?v=th20261021m">
+<script src="../assets/js/theme.js?v=th20261021m"></script>
 <style>
   .ctrls { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 4px 16px; margin-bottom: 14px; }
   .ctrls label { display: flex; justify-content: space-between; gap: 8px; }
   .ctrls output { font: 600 12px var(--font-heading); font-variant-numeric: tabular-nums; }
   .app input[type=range] { padding: 0; border: 0; background: transparent; accent-color: var(--orange); }
   .hint { font-size: 12px; opacity: .8; margin: 2px 0 0; }
-  .app h3 { font-size: 15px; margin: 16px 0 8px; }
+  .app h2 { font-size: 15px; margin: 16px 0 8px; }
   tr.design-row { cursor: pointer; }
   tr.design-row.sel td { background: rgba(129,163,218,.22); }
   tr.design-row td:first-child { font-weight: 600; }
@@ -34,16 +35,17 @@
 </head>
 <body>
 <header class="demo-top">
-  <a class="back" href="../index.html#p03">&larr; Portfolio</a>
-  <img src="../assets/brand/hampy-logo-offwhite.svg" alt="hampy">
+  <a class="back" href="../index.html#p06">&larr; Portfolio</a>
+  <img class="logo-dark" src="../assets/brand/hampy-logo-offwhite.svg" alt="hampy"><img class="logo-light" src="../assets/brand/hampy-logo.svg" alt="hampy">
   <span class="demo-badge">Simulated demo</span>
   <span class="title">Network Scenario Agent</span>
+  <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false" aria-label="Dark mode" title="Switch to dark mode"><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
 </header>
 
 <main class="demo-wrap">
   <section class="demo-intro">
     <h1>Network Scenario Agent</h1>
-    <p>Contoso Logistics runs the inbound network for an automotive OEM plant in central Germany: 60 suppliers across Europe. For each supplier the planner can choose direct full-load, a regional milk-run or cross-dock consolidation through one of three hubs. Move the sliders, pick a design on the map, and ask the agent why it recommends the mix it does. Every number below is computed live by the network engine on synthetic data.</p>
+    <p>Contoso Logistics runs the inbound network for an automotive OEM plant in central Germany: 60 suppliers across Europe. For each supplier the planner can choose direct full-load, a regional milk-run or cross-dock consolidation through one of three hubs. Move the sliders and pick a design on the map to see why the engine recommends the mix it does. Every number below is computed live by the network engine on synthetic data.</p>
   </section>
 
   <div class="demo-grid">
@@ -59,7 +61,7 @@
 
         <div class="kpis" id="kpis"></div>
 
-        <h3>Results per design (per week)</h3>
+        <h2>Results per design (per week)</h2>
         <div class="table-scroll">
           <table id="results">
             <thead><tr><th>Design</th><th class="num">Cost</th><th class="num">CO2 t</th><th class="num">Trucks</th><th class="num">Plant arrivals</th><th class="num">Cost + CO2 price</th></tr></thead>
@@ -68,7 +70,7 @@
         </div>
         <p class="hint">Click a row or a map tab to draw that design. ldm = loading metres (13.6 per trailer).</p>
 
-        <h3>Flows on the map</h3>
+        <h2>Flows on the map</h2>
         <div class="map-tabs" role="group" aria-label="Design shown on map" id="mapTabs"></div>
         <div class="mapbox"><svg id="map" viewBox="0 0 600 430" role="img" aria-label="Map of supplier flows for the selected design"></svg>
           <div class="legend" id="legend"></div>
@@ -76,32 +78,12 @@
         <p class="parity" id="parity">Checking JS engine against the Python baseline...</p>
       </div>
     </section>
-
-    <aside class="copilot" aria-label="Network Scenario Agent chat">
-      <div class="copilot-head"><img src="../assets/brand/hampy-agent-icon.png" alt="">Network Scenario Agent</div>
-      <p class="sim-note">Simulation of the Copilot Studio agent: fixed intents and rules in this page stand in for the generative answers. In production it calls the scenario connector as a tool.</p>
-      <div class="copilot-log" id="log" aria-live="polite"></div>
-      <div class="suggest" id="suggest">
-        <button type="button" data-q="Run a scenario">Run a scenario</button>
-        <button type="button" data-q="Compare designs">Compare designs</button>
-        <button type="button" data-q="What if diesel goes up 30%?">What if diesel +30%?</button>
-        <button type="button" data-q="Explain the recommendation">Explain recommendation</button>
-        <button type="button" data-q="Set CO2 price to 150">CO2 at 150 per tonne</button>
-        <button type="button" data-q="Reset">Reset</button>
-      </div>
-      <form class="copilot-input" id="ask">
-        <input id="q" type="text" placeholder="Ask, e.g. max stops 6" aria-label="Message the agent">
-        <button class="btn" type="submit">Send</button>
-      </form>
-    </aside>
   </div>
 
   <div class="stack-note">
     <strong>How this maps to Microsoft in production.</strong>
-    Sliders and results table: <strong>Power Apps</strong> canvas app (or the Copilot Studio chat itself).
+    Sliders and results table: <strong>Power Apps</strong> canvas app.
     Network engine: Python package written with <strong>GitHub Copilot</strong>, hosted in an <strong>Azure Function</strong> (POST /scenarios).
-    Tool call: <strong>Power Platform custom connector</strong> from the OpenAPI file, added to the agent as an action.
-    Chat panel: <strong>Copilot Studio</strong> agent "Network Scenario Agent" with topics Run a scenario, Compare designs, What if fuel price changes and Explain recommendation.
     Scenario log: <strong>Dataverse</strong> tables via <strong>Power Automate</strong>.
     Map: <strong>Power BI</strong> map visual on the logged flows. Here, the engine is ported to JavaScript and checked against the Python baseline.
   </div>
@@ -325,13 +307,10 @@ const NetEngine = (function () {
   const $ = id => document.getElementById(id);
   const eur = v => "€" + Math.round(v).toLocaleString("en-GB");
   const f1 = v => v.toLocaleString("en-GB", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  const pct = v => (v >= 0 ? "+" : "") + v.toFixed(1) + "%";
-  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const sliders = { fuel_index: $("fuel"), co2_price_t: $("co2"), handling_ldm: $("handling"), max_stops: $("stops") };
   const SUPP = {}; NET.suppliers.forEach(s => SUPP[s.id] = s);
   const HUB = {}; NET.hubs.forEach(h => HUB[h.id] = h);
   let state = { res: null, sum: null, overrides: null, mapDesign: "bestmix" };
-  let logId = 0;
 
   function overrides() {
     const o = {};
@@ -365,8 +344,8 @@ const NetEngine = (function () {
     ].map(([v, l]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
     const minOf = k => Math.min(...ORDER.map(d => s[d][k]));
     const cell = (d, k, txt) => `<td class="num">${txt}${s[d][k] === minOf(k) ? ' <span class="tag ok">low</span>' : ""}</td>`;
-    $("results").querySelector("tbody").innerHTML = ORDER.map(d => `<tr class="design-row${d === state.mapDesign ? " sel" : ""}" data-d="${d}" tabindex="0">
-      <td>${LABEL[d]}${d === "bestmix" ? ' <span class="tag info">Recommended</span>' : ""}</td>
+    $("results").querySelector("tbody").innerHTML = ORDER.map(d => `<tr class="design-row${d === state.mapDesign ? " sel" : ""}" data-d="${d}">
+      <td><button type="button" class="row-btn" aria-pressed="${d === state.mapDesign}">${LABEL[d]}</button>${d === "bestmix" ? ' <span class="tag info">Recommended</span>' : ""}</td>
       ${cell(d, "cost_week", eur(s[d].cost_week))}${cell(d, "co2_t_week", f1(s[d].co2_t_week))}
       ${cell(d, "trucks_week", s[d].trucks_week)}${cell(d, "plant_arrivals_week", s[d].plant_arrivals_week)}
       <td class="num">${eur(s[d].objective)}</td></tr>`).join("");
@@ -415,118 +394,23 @@ const NetEngine = (function () {
       <span style="margin-left:auto">${LABEL[state.mapDesign]}: ${eur(sum.cost_week)}, ${f1(sum.co2_t_week)} t CO2, ${sum.trucks_week} trips</span>`;
   }
 
-  // ---- agent (deterministic simulation of the Copilot Studio agent) ----
-  function say(html, who) {
-    const el = document.createElement("div");
-    el.className = "msg " + (who || "bot");
-    el.innerHTML = html;
-    $("log").appendChild(el);
-    $("log").scrollTop = $("log").scrollHeight;
-  }
-  function paramsLine(o) {
-    return `diesel index ${o.fuel_index.toFixed(2)}, CO2 €${o.co2_price_t}/t, handling €${o.handling_ldm.toFixed(1)}/ldm, max ${o.max_stops} stops`;
-  }
-  function designTable(sum, ref) {
-    return `<table><tr><th>Design</th><th class="num">Cost/wk</th><th class="num">CO2 t</th><th class="num">Trucks</th></tr>` +
-      ORDER.map(d => `<tr><td>${LABEL[d]}</td><td class="num">${eur(sum[d].cost_week)}${ref ? " (" + pct(100 * (sum[d].cost_week - ref[d].cost_week) / ref[d].cost_week) + ")" : ""}</td><td class="num">${f1(sum[d].co2_t_week)}</td><td class="num">${sum[d].trucks_week}</td></tr>`).join("") + "</table>";
-  }
-  function intentRun() {
-    compute();
-    const s = state.sum, bp = bestPure(s);
-    logId++;
-    say(`Ran the scenario (${paramsLine(state.overrides)}).
-      <div class="card-ac" style="margin-top:8px"><h4>Scenario NS-${String(logId).padStart(4, "0")}</h4>${designTable(s)}</div>
-      Best mix costs ${eur(s.bestmix.cost_week)} a week, ${eur(s[bp].objective - s.bestmix.objective)} less than the cheapest single design (${LABEL[bp].toLowerCase()}).
-      <span class="cite">Tool: POST /scenarios via custom connector. Logged to Dataverse: Network Scenario NS-${String(logId).padStart(4, "0")} (simulated).</span>`);
-  }
-  function intentCompare() {
-    const s = state.sum;
-    const most = ORDER.reduce((a, b) => s[b].plant_arrivals_week > s[a].plant_arrivals_week ? b : a);
-    const greenest = ORDER.reduce((a, b) => s[b].co2_t_week < s[a].co2_t_week ? b : a);
-    const items = ["direct", "milkrun", "crossdock"].map(d =>
-      `<li><strong>${LABEL[d]}</strong>: ${eur(s[d].cost_week)} (${pct(100 * (s[d].cost_week - s.bestmix.cost_week) / s.bestmix.cost_week)} vs best mix), ${f1(s[d].co2_t_week)} t CO2, ${s[d].trucks_week} trips, ${s[d].plant_arrivals_week} plant arrivals.</li>`).join("");
-    say(`Per week, against the best mix (${eur(s.bestmix.cost_week)}, ${f1(s.bestmix.co2_t_week)} t, ${s.bestmix.trucks_week} trips):<ul>${items}</ul>
-      Lowest CO2: ${LABEL[greenest].toLowerCase()}. Most trucks at the plant gate: ${LABEL[most].toLowerCase()} (${s[most].plant_arrivals_week} a week).
-      <span class="cite">Source: engine results for the current sliders.</span>`);
-  }
-  function intentFuel(text) {
-    const m = /([+-]?\d+(?:\.\d+)?)\s*%/.exec(text || "");
-    let change = m ? Number(m[1]) : 30;
-    if (/down|drop|fall|cheaper|lower/i.test(text || "") && change > 0) change = -change;
-    const before = state.sum, beforeAssign = state.res.designs.bestmix.assign, oldIdx = Number(sliders.fuel_index.value);
-    const idx = Math.max(0.6, Math.min(1.8, Math.round((1 + change / 100) * 20) / 20));
-    sliders.fuel_index.value = idx;
-    compute();
-    const moved = Object.keys(beforeAssign).filter(k => beforeAssign[k] !== state.res.designs.bestmix.assign[k]).length;
-    say(`Diesel cost index ${oldIdx.toFixed(2)} to ${idx.toFixed(2)} (fuel is ${Math.round(100 * NetEngine.DEFAULTS.fuel_share)}% of the km rate).
-      <div class="card-ac" style="margin-top:8px"><h4>Cost change per design</h4>${designTable(state.sum, before)}</div>
-      ${moved ? `${moved} supplier${moved > 1 ? "s" : ""} switch mode in the best mix.` : "The best mix keeps the same mode for every supplier: the ranking is stable, only the bill moves."}
-      Least exposed: ${LABEL[["direct", "milkrun", "crossdock"].reduce((a, b) => Math.abs(state.sum[b].cost_week / before[b].cost_week - 1) < Math.abs(state.sum[a].cost_week / before[a].cost_week - 1) ? b : a)].toLowerCase()}, as fixed trip, stop and handling costs do not move with diesel.`);
-  }
-  function intentExplain() {
-    const mix = state.res.designs.bestmix, s = state.sum, bp = bestPure(s);
-    const by = { direct: [], milkrun: [], crossdock: [] };
-    for (const sp of NET.suppliers) by[mix.assign[sp.id]].push(sp);
-    const avg = (arr, f) => arr.length ? arr.reduce((a, x) => a + f(x), 0) / arr.length : 0;
-    const p = state.res.params, km = sp => NetEngine.roadKm(sp, NET.plant, p);
-    const regions = arr => [...new Set(arr.map(x => x.region))].sort().join(", ");
-    const hubs = {}; for (const [sid, h] of Object.entries(mix.hub_of)) if (mix.assign[sid] === "crossdock") hubs[h] = (hubs[h] || 0) + 1;
-    const li = [];
-    if (by.direct.length) li.push(`<li><strong>Direct (${by.direct.length})</strong>: average ${f1(avg(by.direct, x => x.ldm_week))} ldm a week and ${Math.round(avg(by.direct, km))} km. Volume fills trucks, so pooling adds stops without saving trips.</li>`);
-    if (by.milkrun.length) li.push(`<li><strong>Milk-run (${by.milkrun.length})</strong>: average ${f1(avg(by.milkrun, x => x.ldm_week))} ldm a week, regions ${regions(by.milkrun)}. Part loads share one truck a day.</li>`);
-    if (by.crossdock.length) li.push(`<li><strong>Cross-dock (${by.crossdock.length})</strong>: average ${f1(avg(by.crossdock, x => x.ldm_week))} ldm a week and ${Math.round(avg(by.crossdock, km))} km from the plant, via ${Object.entries(hubs).map(([h, n]) => h + " (" + n + ")").join(", ")}. Long distance plus small volume: a short collection and a full line-haul beat a long part-empty run.</li>`);
-    say(`I recommend the <strong>best mix</strong>: ${eur(s.bestmix.cost_week)} and ${f1(s.bestmix.co2_t_week)} t CO2 a week, ${eur(s[bp].objective - s.bestmix.objective)} below ${LABEL[bp].toLowerCase()} on cost plus CO2 price.<ul>${li.join("")}</ul>
-      Trade-off: ${s.bestmix.trucks_week} truck trips against ${s.direct.trucks_week} for all-direct, at the price of fixed daily milk-run and hub schedules.
-      <span class="cite">Rules: per-supplier mode choice by the engine; cost allocated by load x distance on shared routes.</span>`);
-  }
-  function setSlider(key, val, label) {
-    const el = sliders[key];
-    const v = Math.max(Number(el.min), Math.min(Number(el.max), val));
-    const before = state.sum;
-    el.value = v;
-    compute();
-    say(`Set ${label} to ${key === "max_stops" ? v : "€" + v}. Best mix now ${eur(state.sum.bestmix.cost_week)} (${pct(100 * (state.sum.bestmix.cost_week - before.bestmix.cost_week) / before.bestmix.cost_week)}), ${f1(state.sum.bestmix.co2_t_week)} t CO2, ${state.sum.bestmix.trucks_week} trips.
-      <span class="cite">Mix: ${state.sum.bestmix.mode_counts.direct} direct, ${state.sum.bestmix.mode_counts.milkrun} milk-run, ${state.sum.bestmix.mode_counts.crossdock} cross-dock.</span>`);
-  }
-  function reset() {
-    sliders.fuel_index.value = 1; sliders.co2_price_t.value = 0; sliders.handling_ldm.value = 6; sliders.max_stops.value = 4;
-    state.mapDesign = "bestmix";
-    compute();
-    say("Reset to the base case: diesel index 1.00, no CO2 price, handling €6.0/ldm, 4 stops.");
-  }
-  function handle(text) {
-    const t = text.toLowerCase();
-    const num = (/(\d+(?:\.\d+)?)/.exec(t) || [])[1];
-    if (/reset|base case/.test(t)) return reset();
-    if (/explain|why|recommend/.test(t)) return intentExplain();
-    if (/compare|versus|vs\b|difference/.test(t)) return intentCompare();
-    if (/fuel|diesel/.test(t)) return intentFuel(text);
-    if (/co2|carbon/.test(t) && num) return setSlider("co2_price_t", Number(num), "the CO2 price per tonne");
-    if (/stop/.test(t) && num) return setSlider("max_stops", Math.round(Number(num)), "milk-run max stops");
-    if (/handling|cross.?dock cost/.test(t) && num) return setSlider("handling_ldm", Number(num), "cross-dock handling per ldm");
-    if (/run|scenario|calculate/.test(t)) return intentRun();
-    say("I can run a scenario, compare designs, test a diesel change (\"diesel +20%\"), set a CO2 price, handling cost or max stops, and explain the recommendation.");
-  }
-  function ask(text) { say(esc(text), "user"); handle(text); }
-
   // ---- wiring ----
   let timer = null;
   Object.values(sliders).forEach(el => el.addEventListener("input", () => { showSliderValues(); clearTimeout(timer); timer = setTimeout(compute, 120); }));
-  $("suggest").addEventListener("click", e => { const b = e.target.closest("button"); if (b) ask(b.dataset.q); });
-  $("ask").addEventListener("submit", e => { e.preventDefault(); const v = $("q").value.trim(); if (v) { ask(v); $("q").value = ""; } });
   const pick = d => { if (d) { state.mapDesign = d; render(); } };
   $("mapTabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) pick(b.dataset.d); });
-  $("results").addEventListener("click", e => { const r = e.target.closest("tr[data-d]"); if (r) pick(r.dataset.d); });
-  $("results").addEventListener("keydown", e => { const r = e.target.closest("tr[data-d]"); if (r && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pick(r.dataset.d); } });
+  $("results").addEventListener("click", e => {
+    const r = e.target.closest("tr[data-d]"); if (!r) return;
+    const refocus = !!e.target.closest(".row-btn");
+    pick(r.dataset.d);
+    if (refocus) { const b = $("results").querySelector(`tr[data-d="${r.dataset.d}"] .row-btn`); if (b) b.focus(); }
+  });
 
   compute();
-  say("Hello. I compare inbound network designs for the plant on cost, CO2 and truck movements. Pick a suggestion below or move the sliders.");
 
-  // Hash states for screenshots: #state=result | fuel | crossdock
+  // Hash state for screenshots: #state=crossdock
   const hs = (/state=([a-z]+)/.exec(location.hash) || [])[1];
-  if (hs === "result") { ask("Run a scenario"); ask("Explain the recommendation"); }
-  if (hs === "fuel") { ask("What if diesel goes up 30%?"); }
-  if (hs === "crossdock") { sliders.max_stops.value = 2; compute(); state.mapDesign = "crossdock"; render(); ask("Compare designs"); }
+  if (hs === "crossdock") { sliders.max_stops.value = 2; compute(); state.mapDesign = "crossdock"; render(); }
 
   // Parity check: JS engine vs Python baseline export
   setTimeout(() => {

@@ -1,9 +1,14 @@
 {
   "id": "02",
   "slug": "road-toll-surcharge-app",
-  "title": "Road-Toll Surcharge Recovery App",
+  "order": 7,
+  "title": "Pricing Approval App",
+  "kickerNote": "proven in logistics",
+  "impact": [
+    "cost",
+    "time"
+  ],
   "outcome": "Per-customer toll impact, a defensible surcharge and the right approver in one screen.",
-  "summary": "A new per-kilometre HGV toll hits every customer contract at once, and commercial teams need each customer's impact and an approved surcharge fast. Built a tested toll model, a Power Apps surcharge screen with margin effect, a tiered Power Automate approval and a Power BI steering dashboard.",
   "stack": [
     "Power Apps",
     "Dataverse",
@@ -12,11 +17,29 @@
     "Copilot in Power Apps",
     "Copilot Studio",
     "Python",
-    "GitHub Copilot"
+    {
+      "label": "Claude Code",
+      "ghost": true
+    },
+    {
+      "label": "GitHub Copilot",
+      "ghost": true
+    }
   ],
+  "summary": "A new per-kilometre HGV toll hits every customer contract at once, and commercial teams need each customer's impact and an approved surcharge fast. Built a tested toll model, a Power Apps surcharge screen with margin effect, a tiered Power Automate approval and a Power BI steering dashboard.",
   "cv": "Inspired by: quantified the commercial impact of the Dutch road-freight toll across more than 400,000 annual shipments and 2,400 customers, and built the customer surcharge recovery model and executive dashboard for the Commercial Steering Committee.",
-  "demo": "demos/02-road-toll-surcharge-app.html",
-  "repo": "projects/02-road-toll-surcharge-app",
+  "links": [
+    {
+      "label": "Try the demo",
+      "href": "demos/02-road-toll-surcharge-app.html"
+    },
+    {
+      "label": "Source",
+      "href": "https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/02-road-toll-surcharge-app",
+      "secondary": true,
+      "external": true
+    }
+  ],
   "cards": [
     {
       "type": "image",
@@ -78,14 +101,15 @@
     },
     {
       "type": "text",
-      "title": "GitHub Copilot ready",
-      "caption": "Code drafted with AI pair programming and verified by 20 pytest tests and a Python to JavaScript parity check. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
+      "title": "Built with Claude Code",
+      "body": "Built with Claude Code and verified by 20 pytest tests and a Python to JavaScript parity check. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
     },
     {
       "type": "demo",
       "title": "Try it",
       "caption": "Open the simulated app: pick a customer, change the recovery method, submit for approval and ask the Copilot panel to explain the impact.",
-      "href": "demos/02-road-toll-surcharge-app.html"
+      "href": "demos/02-road-toll-surcharge-app.html",
+      "cta": "Open the demo"
     }
   ]
 }

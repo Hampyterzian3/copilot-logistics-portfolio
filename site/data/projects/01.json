@@ -1,29 +1,47 @@
 {
   "id": "01",
   "slug": "tender-desk-copilot",
-  "title": "Tender Desk Copilot",
+  "order": 4,
+  "title": "Tender Gap-Check Agent",
+  "kickerNote": "proven in logistics",
+  "impact": [
+    "time",
+    "acc"
+  ],
   "outcome": "RFQ gaps found in seconds, clarification letter drafted the same day.",
-  "summary": "Solution designers lose days finding gaps in RFQ lane files and requirements before pricing can start. A Python checker with nine rules, a Power Automate flow and a Copilot Studio agent list every gap, draft the questions and propose a mode per lane.",
   "stack": [
     "Copilot Studio",
-    "Microsoft 365 Copilot",
     "Power Automate",
     "SharePoint",
     "Dataverse",
     "Azure Functions",
     "Microsoft Teams",
-    "GitHub Copilot"
+    {
+      "label": "GitHub Copilot",
+      "ghost": true
+    }
   ],
+  "summary": "Solution designers lose days finding gaps in RFQ lane files and requirements before pricing can start. A Python checker with nine rules, a Power Automate flow and a Copilot Studio agent list every gap, draft the questions and propose a mode per lane.",
   "cv": "Inspired by: tender and RFQ solution design for large multinational accounts, from data discovery through to customer presentation.",
-  "demo": "demos/01-tender-desk-copilot.html",
-  "repo": "projects/01-tender-desk-copilot",
+  "links": [
+    {
+      "label": "Try the demo",
+      "href": "demos/01-tender-desk-copilot.html"
+    },
+    {
+      "label": "Source",
+      "href": "https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/01-tender-desk-copilot",
+      "secondary": true,
+      "external": true
+    }
+  ],
   "cards": [
     {
       "type": "image",
       "title": "Every gap, with a rule and a severity",
-      "caption": "A 40-lane RFQ from a fictional shipper is checked against nine rules. The agent lists the high-severity gaps to fix before pricing.",
+      "caption": "A 40-lane RFQ from a fictional shipper is checked against nine rules. Every gap is listed with its rule, severity and affected lanes, high severity first, to fix before pricing.",
       "src": "media/01/rfq-check-result.png",
-      "alt": "Tender Desk demo showing KPI tiles, a gap list with severity tags and the agent panel listing high-severity gaps"
+      "alt": "Tender Desk demo, Gaps tab: every gap listed with its rule id, severity and affected lanes"
     },
     {
       "type": "diagram",
@@ -74,18 +92,19 @@
       "title": "Clarification letter, ready for Word",
       "caption": "Questions are grouped by theme with the affected lane ids, so Copilot in Word only has to adjust tone before the letter goes to the customer.",
       "src": "media/01/clarification-letter.png",
-      "alt": "Word-style draft letter with clarification questions grouped by theme next to the agent panel"
+      "alt": "Word-style draft letter with clarification questions grouped by theme"
     },
     {
       "type": "text",
       "title": "GitHub Copilot ready",
-      "caption": "Code drafted with AI pair programming and verified by 50 pytest tests and a Python to JavaScript parity check. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
+      "body": "Code drafted with AI pair programming and verified by 50 pytest tests and a Python to JavaScript parity check. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
     },
     {
       "type": "demo",
       "title": "Try it",
       "caption": "Pick a sample RFQ, run the check, then click through What is missing, Draft clarification email and Suggest mode per lane. Under a minute.",
-      "href": "demos/01-tender-desk-copilot.html"
+      "href": "demos/01-tender-desk-copilot.html",
+      "cta": "Open the demo"
     }
   ]
 }

@@ -1,0 +1,107 @@
+{
+  "id": "09",
+  "order": 5,
+  "title": "Baynook Parking Booking",
+  "kickerNote": "live product for mttn",
+  "outcome": "Live: staff claim a free bay in two clicks, and the database makes a double booking impossible.",
+  "stack": [
+    "React",
+    "TypeScript",
+    "Vite",
+    "Tailwind",
+    "Netlify Functions",
+    "Postgres (Neon)",
+    "Vitest + Playwright",
+    {
+      "label": "Claude Code",
+      "ghost": true
+    }
+  ],
+  "summary": "An office with a fixed pool of numbered bays needs a fair, simple way to share them. Staff see which bays are free by day, week or on a map, claim one and add it to their calendar. Admins manage bays, people, fixed holders and rules, and reception gets a read-only board of who parks where.",
+  "cv": "Product built for mttn (Mitten Digital Solutions LLC), running as a public demo with one-click Staff, Admin and Reception sign-in.",
+  "links": [
+    {
+      "label": "Try the demo",
+      "href": "https://baynook.netlify.app",
+      "external": true
+    }
+  ],
+  "cards": [
+    {
+      "type": "image",
+      "title": "Pick a free bay",
+      "caption": "The staff day view: free bays, taken bays with the colleague's name, EV charge points and reserved fixed holders. Demo office, fictional names.",
+      "src": "media/09/book-day.webp",
+      "alt": "Book a bay day view: 18 of 30 bays free, taken bays show who has them, EV bays and fixed holders marked"
+    },
+    {
+      "type": "image",
+      "title": "Admin overview",
+      "caption": "Free today, week peak, 30-day occupancy, busiest weekday and the booking mix of staff, fixed bays and visitors.",
+      "src": "media/09/admin-overview.webp",
+      "alt": "Admin overview with free bays today, week peak, 30-day occupancy, cancellation rate, occupancy by weekday and booking mix"
+    },
+    {
+      "type": "diagram",
+      "title": "Architecture",
+      "caption": "A React app and Netlify Functions on one origin over Postgres on Neon. Sessions are a signed cookie the browser never reads, and the app calls no other site.",
+      "src": "media/09/architecture.svg",
+      "alt": "Architecture diagram: three roles, React single-page app, Netlify Functions and Postgres on Neon, the rules guaranteed by design and the outputs"
+    },
+    {
+      "type": "code",
+      "title": "No double bookings, by design",
+      "caption": "The two hard rules live in the database. If two people click the same bay at once, exactly one wins; the app turns the other into a clear message.",
+      "lang": "sql",
+      "code": "-- Rule 1: a bay can hold at most one live booking on a date.\ncreate unique index bookings_space_date_live_idx\n  on bookings (space_id, booking_date) where status <> 'cancelled';\n-- Rule 2: one live booking per user per date FOR THEMSELVES.\ncreate unique index bookings_user_date_live_idx\n  on bookings (user_id, booking_date)\n  where status <> 'cancelled' and booked_for = 'self';"
+    },
+    {
+      "type": "metric",
+      "title": "Engineering discipline",
+      "caption": "Counted from the repository: unit, API and end-to-end tests (Vitest and Playwright), Netlify Functions and database migrations. Fonts are self-hosted, so the app loads nothing from other sites.",
+      "metrics": [
+        {
+          "value": "189",
+          "label": "automated tests"
+        },
+        {
+          "value": "12",
+          "label": "serverless functions"
+        },
+        {
+          "value": "6",
+          "label": "SQL migrations"
+        },
+        {
+          "value": "0",
+          "label": "off-origin requests"
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "title": "Book a bay",
+      "caption": "Seven seconds of the live demo: pick a bay, confirm, add it to the calendar.",
+      "description": {
+        "summary": "Text description of the video",
+        "id": "v09-desc",
+        "text": "Silent, 7 seconds. 0:00 A staff member is on Book a bay, day view, with free bays outlined and taken bays filled in with colleagues' names. 0:02 The pointer moves to bay 120, which is free, and clicks it. 0:03 A side panel opens for bay 120 with the date and a choice to book it for myself or a visitor. 0:05 The pointer clicks Confirm booking. 0:06 A confirmation page reads Bay booked, shows bay 120 and the date, and offers Add to calendar."
+      },
+      "src": "media/09/clip-book.mp4",
+      "poster": "media/09/clip-book-poster.webp",
+      "alt": "Book a bay"
+    },
+    {
+      "type": "text",
+      "title": "Built with Claude Code",
+      "body": "Built with Claude Code from a written brief. The repo keeps its agent instructions, architecture notes and changelog, and a change is only done once types check and the relevant unit, API or end-to-end tests pass."
+    },
+    {
+      "type": "demo",
+      "title": "Try it",
+      "caption": "Sign in with one click as Staff, Admin or Reception in a fictional 30-bay office. The demo data resets every night.",
+      "href": "https://baynook.netlify.app",
+      "cta": "Open the live demo"
+    }
+  ]
+}

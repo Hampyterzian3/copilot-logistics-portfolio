@@ -1,21 +1,43 @@
 {
   "id": "05",
   "slug": "kpi-briefing-copilot",
-  "title": "Executive KPI Briefing Copilot",
+  "order": 2,
+  "title": "Executive Briefing Agent",
+  "kickerNote": "proven in logistics",
+  "impact": [
+    "acc",
+    "time"
+  ],
   "outcome": "Monday account brief drafted from one governed dataset, every sentence traced to a number.",
-  "summary": "Leadership had dashboards but not the story, and analysts wrote the weekly account brief by hand. Built a variance engine with materiality ranking over a Power BI semantic model and an agent that drafts the brief, slide outline and Teams post for analyst approval.",
   "stack": [
     "Power BI",
     "Power Automate",
     "Copilot Studio",
-    "Microsoft 365 Copilot",
     "Dataverse",
     "Teams",
-    "GitHub Copilot"
+    {
+      "label": "Claude Code",
+      "ghost": true
+    },
+    {
+      "label": "GitHub Copilot",
+      "ghost": true
+    }
   ],
+  "summary": "Leadership had dashboards but not the story, and analysts wrote the weekly account brief by hand. Built a variance engine with materiality ranking over a Power BI semantic model and an agent that drafts the brief, slide outline and Teams post for analyst approval.",
   "cv": "Inspired by: executive Power BI dashboards consolidating the top six global customers into a single KPI view, and governed single-source datasets replacing fragmented reporting.",
-  "demo": "demos/05-kpi-briefing-copilot.html",
-  "repo": "projects/05-kpi-briefing-copilot",
+  "links": [
+    {
+      "label": "Try the demo",
+      "href": "demos/05-kpi-briefing-copilot.html"
+    },
+    {
+      "label": "Source",
+      "href": "https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/05-kpi-briefing-copilot",
+      "secondary": true,
+      "external": true
+    }
+  ],
   "cards": [
     {
       "type": "image",
@@ -33,10 +55,10 @@
     },
     {
       "type": "image",
-      "title": "Why did margin move?",
-      "caption": "The agent splits a margin change into a rate effect and a cost effect from pooled revenue and cost per shipment. For the seeded Fabrikam Steel dip it points to cost to serve.",
-      "src": "media/05/02-margin-question.png",
-      "alt": "Variance table, Word-style brief and the agent explaining a margin drop for Fabrikam Steel in 2026-W32"
+      "title": "Every sentence has a source",
+      "caption": "The weekly brief is drafted from the flagged variances only. Each sentence carries source tags that open the measure and number behind it.",
+      "src": "media/05/02-weekly-brief.png",
+      "alt": "Word-style weekly account brief with a headline, three things that matter, customer callouts and blue source tags on every sentence"
     },
     {
       "type": "code",
@@ -73,18 +95,19 @@
       "title": "Slides and approval",
       "caption": "The same facts produce a five-slide outline for PowerPoint and a Teams post that is only released after an analyst approves.",
       "src": "media/05/03-slides-teams.png",
-      "alt": "Five-slide outline cards and the agent confirming analyst approval for 2026-W35"
+      "alt": "Slide outline tab with five slide cards built from the same facts as the brief"
     },
     {
       "type": "text",
-      "title": "GitHub Copilot ready",
-      "caption": "Code drafted with AI pair programming and verified by 17 pytest tests, including a check that every sentence in the brief traces to a number. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
+      "title": "Built with Claude Code",
+      "body": "Built with Claude Code and verified by 17 pytest tests, including a check that every sentence in the brief traces to a number. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
     },
     {
       "type": "demo",
       "title": "Try it",
       "caption": "Pick a week, click a source tag to see its DAX measure, ask why margin moved, build the slide outline and approve the Teams post.",
-      "href": "demos/05-kpi-briefing-copilot.html"
+      "href": "demos/05-kpi-briefing-copilot.html",
+      "cta": "Open the demo"
     }
   ]
 }

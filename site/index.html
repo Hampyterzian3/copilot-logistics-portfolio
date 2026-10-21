@@ -1,55 +1,288 @@
 <!doctype html>
-<html lang="en-GB">
+<html lang="en-GB" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hampy Terzian, AI automation</title>
-<meta name="description" content="Eight AI automation projects for logistics and operations, built on Microsoft 365 Copilot, Copilot Studio, Power Platform and GitHub Copilot.">
+<title>Hampy Terzian | AI solutions: more with less</title>
+<meta name="description" content="AI agents and automations that raise accuracy, save time and cut cost. Nine working projects built with Copilot Studio, Power Platform, Python and Claude Code.">
 <meta name="theme-color" content="#0c2c23">
 <link rel="icon" href="assets/brand/hampy-favicon-64.png">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Hampy Terzian, AI automation for logistics">
-<meta property="og:description" content="Eight projects on the Microsoft AI stack: Copilot Studio agents, Power Platform apps and flows, and tested code in GitHub Copilot-ready repos.">
-<meta property="og:image" content="https://hampy-portfolio.netlify.app/assets/brand/og.png">
-<meta property="og:url" content="https://hampy-portfolio.netlify.app/">
+<meta property="og:title" content="Hampy Terzian: more with less, AI solutions for accuracy, time and cost">
+<meta property="og:description" content="Nine working AI projects: Copilot Studio agents, Power Platform apps and flows, and tested code built with Claude Code and GitHub Copilot-ready repos.">
+<meta property="og:image" content="https://hampy-ai.netlify.app/assets/brand/og.png">
+<meta property="og:url" content="https://hampy-ai.netlify.app/">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="assets/css/tokens.css?v=mvh4uumz">
-<link rel="stylesheet" href="assets/css/site.css?v=mvh4uumz">
+<link rel="stylesheet" href="assets/css/tokens.css?v=th20261021m">
+<link rel="stylesheet" href="assets/css/site.css?v=th20261021m">
+<script src="assets/js/theme.js?v=th20261021m"></script>
 </head>
 <body>
-<a class="skip" href="#p01">Skip to projects</a>
+<a class="skip" href="#trust">Skip to content</a>
 <header class="topbar">
-  <a href="#top" class="brand"><img src="assets/brand/hampy-logo-offwhite.svg" alt="hampy" height="24"></a>
+  <a href="#top" class="brand"><img class="logo-dark" src="assets/brand/hampy-logo-offwhite.svg" alt="hampy" height="24"><img class="logo-light" src="assets/brand/hampy-logo.svg" alt="hampy" height="24"></a>
   <span class="where" aria-live="polite"></span>
-  <a class="btn small" href="#contact">Work with me</a>
+  <a class="btn small" href="#contact">Contact</a>
+  <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false" aria-label="Dark mode" title="Switch to dark mode"><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
 </header>
 <nav class="rail" aria-label="Sections"><ol>
-  <li><a href="#top"><span>Intro</span></a></li><li><a href="#p01"><span>Tender Desk Copilot</span></a></li><li><a href="#p02"><span>Road-Toll Surcharge Recovery App</span></a></li><li><a href="#p03"><span>Network Scenario Agent</span></a></li><li><a href="#p04"><span>Inbound Risk Early-Warning Agent</span></a></li><li><a href="#p05"><span>Executive KPI Briefing Copilot</span></a></li><li><a href="#p06"><span>AI Brand Theme Systems</span></a></li><li><a href="#p07"><span>Document Data-Extraction Models</span></a></li><li><a href="#p08"><span>Live Wedding Website with AI Photo Album</span></a></li>
+  <li><a href="#top"><span>Intro</span></a></li><li><a href="#trust"><span>How I build</span></a></li><li><a href="#p01"><span>Invoice Intake Agent</span></a></li><li><a href="#p02"><span>Executive Briefing Agent</span></a></li><li><a href="#p03"><span>Early-Warning Risk Agent</span></a></li><li><a href="#p04"><span>Tender Gap-Check Agent</span></a></li><li><a href="#p05"><span>Baynook Parking Booking</span></a></li><li><a href="#p06"><span>Network Scenario Agent</span></a></li><li><a href="#p07"><span>Pricing Approval App</span></a></li><li><a href="#p08"><span>Private Photo Platform</span></a></li><li><a href="#p09"><span>AI Brand Theme Systems</span></a></li>
   <li><a href="#contact"><span>Contact</span></a></li>
 </ol></nav>
 <main class="snap" id="snap">
 <section class="panel hero" id="top" data-title="Intro" aria-labelledby="hero-h">
   <div class="panel-in">
-    <p class="kicker">Freelance AI automation consultant · Amsterdam</p>
-    <h1 id="hero-h">AI that does the <em>logistics</em> paperwork.</h1>
-    <p class="lede">Eight projects built on the Microsoft AI stack. Copilot Studio agents, Power Platform apps and flows, and tested code in GitHub Copilot-ready repos, each grounded in a real problem from a decade in freight forwarding and contract logistics.</p>
-    <ul class="stack big" aria-label="Microsoft stack"><li class="chip">Microsoft 365 Copilot</li><li class="chip">Copilot Studio</li><li class="chip">Power Apps</li><li class="chip">Power Automate</li><li class="chip">Dataverse</li><li class="chip">Power BI</li><li class="chip">AI Builder</li><li class="chip">GitHub Copilot</li></ul>
+    <div class="intro">
+      <div class="intro-text">
+        <p class="kicker">Hampy Terzian · AI solutions · Amsterdam</p>
+        <h1 id="hero-h">More with <em>less</em>.</h1>
+        <p class="value">AI agents that raise accuracy, save time and cut cost, with people in control of every decision that matters.</p>
+        <p class="bio">I am Hampy Terzian. I design and build AI agents and automations that take on repetitive, rule-heavy work: reading documents, checking them against controls, flagging risk and drafting the next step for a person to approve. I bring ten years of turning messy operational data into decisions, an industrial engineering background and an MIT MicroMasters. I proved this work in logistics; the patterns carry to any regulated business.</p>
+      </div>
+      <img class="portrait" src="assets/brand/hampy-portrait-480.jpg" srcset="assets/brand/hampy-portrait-480.jpg 480w, assets/brand/hampy-portrait-960.jpg 960w" sizes="(max-width: 640px) 112px, 300px" width="480" height="480" alt="Portrait of Hampy Terzian">
+    </div>
+    <ul class="pillars" aria-label="What every project is measured on">
+      <li class="pillar p-acc"><span class="p-h">Accuracy</span><span class="p-t">All 8 planted errors in a 50-invoice synthetic test stopped, none wrongly approved.</span></li>
+      <li class="pillar p-time"><span class="p-h">Time</span><span class="p-t">50 invoices checked in 1.4 seconds; tender gaps found in seconds, not days.</span></li>
+      <li class="pillar p-cost"><span class="p-h">Cost</span><span class="p-t">142 of 150 minutes of manual keying removed per 50-invoice batch; people review only the exceptions.</span></li>
+    </ul>
+    <ul class="stack big" aria-label="Tools"><li class="chip">Copilot Studio</li><li class="chip">Power Apps</li><li class="chip">Power Automate</li><li class="chip">Power BI</li><li class="chip">Python</li><li class="chip">Claude Code</li><li class="chip">Codex</li><li class="chip">GitHub Copilot</li></ul>
     <div class="hero-grid">
-      <a class="hero-tile" href="#p01"><span class="ht-n">01</span><span class="ht-t">Tender Desk Copilot</span></a><a class="hero-tile" href="#p02"><span class="ht-n">02</span><span class="ht-t">Road-Toll Surcharge Recovery App</span></a><a class="hero-tile" href="#p03"><span class="ht-n">03</span><span class="ht-t">Network Scenario Agent</span></a><a class="hero-tile" href="#p04"><span class="ht-n">04</span><span class="ht-t">Inbound Risk Early-Warning Agent</span></a><a class="hero-tile" href="#p05"><span class="ht-n">05</span><span class="ht-t">Executive KPI Briefing Copilot</span></a><a class="hero-tile" href="#p06"><span class="ht-n">06</span><span class="ht-t">AI Brand Theme Systems</span></a><a class="hero-tile" href="#p07"><span class="ht-n">07</span><span class="ht-t">Document Data-Extraction Models</span></a><a class="hero-tile" href="#p08"><span class="ht-n">08</span><span class="ht-t">Live Wedding Website with AI Photo Album</span></a>
+      <a class="hero-tile" href="#p01"><span class="ht-n">01</span><span class="ht-t">Invoice Intake Agent</span></a><a class="hero-tile" href="#p02"><span class="ht-n">02</span><span class="ht-t">Executive Briefing Agent</span></a><a class="hero-tile" href="#p03"><span class="ht-n">03</span><span class="ht-t">Early-Warning Risk Agent</span></a><a class="hero-tile" href="#p04"><span class="ht-n">04</span><span class="ht-t">Tender Gap-Check Agent</span></a><a class="hero-tile" href="#p05"><span class="ht-n">05</span><span class="ht-t">Baynook Parking Booking</span></a><a class="hero-tile" href="#p06"><span class="ht-n">06</span><span class="ht-t">Network Scenario Agent</span></a><a class="hero-tile" href="#p07"><span class="ht-n">07</span><span class="ht-t">Pricing Approval App</span></a><a class="hero-tile" href="#p08"><span class="ht-n">08</span><span class="ht-t">Private Photo Platform</span></a><a class="hero-tile" href="#p09"><span class="ht-n">09</span><span class="ht-t">AI Brand Theme Systems</span></a>
     </div>
     <p class="cue" aria-hidden="true">Scroll <span>&darr;</span> one project per screen, swipe each roll <span>&rarr;</span></p>
   </div>
 </section>
 
-<section class="panel project" id="p01" data-title="Tender Desk Copilot" aria-labelledby="t01">
+<section class="panel trust" id="trust" data-title="How I build" aria-labelledby="trust-h">
+  <div class="panel-in">
+    <p class="kicker">Method</p>
+    <h2 id="trust-h">How I build agents a bank can trust</h2>
+    <ul class="trust-grid">
+      <li><svg class="t-ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path class="i-ink" d="M1 1h14v1h-14zM1 2h1v1h-1zM14 2h1v1h-1zM1 3h1v1h-1zM14 3h1v1h-1zM1 4h1v1h-1zM7 4h6v1h-6zM14 4h1v1h-1zM1 5h1v1h-1zM14 5h1v1h-1zM1 6h1v1h-1zM14 6h1v1h-1zM1 7h1v1h-1zM14 7h1v1h-1zM1 8h1v1h-1zM7 8h6v1h-6zM14 8h1v1h-1zM1 9h1v1h-1zM14 9h1v1h-1zM1 10h1v1h-1zM14 10h1v1h-1zM1 11h1v1h-1zM14 11h1v1h-1zM1 12h1v1h-1zM7 12h6v1h-6zM14 12h1v1h-1zM1 13h1v1h-1zM14 13h1v1h-1zM1 14h14v1h-14z"/><path class="i-acc" d="M5 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM3 5h1v1h-1zM5 7h1v1h-1zM2 8h1v1h-1zM4 8h1v1h-1zM3 9h1v1h-1zM5 11h1v1h-1zM2 12h1v1h-1zM4 12h1v1h-1zM3 13h1v1h-1z"/></svg><span class="t-h">Rules decide, AI explains</span><span class="t-t">Thresholds, checks and approval tiers run as tested, deterministic code. The agent calls those tools and reports what they return; it never computes the answer itself.</span></li>
+      <li><svg class="t-ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path class="i-ink" d="M3 1h4v1h-4zM2 2h6v1h-6zM2 3h6v1h-6zM2 4h6v1h-6zM3 5h4v1h-4zM2 7h6v1h-6zM1 8h8v1h-8zM1 9h8v1h-8zM1 10h8v1h-8zM1 11h8v1h-8zM1 12h8v1h-8zM1 13h8v1h-8zM1 14h8v1h-8z"/><path class="i-acc" d="M15 9h1v1h-1zM14 10h2v1h-2zM10 11h1v1h-1zM13 11h2v1h-2zM10 12h4v1h-4zM11 13h2v1h-2z"/></svg><span class="t-h">People approve</span><span class="t-t">Nothing is posted, released or priced without a person. Approval steps, tiers and exception queues keep every consequential decision with someone accountable.</span></li>
+      <li><svg class="t-ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path class="i-ink" d="M1 1h9v1h-9zM1 2h1v1h-1zM9 2h2v1h-2zM1 3h1v1h-1zM3 3h5v1h-5zM10 3h2v1h-2zM1 4h1v1h-1zM11 4h1v1h-1zM1 5h1v1h-1zM3 5h7v1h-7zM11 5h1v1h-1zM1 6h1v1h-1zM11 6h1v1h-1zM1 7h1v1h-1zM3 7h4v1h-4zM1 8h1v1h-1zM1 9h1v1h-1zM1 10h1v1h-1zM1 11h1v1h-1zM1 12h1v1h-1zM1 13h7v1h-7z"/><path class="i-acc" d="M9 8h5v1h-5zM8 9h1v1h-1zM11 9h1v1h-1zM14 9h1v1h-1zM7 10h1v1h-1zM11 10h1v1h-1zM15 10h1v1h-1zM7 11h1v1h-1zM11 11h3v1h-3zM15 11h1v1h-1zM7 12h1v1h-1zM15 12h1v1h-1zM8 13h1v1h-1zM14 13h1v1h-1zM9 14h5v1h-5z"/></svg><span class="t-h">Every decision traceable</span><span class="t-t">Decisions are logged with who, when and why, and every statement the agent makes traces back to a number in the data.</span></li>
+      <li><svg class="t-ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path class="i-ink" d="M6 1h4v1h-4zM4 2h8v1h-8zM2 3h12v1h-12zM2 4h1v1h-1zM13 4h1v1h-1zM2 5h1v1h-1zM13 5h1v1h-1zM2 6h1v1h-1zM13 6h1v1h-1zM2 7h1v1h-1zM13 7h1v1h-1zM2 8h1v1h-1zM13 8h1v1h-1zM2 9h1v1h-1zM13 9h1v1h-1zM2 10h1v1h-1zM13 10h1v1h-1zM3 11h1v1h-1zM12 11h1v1h-1zM4 12h1v1h-1zM11 12h1v1h-1zM5 13h1v1h-1zM10 13h1v1h-1zM6 14h4v1h-4z"/><path class="i-acc" d="M12 5h1v1h-1zM11 6h2v1h-2zM4 7h1v1h-1zM10 7h2v1h-2zM4 8h2v1h-2zM9 8h2v1h-2zM5 9h2v1h-2zM8 9h2v1h-2zM6 10h3v1h-3zM7 11h1v1h-1z"/></svg><span class="t-h">Tested and private by design</span><span class="t-t">Automated tests cover the rules and their edge cases before anything ships. Demos run on fictional companies and generated data, and personal data stays behind a single access rule.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="panel project" id="p01" data-title="Invoice Intake Agent" aria-labelledby="t01">
   <div class="panel-in">
     <header class="ph">
       <div class="ph-num" aria-hidden="true">01</div>
       <div class="ph-main">
-        <p class="kicker">Project 1 of 8</p>
-        <h2 id="t01">Tender Desk Copilot</h2>
+        <p class="kicker">Project 1 of 9</p>
+        <h2 id="t01">Invoice Intake Agent</h2>
+        <ul class="impact" aria-label="Impact"><li class="imp i-acc">Accuracy</li><li class="imp i-time">Time</li><li class="imp i-cost">Cost</li></ul>
+        <p class="outcome">50 synthetic invoices checked in 1.4 s: all 8 planted errors stopped, none wrongly approved, 142 of 150 keying minutes removed.</p>
+        <ul class="stack" aria-label="Stack"><li class="chip">Python</li><li class="chip">Anthropic SDK</li><li class="chip">pdfplumber</li><li class="chip">SQLite</li><li class="chip">Streamlit</li><li class="chip">Power Automate</li><li class="chip">Dataverse</li><li class="chip">Copilot Studio</li></ul>
+      </div>
+      <div class="ph-side">
+        <p class="summary">Accounts payable teams key supplier invoices by hand at about three minutes each. I built a Python agent that reads PDF invoices, checks them against vendor and PO master data, and only sends exceptions to a person, then mapped it to AI Builder, Power Automate, Dataverse and Copilot Studio. The benchmark uses the rule-based reader; the Claude extraction path was not part of that run.</p>
+        <p class="cv">Inspired by: P&amp;O integration analytics into governed single-source datasets.</p>
+        <div class="links"><a class="btn" href="demos/07-document-extraction.html">Try the demo</a><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/07-document-extraction" target="_blank" rel="noopener">Source</a></div>
+      </div>
+    </header>
+    <div class="roll" data-roll role="region" aria-roledescription="carousel" aria-label="Invoice Intake Agent snippets">
+      <ul class="roll-track" tabindex="0" aria-label="Invoice Intake Agent snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: One click, 50 invoices">
+    <a class="m m-img" href="media/07/run-intake.png" target="_blank" rel="noopener">
+      <img src="media/07/run-intake.png" alt="Invoice intake app showing 50 processed invoices, outcome chart and reasons chart" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">01</span>One click, 50 invoices</h3><p class="cap">The built Streamlit app after a run: 42 auto-approved, 8 sent for review, and why each one needed a person.</p></div>
+  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="2 of 8: Exception queue with reasons">
+    <a class="m m-img" href="media/07/exception-queue.png" target="_blank" rel="noopener">
+      <img src="media/07/exception-queue.png" alt="Exception queue listing an unknown vendor, a PO that does not exist and an amount that differs from the PO" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">02</span>Exception queue with reasons</h3><p class="cap">Reviewers only see exceptions, each with the reason in plain words and approve or reject with a comment.</p></div>
+  </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="3 of 8: Architecture">
+    <a class="m m-img m-diagram" href="media/07/architecture.svg" target="_blank" rel="noopener">
+      <img src="media/07/architecture.svg" alt="Architecture diagram of the Python invoice intake pipeline and its Power Platform mapping" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">03</span>Architecture</h3><p class="cap">Top: the built Python pipeline. Bottom: the same steps mapped to SharePoint, AI Builder, Power Automate, Dataverse, Teams and Copilot Studio (design, not deployed).</p></div>
+  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="4 of 8: Deterministic PO controls">
+    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>python</em></div><pre tabindex="0"><code>    if not f.po_number:
+        reasons.append((&quot;MISSING_PO&quot;, &quot;No purchase order reference on the invoice&quot;))
+    elif f.po_number not in md.pos:
+        reasons.append((&quot;PO_NOT_FOUND&quot;, f&quot;{f.po_number} does not exist&quot;))
+    else:
+        po = md.pos[f.po_number]
+        if vid and po[&quot;vendor_id&quot;] != vid:
+            reasons.append((&quot;PO_VENDOR_MISMATCH&quot;, f&quot;{f.po_number} belongs to vendor {po['vendor_id']}, not {vid}&quot;))
+        if f.net_amount is not None:
+            diff = (f.net_amount - po[&quot;net_amount&quot;]) / po[&quot;net_amount&quot;]
+            if abs(diff) &gt; rules.amount_tolerance:
+                reasons.append((&quot;AMOUNT_MISMATCH&quot;, f&quot;Net {f.net_amount:,.2f} vs PO {po['net_amount']:,.2f} ({diff:+.1%})&quot;))</code></pre></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">04</span>Deterministic PO controls</h3><p class="cap">Real excerpt from intake/validate.py. Extraction can use AI; approval decisions stay rule-based and explainable.</p></div>
+  </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: Benchmark on 50 synthetic invoices">
+    <div class="m m-metric"><div class="metric"><span class="mv">8/8</span><span class="ml">seeded errors caught</span></div><div class="metric"><span class="mv">0</span><span class="ml">false approvals</span></div><div class="metric"><span class="mv">50/50</span><span class="ml">key fields exact</span></div><div class="metric"><span class="mv">142 min</span><span class="ml">keying saved of 150</span></div></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">05</span>Benchmark on 50 synthetic invoices</h3><p class="cap">Re-run offline with the rule-based reader across three layouts. Synthetic data; real supplier documents will differ.</p></div>
+  </li><li class="shot shot-video" aria-roledescription="slide" aria-label="6 of 8: Watch the run">
+    <div class="m m-video"><video src="media/07/clip.mp4" poster="media/07/clip-poster.jpg" muted playsinline loop controls preload="none" aria-label="Watch the run" aria-describedby="v07-desc"></video></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">06</span>Watch the run</h3><p class="cap">28 seconds from the demo video: the inbox, one click, and the results with reasons.</p><details class="vdesc"><summary>Text description of the video</summary><p id="v07-desc">Silent, 28 seconds, with on-screen captions. 0:00 The Invoice intake agent app shows an empty run: 0 invoices processed. Caption: "Here is the inbox: fifty synthetic invoices in three different layouts, with a few deliberate errors hidden inside." 0:08 The user clicks Run intake. Caption: "One click." 0:09 The tiles fill in: 50 processed, 84% auto-approved, 8 waiting for review, 2.4 hours saved, with a bar chart of outcomes and of why invoices need a person. Caption: "Fifty invoices are read and checked in under two seconds. By hand, that is about two and a half hours of keying." 0:16 Caption: "Forty two passed every control and were approved automatically." 0:20 The exception queue is shown. Caption: "Eight need a person, and the agent says why: an amount that differs from the purchase order, an unknown vendor, a duplicate, or wrong VAT."</p></details></div>
+  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: AI pair programming">
+    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Developed with AI pair programming, not GitHub Copilot. The benchmark figures come from a fresh run of the original build. The Power Platform version is a written design and has not been deployed.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">07</span>AI pair programming</h3></div>
+  </li><li class="shot shot-demo" aria-roledescription="slide" aria-label="8 of 8: Try it">
+    <div class="m m-demo"><img src="assets/brand/hampy-agent-icon.png" alt="" width="72" height="72">
+      <a class="btn" href="demos/07-document-extraction.html">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">08</span>Try it</h3><p class="cap">Run a simulated intake on 12 of the app's invoices, see field confidence and every check, release an exception through the assistant and watch the audit trail.</p></div>
+  </li></ul>
+      <div class="roll-ctl">
+        <button class="rb prev" type="button" aria-label="Previous snippet">&larr;</button>
+        <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <span class="count" aria-live="polite">1 / 8</span>
+        <button class="rb next" type="button" aria-label="Next snippet">&rarr;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel project" id="p02" data-title="Executive Briefing Agent" aria-labelledby="t02">
+  <div class="panel-in">
+    <header class="ph">
+      <div class="ph-num" aria-hidden="true">02</div>
+      <div class="ph-main">
+        <p class="kicker">Project 2 of 9 · proven in logistics</p>
+        <h2 id="t02">Executive Briefing Agent</h2>
+        <ul class="impact" aria-label="Impact"><li class="imp i-acc">Accuracy</li><li class="imp i-time">Time</li></ul>
+        <p class="outcome">Monday account brief drafted from one governed dataset, every sentence traced to a number.</p>
+        <ul class="stack" aria-label="Stack"><li class="chip">Power BI</li><li class="chip">Power Automate</li><li class="chip">Copilot Studio</li><li class="chip">Dataverse</li><li class="chip">Teams</li><li class="chip ghost">Claude Code</li><li class="chip ghost">GitHub Copilot</li></ul>
+      </div>
+      <div class="ph-side">
+        <p class="summary">Leadership had dashboards but not the story, and analysts wrote the weekly account brief by hand. Built a variance engine with materiality ranking over a Power BI semantic model and an agent that drafts the brief, slide outline and Teams post for analyst approval.</p>
+        <p class="cv">Inspired by: executive Power BI dashboards consolidating the top six global customers into a single KPI view, and governed single-source datasets replacing fragmented reporting.</p>
+        <div class="links"><a class="btn" href="demos/05-kpi-briefing-copilot.html">Try the demo</a><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/05-kpi-briefing-copilot" target="_blank" rel="noopener">Source</a></div>
+      </div>
+    </header>
+    <div class="roll" data-roll role="region" aria-roledescription="carousel" aria-label="Executive Briefing Agent snippets">
+      <ul class="roll-track" tabindex="0" aria-label="Executive Briefing Agent snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: Dashboard to story">
+    <a class="m m-img" href="media/05/01-weekly-view.png" target="_blank" rel="noopener">
+      <img src="media/05/01-weekly-view.png" alt="Weekly view with portfolio KPI tiles and customer sparklines for week 2026-W39" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">01</span>Dashboard to story</h3><p class="cap">Six fictional top customers over 26 weeks: KPI tiles, hand-built sparklines with the eight-week baseline window, and only the variances that pass both threshold and z-score gates.</p></div>
+  </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="2 of 8: Architecture">
+    <a class="m m-img m-diagram" href="media/05/architecture.svg" target="_blank" rel="noopener">
+      <img src="media/05/architecture.svg" alt="Architecture from Power BI semantic model through Power Automate, Dataverse and Copilot Studio to Word, PowerPoint and an approved Teams post" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">02</span>Architecture</h3><p class="cap">A certified Power BI semantic model feeds a Monday Power Automate flow. Copilot Studio and Microsoft 365 Copilot draft in Word, PowerPoint and Teams; an analyst approves before release.</p></div>
+  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="3 of 8: Every sentence has a source">
+    <a class="m m-img" href="media/05/02-weekly-brief.png" target="_blank" rel="noopener">
+      <img src="media/05/02-weekly-brief.png" alt="Word-style weekly account brief with a headline, three things that matter, customer callouts and blue source tags on every sentence" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">03</span>Every sentence has a source</h3><p class="cap">The weekly brief is drafted from the flagged variances only. Each sentence carries source tags that open the measure and number behind it.</p></div>
+  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="4 of 8: No claim without data">
+    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>python</em></div><pre tabindex="0"><code>    for s in sentences:
+        if not s[&quot;refs&quot;]:
+            problems.append(f&quot;no refs: {s['text']}&quot;)
+            continue
+        missing = [r for r in s[&quot;refs&quot;] if r not in book.facts]
+        if missing:
+            problems.append(f&quot;unknown refs {missing}: {s['text']}&quot;)
+            continue
+        allowed = set()
+        for r in s[&quot;refs&quot;]:
+            for d in book.displays(r):
+                allowed |= number_tokens(d)
+        stray = number_tokens(s[&quot;text&quot;]) - allowed
+        if stray:
+            problems.append(f&quot;unsupported numbers {sorted(stray)}: {s['text']}&quot;)</code></pre></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">04</span>No claim without data</h3><p class="cap">Every sentence carries fact refs. The validator rejects a sentence with no source, an unknown source, or any number that is not in its referenced facts.</p></div>
+  </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: Result on synthetic data">
+    <div class="m m-metric"><div class="metric"><span class="mv">756</span><span class="ml">customer x KPI checks</span></div><div class="metric"><span class="mv">20</span><span class="ml">flagged variances</span></div><div class="metric"><span class="mv">420</span><span class="ml">sentences, all traced</span></div><div class="metric"><span class="mv">17</span><span class="ml">pytest tests passing</span></div></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">05</span>Result on synthetic data</h3><p class="cap">Computed by src/briefing.py over 18 briefed weeks. All three seeded events ranked first in their weeks; no quiet week raised a High flag.</p></div>
+  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="6 of 8: Slides and approval">
+    <a class="m m-img" href="media/05/03-slides-teams.png" target="_blank" rel="noopener">
+      <img src="media/05/03-slides-teams.png" alt="Slide outline tab with five slide cards built from the same facts as the brief" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">06</span>Slides and approval</h3><p class="cap">The same facts produce a five-slide outline for PowerPoint and a Teams post that is only released after an analyst approves.</p></div>
+  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: Built with Claude Code">
+    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Built with Claude Code and verified by 17 pytest tests, including a check that every sentence in the brief traces to a number. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">07</span>Built with Claude Code</h3></div>
+  </li><li class="shot shot-demo" aria-roledescription="slide" aria-label="8 of 8: Try it">
+    <div class="m m-demo"><img src="assets/brand/hampy-agent-icon.png" alt="" width="72" height="72">
+      <a class="btn" href="demos/05-kpi-briefing-copilot.html">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">08</span>Try it</h3><p class="cap">Pick a week, click a source tag to see its DAX measure, ask why margin moved, build the slide outline and approve the Teams post.</p></div>
+  </li></ul>
+      <div class="roll-ctl">
+        <button class="rb prev" type="button" aria-label="Previous snippet">&larr;</button>
+        <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <span class="count" aria-live="polite">1 / 8</span>
+        <button class="rb next" type="button" aria-label="Next snippet">&rarr;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel project" id="p03" data-title="Early-Warning Risk Agent" aria-labelledby="t03">
+  <div class="panel-in">
+    <header class="ph">
+      <div class="ph-num" aria-hidden="true">03</div>
+      <div class="ph-main">
+        <p class="kicker">Project 3 of 9 · proven in logistics</p>
+        <h2 id="t03">Early-Warning Risk Agent</h2>
+        <ul class="impact" aria-label="Impact"><li class="imp i-acc">Accuracy</li><li class="imp i-time">Time</li></ul>
+        <p class="outcome">Critical alerts 97% precise; at-risk-or-above alerts catch 49% of late shipments (backtest, synthetic data).</p>
+        <ul class="stack" aria-label="Stack"><li class="chip">Copilot Studio</li><li class="chip">Power Automate</li><li class="chip">Azure Functions</li><li class="chip">Dataverse</li><li class="chip">Microsoft Teams</li><li class="chip">Power BI</li><li class="chip ghost">GitHub Copilot</li></ul>
+      </div>
+      <div class="ph-side">
+        <p class="summary">Delayed or lost inbound shipments were noticed too late, often by the customer. A transparent 0-100 risk score with plain-word reasons, Teams alerts and a Copilot Studio agent warns the control tower while there is still time to act.</p>
+        <p class="cv">Inspired by: inbound-risk dashboard sustaining 99% on-time through COVID-19; lost-shipment postcode analysis cutting lost shipments 64%.</p>
+        <div class="links"><a class="btn" href="demos/04-inbound-risk-agent.html">Try the demo</a><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/04-inbound-risk-agent" target="_blank" rel="noopener">Source</a></div>
+      </div>
+    </header>
+    <div class="roll" data-roll role="region" aria-roledescription="carousel" aria-label="Early-Warning Risk Agent snippets">
+      <ul class="roll-track" tabindex="0" aria-label="Early-Warning Risk Agent snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: 300 shipments, scored every 30 minutes">
+    <a class="m m-img" href="media/04/01-risk-list.png" target="_blank" rel="noopener">
+      <img src="media/04/01-risk-list.png" alt="Inbound risk monitor listing shipments by score with critical, at risk and watch tags and KPI tiles" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">01</span>300 shipments, scored every 30 minutes</h3><p class="cap">Each in-transit shipment gets a 0-100 score from seven weighted factors, sorted by risk and filterable by customer and carrier.</p></div>
+  </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="2 of 8: Architecture">
+    <a class="m m-img m-diagram" href="media/04/architecture.svg" target="_blank" rel="noopener">
+      <img src="media/04/architecture.svg" alt="Architecture diagram from TMS events through Power Automate and Azure Function to Dataverse, Teams, Copilot Studio and Power BI" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">02</span>Architecture</h3><p class="cap">A scheduled flow pulls tracking events, an Azure Function scores them, Dataverse stores scores and reasons, Teams, Copilot Studio and Power BI use them.</p></div>
+  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="3 of 8: Every point is explainable">
+    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>python</em></div><pre tabindex="0"><code>    return {
+        &quot;lane&quot;: clamp01((f[&quot;lane_delay_rate&quot;] - 0.06) / 0.24),
+        &quot;area&quot;: clamp01((f[&quot;area_loss_rate&quot;] - 0.004) / 0.016),
+        &quot;carrier&quot;: clamp01((0.95 - f[&quot;carrier_on_time&quot;]) / 0.20),
+        &quot;dwell&quot;: clamp01((ratio - 1.0) / 2.0),
+        &quot;customs&quot;: 1.0 if f[&quot;customs_status&quot;] == &quot;held&quot; else 0.5 if f[&quot;customs_status&quot;] == &quot;pending&quot; else 0.0,
+        &quot;slack&quot;: clamp01((1.0 - slack) / 2.0),
+        &quot;calendar&quot;: cal,
+    }</code></pre></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">03</span>Every point is explainable</h3><p class="cap">Each factor is a straight line between no concern and full concern, times a fixed weight. Weights sum to 100.</p></div>
+  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="4 of 8: Reasons and a Teams alert">
+    <a class="m m-img" href="media/04/02-shipment-card.png" target="_blank" rel="noopener">
+      <img src="media/04/02-shipment-card.png" alt="Shipment detail with ranked reasons, factor bars and a Teams adaptive card preview with Acknowledge, Draft customer update and Escalate buttons" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">04</span>Reasons and a Teams alert</h3><p class="cap">Clicking a shipment shows its top reasons, points per factor, scan history and the Adaptive Card 1.5 posted to the control tower channel.</p></div>
+  </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: Backtest on later shipments">
+    <div class="m m-metric"><div class="metric"><span class="mv">96.9%</span><span class="ml">critical precision</span></div><div class="metric"><span class="mv">49.0%</span><span class="ml">late shipments caught at risk or above</span></div><div class="metric"><span class="mv">2</span><span class="ml">high-loss postcode areas found from history</span></div></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">05</span>Backtest on later shipments</h3><p class="cap">Rates learned before 1 August 2026, then tested on 1,772 later closed shipments (synthetic) against what actually happened.</p></div>
+  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="6 of 8: Critical shipments first">
+    <a class="m m-img" href="media/04/03-critical-filter.png" target="_blank" rel="noopener">
+      <img src="media/04/03-critical-filter.png" alt="Inbound risk monitor filtered to critical shipments, each with its score, customer, carrier, lane and top reason" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">06</span>Critical shipments first</h3><p class="cap">One filter shows the control tower only the critical shipments, each with its score and the top reason in plain words, ready to act on.</p></div>
+  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: GitHub Copilot ready">
+    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Code drafted with AI pair programming and verified by 28 pytest tests and a parity check on all 300 risk scores. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">07</span>GitHub Copilot ready</h3></div>
+  </li><li class="shot shot-demo" aria-roledescription="slide" aria-label="8 of 8: Try it">
+    <div class="m m-demo"><img src="assets/brand/hampy-agent-icon.png" alt="" width="72" height="72">
+      <a class="btn" href="demos/04-inbound-risk-agent.html">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">08</span>Try it</h3><p class="cap">Sort and filter the list, open a critical shipment and click through the agent suggestions in under a minute.</p></div>
+  </li></ul>
+      <div class="roll-ctl">
+        <button class="rb prev" type="button" aria-label="Previous snippet">&larr;</button>
+        <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <span class="count" aria-live="polite">1 / 8</span>
+        <button class="rb next" type="button" aria-label="Next snippet">&rarr;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel project" id="p04" data-title="Tender Gap-Check Agent" aria-labelledby="t04">
+  <div class="panel-in">
+    <header class="ph">
+      <div class="ph-num" aria-hidden="true">04</div>
+      <div class="ph-main">
+        <p class="kicker">Project 4 of 9 · proven in logistics</p>
+        <h2 id="t04">Tender Gap-Check Agent</h2>
+        <ul class="impact" aria-label="Impact"><li class="imp i-time">Time</li><li class="imp i-acc">Accuracy</li></ul>
         <p class="outcome">RFQ gaps found in seconds, clarification letter drafted the same day.</p>
-        <ul class="stack" aria-label="Stack"><li class="chip">Copilot Studio</li><li class="chip">Microsoft 365 Copilot</li><li class="chip">Power Automate</li><li class="chip">SharePoint</li><li class="chip">Dataverse</li><li class="chip">Azure Functions</li><li class="chip">Microsoft Teams</li><li class="chip ghost">GitHub Copilot</li></ul>
+        <ul class="stack" aria-label="Stack"><li class="chip">Copilot Studio</li><li class="chip">Power Automate</li><li class="chip">SharePoint</li><li class="chip">Dataverse</li><li class="chip">Azure Functions</li><li class="chip">Microsoft Teams</li><li class="chip ghost">GitHub Copilot</li></ul>
       </div>
       <div class="ph-side">
         <p class="summary">Solution designers lose days finding gaps in RFQ lane files and requirements before pricing can start. A Python checker with nine rules, a Power Automate flow and a Copilot Studio agent list every gap, draft the questions and propose a mode per lane.</p>
@@ -57,15 +290,15 @@
         <div class="links"><a class="btn" href="demos/01-tender-desk-copilot.html">Try the demo</a><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/01-tender-desk-copilot" target="_blank" rel="noopener">Source</a></div>
       </div>
     </header>
-    <div class="roll" data-roll>
-      <ul class="roll-track" tabindex="0" aria-label="Tender Desk Copilot snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: Every gap, with a rule and a severity">
+    <div class="roll" data-roll role="region" aria-roledescription="carousel" aria-label="Tender Gap-Check Agent snippets">
+      <ul class="roll-track" tabindex="0" aria-label="Tender Gap-Check Agent snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: Every gap, with a rule and a severity">
     <a class="m m-img" href="media/01/rfq-check-result.png" target="_blank" rel="noopener">
-      <img src="media/01/rfq-check-result.png" alt="Tender Desk demo showing KPI tiles, a gap list with severity tags and the agent panel listing high-severity gaps" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">01</span>Every gap, with a rule and a severity</h4><p class="cap">A 40-lane RFQ from a fictional shipper is checked against nine rules. The agent lists the high-severity gaps to fix before pricing.</p></div>
+      <img src="media/01/rfq-check-result.png" alt="Tender Desk demo, Gaps tab: every gap listed with its rule id, severity and affected lanes" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">01</span>Every gap, with a rule and a severity</h3><p class="cap">A 40-lane RFQ from a fictional shipper is checked against nine rules. Every gap is listed with its rule, severity and affected lanes, high severity first, to fix before pricing.</p></div>
   </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="2 of 8: Architecture">
     <a class="m m-img m-diagram" href="media/01/architecture.svg" target="_blank" rel="noopener">
       <img src="media/01/architecture.svg" alt="Architecture diagram: SharePoint, Power Automate, Azure Function, Dataverse, Teams, Copilot Studio, Microsoft 365 Copilot in Word and PowerPoint" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">02</span>Architecture</h4><p class="cap">A new RFQ folder in SharePoint triggers a flow that runs the checker as an Azure Function, writes Dataverse rows, posts a Teams card and saves a summary file that grounds Copilot in Word and PowerPoint.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">02</span>Architecture</h3><p class="cap">A new RFQ folder in SharePoint triggers a flow that runs the checker as an Azure Function, writes Dataverse rows, posts a Teams card and saves a summary file that grounds Copilot in Word and PowerPoint.</p></div>
   </li><li class="shot shot-code" aria-roledescription="slide" aria-label="3 of 8: Copilot Studio topic: Check new RFQ">
     <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>yaml</em></div><pre tabindex="0"><code>    - kind: InvokeFlowAction
       id: runChecker
@@ -82,7 +315,7 @@
           gapsLow: Topic.GapsLow
           readinessPct: Topic.ReadinessPct
           topGaps: Topic.TopGaps</code></pre></div>
-    <div class="shot-txt"><h4><span class="n">03</span>Copilot Studio topic: Check new RFQ</h4><p class="cap">The agent never computes gaps itself. It calls the checker flow and reports the counts it returns.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">03</span>Copilot Studio topic: Check new RFQ</h3><p class="cap">The agent never computes gaps itself. It calls the checker flow and reports the counts it returns.</p></div>
   </li><li class="shot shot-code" aria-roledescription="slide" aria-label="4 of 8: Rule R06: transit times no truck can meet">
     <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>python</em></div><pre tabindex="0"><code>    # R06 unrealistic transit time
     km = to_int(row.get(&quot;distance_km&quot;))
@@ -91,21 +324,21 @@
         gaps.append(make_gap(&quot;R06&quot;, lid, &quot;required_transit_days&quot;,
                              f&quot;{days} day(s) requested for {km} km; road minimum is about &quot;
                              f&quot;{min_transit_days(km)} day(s) at {ROAD_KM_PER_DAY} km per day.&quot;))</code></pre></div>
-    <div class="shot-txt"><h4><span class="n">04</span>Rule R06: transit times no truck can meet</h4><p class="cap">Each rule is a few readable lines with a pytest case. The same rule runs in the demo page in JavaScript and is checked for identical output.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">04</span>Rule R06: transit times no truck can meet</h3><p class="cap">Each rule is a few readable lines with a pytest case. The same rule runs in the demo page in JavaScript and is checked for identical output.</p></div>
   </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: Result on the sample RFQ">
     <div class="m m-metric"><div class="metric"><span class="mv">40</span><span class="ml">lanes checked</span></div><div class="metric"><span class="mv">25</span><span class="ml">gaps found</span></div><div class="metric"><span class="mv">9</span><span class="ml">high severity</span></div><div class="metric"><span class="mv">10</span><span class="ml">questions drafted</span></div></div>
-    <div class="shot-txt"><h4><span class="n">05</span>Result on the sample RFQ</h4><p class="cap">Computed by the checker on the synthetic Northwind Components pack: all 25 seeded gaps found, 10 clarification questions drafted in 7 themes.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">05</span>Result on the sample RFQ</h3><p class="cap">Computed by the checker on the synthetic Northwind Components pack: all 25 seeded gaps found, 10 clarification questions drafted in 7 themes.</p></div>
   </li><li class="shot shot-image" aria-roledescription="slide" aria-label="6 of 8: Clarification letter, ready for Word">
     <a class="m m-img" href="media/01/clarification-letter.png" target="_blank" rel="noopener">
-      <img src="media/01/clarification-letter.png" alt="Word-style draft letter with clarification questions grouped by theme next to the agent panel" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">06</span>Clarification letter, ready for Word</h4><p class="cap">Questions are grouped by theme with the affected lane ids, so Copilot in Word only has to adjust tone before the letter goes to the customer.</p></div>
+      <img src="media/01/clarification-letter.png" alt="Word-style draft letter with clarification questions grouped by theme" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">06</span>Clarification letter, ready for Word</h3><p class="cap">Questions are grouped by theme with the affected lane ids, so Copilot in Word only has to adjust tone before the letter goes to the customer.</p></div>
   </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: GitHub Copilot ready">
     <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Code drafted with AI pair programming and verified by 50 pytest tests and a Python to JavaScript parity check. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules.</p></div>
-    <div class="shot-txt"><h4><span class="n">07</span>GitHub Copilot ready</h4></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">07</span>GitHub Copilot ready</h3></div>
   </li><li class="shot shot-demo" aria-roledescription="slide" aria-label="8 of 8: Try it">
     <div class="m m-demo"><img src="assets/brand/hampy-agent-icon.png" alt="" width="72" height="72">
       <a class="btn" href="demos/01-tender-desk-copilot.html">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
-    <div class="shot-txt"><h4><span class="n">08</span>Try it</h4><p class="cap">Pick a sample RFQ, run the check, then click through What is missing, Draft clarification email and Suggest mode per lane. Under a minute.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">08</span>Try it</h3><p class="cap">Pick a sample RFQ, run the check, then click through What is missing, Draft clarification email and Suggest mode per lane. Under a minute.</p></div>
   </li></ul>
       <div class="roll-ctl">
         <button class="rb prev" type="button" aria-label="Previous snippet">&larr;</button>
@@ -117,68 +350,57 @@
   </div>
 </section>
 
-<section class="panel project" id="p02" data-title="Road-Toll Surcharge Recovery App" aria-labelledby="t02">
+<section class="panel project" id="p05" data-title="Baynook Parking Booking" aria-labelledby="t05">
   <div class="panel-in">
     <header class="ph">
-      <div class="ph-num" aria-hidden="true">02</div>
+      <div class="ph-num" aria-hidden="true">05</div>
       <div class="ph-main">
-        <p class="kicker">Project 2 of 8</p>
-        <h2 id="t02">Road-Toll Surcharge Recovery App</h2>
-        <p class="outcome">Per-customer toll impact, a defensible surcharge and the right approver in one screen.</p>
-        <ul class="stack" aria-label="Stack"><li class="chip">Power Apps</li><li class="chip">Dataverse</li><li class="chip">Power Automate</li><li class="chip">Power BI</li><li class="chip">Copilot in Power Apps</li><li class="chip">Copilot Studio</li><li class="chip">Python</li><li class="chip ghost">GitHub Copilot</li></ul>
+        <p class="kicker">Project 5 of 9 · live product for mttn</p>
+        <h2 id="t05">Baynook Parking Booking</h2>
+        <p class="outcome">Live: staff claim a free bay in two clicks, and the database makes a double booking impossible.</p>
+        <ul class="stack" aria-label="Stack"><li class="chip">React</li><li class="chip">TypeScript</li><li class="chip">Vite</li><li class="chip">Tailwind</li><li class="chip">Netlify Functions</li><li class="chip">Postgres (Neon)</li><li class="chip">Vitest + Playwright</li><li class="chip ghost">Claude Code</li></ul>
       </div>
       <div class="ph-side">
-        <p class="summary">A new per-kilometre HGV toll hits every customer contract at once, and commercial teams need each customer's impact and an approved surcharge fast. Built a tested toll model, a Power Apps surcharge screen with margin effect, a tiered Power Automate approval and a Power BI steering dashboard.</p>
-        <p class="cv">Inspired by: quantified the commercial impact of the Dutch road-freight toll across more than 400,000 annual shipments and 2,400 customers, and built the customer surcharge recovery model and executive dashboard for the Commercial Steering Committee.</p>
-        <div class="links"><a class="btn" href="demos/02-road-toll-surcharge-app.html">Try the demo</a><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/02-road-toll-surcharge-app" target="_blank" rel="noopener">Source</a></div>
+        <p class="summary">An office with a fixed pool of numbered bays needs a fair, simple way to share them. Staff see which bays are free by day, week or on a map, claim one and add it to their calendar. Admins manage bays, people, fixed holders and rules, and reception gets a read-only board of who parks where.</p>
+        <p class="cv">Product built for mttn (Mitten Digital Solutions LLC), running as a public demo with one-click Staff, Admin and Reception sign-in.</p>
+        <div class="links"><a class="btn" href="https://baynook.netlify.app" target="_blank" rel="noopener">Try the demo</a></div>
       </div>
     </header>
-    <div class="roll" data-roll>
-      <ul class="roll-track" tabindex="0" aria-label="Road-Toll Surcharge Recovery App snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: Surcharge proposal and approval">
-    <a class="m m-img" href="media/02/result.png" target="_blank" rel="noopener">
-      <img src="media/02/result.png" alt="Power Apps style screen with customer list, surcharge proposal, margin bars and an approval card for the steering committee" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">01</span>Surcharge proposal and approval</h4><p class="cap">Pick a customer, choose flat, % of freight or per km recovery, see the margin effect and submit. The approval card shows the correct tier and route. Synthetic data, illustrative rates.</p></div>
-  </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="2 of 8: Architecture">
-    <a class="m m-img m-diagram" href="media/02/architecture.svg" target="_blank" rel="noopener">
-      <img src="media/02/architecture.svg" alt="Architecture diagram from shipment data and toll rates through Dataverse to Power Apps, Power Automate, Teams and Power BI" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">02</span>Architecture</h4><p class="cap">Dataverse holds customers, shipments, lanes, toll rates and proposals. A Python model writes toll per shipment; Power Apps, Power Automate, Teams and Power BI do the rest.</p></div>
-  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="3 of 8: The toll formula">
-    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>python</em></div><pre tabindex="0"><code>def allocation_share(pallets: float, weight_kg: float, basis: str) -&gt; float:
-    &quot;&quot;&quot;Share of the truck used by a shipment, capped at 1.&quot;&quot;&quot;
-    if basis == &quot;pallet&quot;:
-        share = pallets / TRUCK_PALLET_PLACES
-    elif basis == &quot;weight&quot;:
-        share = weight_kg / TRUCK_PAYLOAD_KG
-    else:
-        raise ValueError(f&quot;Unknown allocation basis: {basis}&quot;)
-    return min(max(share, 0.0), 1.0)
-
-
-def shipment_toll(tolled_km: float, co2_class: int, weight_class: str,
-                  pallets: float, weight_kg: float, basis: str) -&gt; float:
-    &quot;&quot;&quot;Toll (EUR) allocated to one shipment. Unrounded; round totals for display.&quot;&quot;&quot;
-    return tolled_km * rate(co2_class, weight_class) * allocation_share(pallets, weight_kg, basis)</code></pre></div>
-    <div class="shot-txt"><h4><span class="n">03</span>The toll formula</h4><p class="cap">Toll per shipment is tolled km x rate by CO2 and weight class x share of the truck. Excerpt from src/toll.py.</p></div>
-  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="4 of 8: Tier logic in Power Fx">
-    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>powerfx</em></div><pre tabindex="0"><code>ApprovalTier(incPct: Number, eur: Number): Text =
-    If(incPct &lt;= TierAutoMaxPct &amp;&amp; eur &lt;= TierAutoMaxEur, &quot;Auto-approved&quot;,
-       incPct &lt;= TierCmMaxPct &amp;&amp; eur &lt;= TierCmMaxEur, &quot;Commercial manager&quot;,
-       &quot;Steering committee&quot;);</code></pre></div>
-    <div class="shot-txt"><h4><span class="n">04</span>Tier logic in Power Fx</h4><p class="cap">The same thresholds drive the app, the approval flow and the Copilot answer. Excerpt from power-apps/formulas.md.</p></div>
-  </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: On the synthetic dataset">
-    <div class="m m-metric"><div class="metric"><span class="mv">4.4%</span><span class="ml">toll as share of freight</span></div><div class="metric"><span class="mv">8.7% to 4.3%</span><span class="ml">margin if toll absorbed</span></div><div class="metric"><span class="mv">8.4%</span><span class="ml">margin with 100% recovery</span></div><div class="metric"><span class="mv">3 / 23 / 14</span><span class="ml">auto / manager / steering</span></div></div>
-    <div class="shot-txt"><h4><span class="n">05</span>On the synthetic dataset</h4><p class="cap">2,000 shipments, 40 customers, illustrative rates. Computed by toll.py and matched to the cent by the JS demo.</p></div>
-  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="6 of 8: Steering dashboard">
-    <a class="m m-img" href="media/02/dashboard.png" target="_blank" rel="noopener">
-      <img src="media/02/dashboard.png" alt="Dashboard tab with KPI tiles and a bar chart of the top 10 customers by toll impact" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">06</span>Steering dashboard</h4><p class="cap">KPI tiles, a hand-built SVG chart of the top 10 customers by toll impact and proposals by tier, mirroring the Power BI report.</p></div>
-  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: GitHub Copilot ready">
-    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Code drafted with AI pair programming and verified by 20 pytest tests and a Python to JavaScript parity check. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules.</p></div>
-    <div class="shot-txt"><h4><span class="n">07</span>GitHub Copilot ready</h4></div>
+    <div class="roll" data-roll role="region" aria-roledescription="carousel" aria-label="Baynook Parking Booking snippets">
+      <ul class="roll-track" tabindex="0" aria-label="Baynook Parking Booking snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: Pick a free bay">
+    <a class="m m-img" href="media/09/book-day.webp" target="_blank" rel="noopener">
+      <img src="media/09/book-day.webp" alt="Book a bay day view: 18 of 30 bays free, taken bays show who has them, EV bays and fixed holders marked" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">01</span>Pick a free bay</h3><p class="cap">The staff day view: free bays, taken bays with the colleague's name, EV charge points and reserved fixed holders. Demo office, fictional names.</p></div>
+  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="2 of 8: Admin overview">
+    <a class="m m-img" href="media/09/admin-overview.webp" target="_blank" rel="noopener">
+      <img src="media/09/admin-overview.webp" alt="Admin overview with free bays today, week peak, 30-day occupancy, cancellation rate, occupancy by weekday and booking mix" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">02</span>Admin overview</h3><p class="cap">Free today, week peak, 30-day occupancy, busiest weekday and the booking mix of staff, fixed bays and visitors.</p></div>
+  </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="3 of 8: Architecture">
+    <a class="m m-img m-diagram" href="media/09/architecture.svg" target="_blank" rel="noopener">
+      <img src="media/09/architecture.svg" alt="Architecture diagram: three roles, React single-page app, Netlify Functions and Postgres on Neon, the rules guaranteed by design and the outputs" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">03</span>Architecture</h3><p class="cap">A React app and Netlify Functions on one origin over Postgres on Neon. Sessions are a signed cookie the browser never reads, and the app calls no other site.</p></div>
+  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="4 of 8: No double bookings, by design">
+    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>sql</em></div><pre tabindex="0"><code>-- Rule 1: a bay can hold at most one live booking on a date.
+create unique index bookings_space_date_live_idx
+  on bookings (space_id, booking_date) where status &lt;&gt; 'cancelled';
+-- Rule 2: one live booking per user per date FOR THEMSELVES.
+create unique index bookings_user_date_live_idx
+  on bookings (user_id, booking_date)
+  where status &lt;&gt; 'cancelled' and booked_for = 'self';</code></pre></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">04</span>No double bookings, by design</h3><p class="cap">The two hard rules live in the database. If two people click the same bay at once, exactly one wins; the app turns the other into a clear message.</p></div>
+  </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: Engineering discipline">
+    <div class="m m-metric"><div class="metric"><span class="mv">189</span><span class="ml">automated tests</span></div><div class="metric"><span class="mv">12</span><span class="ml">serverless functions</span></div><div class="metric"><span class="mv">6</span><span class="ml">SQL migrations</span></div><div class="metric"><span class="mv">0</span><span class="ml">off-origin requests</span></div></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">05</span>Engineering discipline</h3><p class="cap">Counted from the repository: unit, API and end-to-end tests (Vitest and Playwright), Netlify Functions and database migrations. Fonts are self-hosted, so the app loads nothing from other sites.</p></div>
+  </li><li class="shot shot-video" aria-roledescription="slide" aria-label="6 of 8: Book a bay">
+    <div class="m m-video"><video src="media/09/clip-book.mp4" poster="media/09/clip-book-poster.webp" muted playsinline loop controls preload="none" aria-label="Book a bay" aria-describedby="v09-desc"></video></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">06</span>Book a bay</h3><p class="cap">Seven seconds of the live demo: pick a bay, confirm, add it to the calendar.</p><details class="vdesc"><summary>Text description of the video</summary><p id="v09-desc">Silent, 7 seconds. 0:00 A staff member is on Book a bay, day view, with free bays outlined and taken bays filled in with colleagues' names. 0:02 The pointer moves to bay 120, which is free, and clicks it. 0:03 A side panel opens for bay 120 with the date and a choice to book it for myself or a visitor. 0:05 The pointer clicks Confirm booking. 0:06 A confirmation page reads Bay booked, shows bay 120 and the date, and offers Add to calendar.</p></details></div>
+  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: Built with Claude Code">
+    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Built with Claude Code from a written brief. The repo keeps its agent instructions, architecture notes and changelog, and a change is only done once types check and the relevant unit, API or end-to-end tests pass.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">07</span>Built with Claude Code</h3></div>
   </li><li class="shot shot-demo" aria-roledescription="slide" aria-label="8 of 8: Try it">
     <div class="m m-demo"><img src="assets/brand/hampy-agent-icon.png" alt="" width="72" height="72">
-      <a class="btn" href="demos/02-road-toll-surcharge-app.html">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
-    <div class="shot-txt"><h4><span class="n">08</span>Try it</h4><p class="cap">Open the simulated app: pick a customer, change the recovery method, submit for approval and ask the Copilot panel to explain the impact.</p></div>
+      <a class="btn" href="https://baynook.netlify.app" target="_blank" rel="noopener">Open the live demo <span aria-hidden="true">&rarr;</span></a></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">08</span>Try it</h3><p class="cap">Sign in with one click as Staff, Admin or Reception in a fictional 30-bay office. The demo data resets every night.</p></div>
   </li></ul>
       <div class="roll-ctl">
         <button class="rb prev" type="button" aria-label="Previous snippet">&larr;</button>
@@ -190,13 +412,14 @@ def shipment_toll(tolled_km: float, co2_class: int, weight_class: str,
   </div>
 </section>
 
-<section class="panel project" id="p03" data-title="Network Scenario Agent" aria-labelledby="t03">
+<section class="panel project" id="p06" data-title="Network Scenario Agent" aria-labelledby="t06">
   <div class="panel-in">
     <header class="ph">
-      <div class="ph-num" aria-hidden="true">03</div>
+      <div class="ph-num" aria-hidden="true">06</div>
       <div class="ph-main">
-        <p class="kicker">Project 3 of 8</p>
-        <h2 id="t03">Network Scenario Agent</h2>
+        <p class="kicker">Project 6 of 9 · proven in logistics</p>
+        <h2 id="t06">Network Scenario Agent</h2>
+        <ul class="impact" aria-label="Impact"><li class="imp i-cost">Cost</li></ul>
         <p class="outcome">Per-supplier mix of direct, milk-run and cross-dock: 7.1% below the best single design.</p>
         <ul class="stack" aria-label="Stack"><li class="chip">Copilot Studio</li><li class="chip">Azure Functions</li><li class="chip">Power Platform custom connector</li><li class="chip">Power Automate</li><li class="chip">Dataverse</li><li class="chip">Power BI</li><li class="chip ghost">GitHub Copilot</li></ul>
       </div>
@@ -206,15 +429,15 @@ def shipment_toll(tolled_km: float, co2_class: int, weight_class: str,
         <div class="links"><a class="btn" href="demos/03-network-scenario-agent.html">Try the demo</a><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/03-network-scenario-agent" target="_blank" rel="noopener">Source</a></div>
       </div>
     </header>
-    <div class="roll" data-roll>
+    <div class="roll" data-roll role="region" aria-roledescription="carousel" aria-label="Network Scenario Agent snippets">
       <ul class="roll-track" tabindex="0" aria-label="Network Scenario Agent snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: Four designs, one answer">
     <a class="m m-img" href="media/03/03-result.png" target="_blank" rel="noopener">
-      <img src="media/03/03-result.png" alt="Demo showing results per design, a flow map and the agent explaining the recommendation" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">01</span>Four designs, one answer</h4><p class="cap">Sliders for diesel, CO2 price, handling and milk-run stops drive the engine; the agent explains why the best mix wins.</p></div>
+      <img src="media/03/03-result.png" alt="Demo with scenario sliders, KPI tiles, results per design and a flow map" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">01</span>Four designs, one answer</h3><p class="cap">Sliders for diesel, CO2 price, handling and milk-run stops drive the engine; the results table and the map show why the best mix wins.</p></div>
   </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="2 of 8: Architecture">
     <a class="m m-img m-diagram" href="media/03/architecture.svg" target="_blank" rel="noopener">
       <img src="media/03/architecture.svg" alt="Architecture diagram: planner, Copilot Studio, custom connector, Azure Function, Power Automate, Dataverse, Power BI" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">02</span>Architecture</h4><p class="cap">Copilot Studio calls an Azure Function through a custom connector; runs are logged to Dataverse by Power Automate and mapped in Power BI.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">02</span>Architecture</h3><p class="cap">Copilot Studio calls an Azure Function through a custom connector; runs are logged to Dataverse by Power Automate and mapped in Power BI.</p></div>
   </li><li class="shot shot-code" aria-roledescription="slide" aria-label="3 of 8: Best mix never loses to a single design">
     <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>python</em></div><pre tabindex="0"><code>    for _ in range(max_passes):
         improved = False
@@ -232,14 +455,14 @@ def shipment_toll(tolled_km: float, co2_class: int, weight_class: str,
                     improved = True
         if not improved:
             break</code></pre></div>
-    <div class="shot-txt"><h4><span class="n">03</span>Best mix never loses to a single design</h4><p class="cap">The search seeds from the best pure design and only accepts single-supplier moves that cut cost plus CO2 price.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">03</span>Best mix never loses to a single design</h3><p class="cap">The search seeds from the best pure design and only accepts single-supplier moves that cut cost plus CO2 price.</p></div>
   </li><li class="shot shot-image" aria-roledescription="slide" aria-label="4 of 8: What if the stop limit drops?">
     <a class="m m-img" href="media/03/03-crossdock.png" target="_blank" rel="noopener">
       <img src="media/03/03-crossdock.png" alt="Cross-dock design drawn on the map with collection runs and hub line-hauls" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">04</span>What if the stop limit drops?</h4><p class="cap">With only two stops per milk-run, cross-dock consolidation becomes the better route for 21 of 60 suppliers.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">04</span>What if the stop limit drops?</h3><p class="cap">With only two stops per milk-run, cross-dock consolidation becomes the better route for 21 of 60 suppliers.</p></div>
   </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: Baseline week, synthetic network">
     <div class="m m-metric"><div class="metric"><span class="mv">7.1%</span><span class="ml">cheaper than best single design</span></div><div class="metric"><span class="mv">137</span><span class="ml">truck trips vs 209 all-direct</span></div><div class="metric"><span class="mv">66.2 t</span><span class="ml">CO2 a week vs 89.5 t direct</span></div><div class="metric"><span class="mv">22</span><span class="ml">pytest checks passing</span></div></div>
-    <div class="shot-txt"><h4><span class="n">05</span>Baseline week, synthetic network</h4><p class="cap">Computed by the engine on 60 suppliers and 3 hubs. The JS demo matches the Python baseline within 0.001%.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">05</span>Baseline week, synthetic network</h3><p class="cap">Computed by the engine on 60 suppliers and 3 hubs. The JS demo matches the Python baseline within 0.001%.</p></div>
   </li><li class="shot shot-code" aria-roledescription="slide" aria-label="6 of 8: Agent topic: Run a scenario">
     <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>yaml</em></div><pre tabindex="0"><code>    - kind: InvokeConnectorAction
       id: callRunScenario
@@ -256,14 +479,14 @@ def shipment_toll(tolled_km: float, co2_class: int, weight_class: str,
               handling_ldm: If(IsBlank(Topic.Handling), 6, Topic.Handling),
               max_stops: If(IsBlank(Topic.MaxStops), 4, Topic.MaxStops)
             }</code></pre></div>
-    <div class="shot-txt"><h4><span class="n">06</span>Agent topic: Run a scenario</h4><p class="cap">The topic calls the connector action and logs the run before answering.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">06</span>Agent topic: Run a scenario</h3><p class="cap">The topic calls the connector action and logs the run before answering.</p></div>
   </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: GitHub Copilot ready">
     <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Code drafted with AI pair programming and verified by 22 pytest tests and a Python to JavaScript parity check on 80 values. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules.</p></div>
-    <div class="shot-txt"><h4><span class="n">07</span>GitHub Copilot ready</h4></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">07</span>GitHub Copilot ready</h3></div>
   </li><li class="shot shot-demo" aria-roledescription="slide" aria-label="8 of 8: Try it">
     <div class="m m-demo"><img src="assets/brand/hampy-agent-icon.png" alt="" width="72" height="72">
       <a class="btn" href="demos/03-network-scenario-agent.html">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
-    <div class="shot-txt"><h4><span class="n">08</span>Try it</h4><p class="cap">Move the sliders, switch designs on the map and click through the agent's four topics in under a minute.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">08</span>Try it</h3><p class="cap">Move the sliders, switch designs on the map and click through the agent's four topics in under a minute.</p></div>
   </li></ul>
       <div class="roll-ctl">
         <button class="rb prev" type="button" aria-label="Previous snippet">&larr;</button>
@@ -275,60 +498,69 @@ def shipment_toll(tolled_km: float, co2_class: int, weight_class: str,
   </div>
 </section>
 
-<section class="panel project" id="p04" data-title="Inbound Risk Early-Warning Agent" aria-labelledby="t04">
+<section class="panel project" id="p07" data-title="Pricing Approval App" aria-labelledby="t07">
   <div class="panel-in">
     <header class="ph">
-      <div class="ph-num" aria-hidden="true">04</div>
+      <div class="ph-num" aria-hidden="true">07</div>
       <div class="ph-main">
-        <p class="kicker">Project 4 of 8</p>
-        <h2 id="t04">Inbound Risk Early-Warning Agent</h2>
-        <p class="outcome">Flags late inbound shipments in transit; critical band 97% precise in backtest.</p>
-        <ul class="stack" aria-label="Stack"><li class="chip">Copilot Studio</li><li class="chip">Power Automate</li><li class="chip">Azure Functions</li><li class="chip">Dataverse</li><li class="chip">Microsoft Teams</li><li class="chip">Power BI</li><li class="chip ghost">GitHub Copilot</li></ul>
+        <p class="kicker">Project 7 of 9 · proven in logistics</p>
+        <h2 id="t07">Pricing Approval App</h2>
+        <ul class="impact" aria-label="Impact"><li class="imp i-cost">Cost</li><li class="imp i-time">Time</li></ul>
+        <p class="outcome">Per-customer toll impact, a defensible surcharge and the right approver in one screen.</p>
+        <ul class="stack" aria-label="Stack"><li class="chip">Power Apps</li><li class="chip">Dataverse</li><li class="chip">Power Automate</li><li class="chip">Power BI</li><li class="chip">Copilot in Power Apps</li><li class="chip">Copilot Studio</li><li class="chip">Python</li><li class="chip ghost">Claude Code</li><li class="chip ghost">GitHub Copilot</li></ul>
       </div>
       <div class="ph-side">
-        <p class="summary">Delayed or lost inbound shipments were noticed too late, often by the customer. A transparent 0-100 risk score with plain-word reasons, Teams alerts and a Copilot Studio agent warns the control tower while there is still time to act.</p>
-        <p class="cv">Inspired by: inbound-risk dashboard sustaining 99% on-time through COVID-19; lost-shipment postcode analysis cutting lost shipments 64%.</p>
-        <div class="links"><a class="btn" href="demos/04-inbound-risk-agent.html">Try the demo</a><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/04-inbound-risk-agent" target="_blank" rel="noopener">Source</a></div>
+        <p class="summary">A new per-kilometre HGV toll hits every customer contract at once, and commercial teams need each customer's impact and an approved surcharge fast. Built a tested toll model, a Power Apps surcharge screen with margin effect, a tiered Power Automate approval and a Power BI steering dashboard.</p>
+        <p class="cv">Inspired by: quantified the commercial impact of the Dutch road-freight toll across more than 400,000 annual shipments and 2,400 customers, and built the customer surcharge recovery model and executive dashboard for the Commercial Steering Committee.</p>
+        <div class="links"><a class="btn" href="demos/02-road-toll-surcharge-app.html">Try the demo</a><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/02-road-toll-surcharge-app" target="_blank" rel="noopener">Source</a></div>
       </div>
     </header>
-    <div class="roll" data-roll>
-      <ul class="roll-track" tabindex="0" aria-label="Inbound Risk Early-Warning Agent snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: 300 shipments, scored every 30 minutes">
-    <a class="m m-img" href="media/04/01-risk-list.png" target="_blank" rel="noopener">
-      <img src="media/04/01-risk-list.png" alt="Inbound risk monitor listing shipments by score with critical, at risk and watch tags and KPI tiles" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">01</span>300 shipments, scored every 30 minutes</h4><p class="cap">Each in-transit shipment gets a 0-100 score from seven weighted factors, sorted by risk and filterable by customer and carrier.</p></div>
+    <div class="roll" data-roll role="region" aria-roledescription="carousel" aria-label="Pricing Approval App snippets">
+      <ul class="roll-track" tabindex="0" aria-label="Pricing Approval App snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: Surcharge proposal and approval">
+    <a class="m m-img" href="media/02/result.png" target="_blank" rel="noopener">
+      <img src="media/02/result.png" alt="Power Apps style screen with customer list, surcharge proposal, margin bars and an approval card for the steering committee" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">01</span>Surcharge proposal and approval</h3><p class="cap">Pick a customer, choose flat, % of freight or per km recovery, see the margin effect and submit. The approval card shows the correct tier and route. Synthetic data, illustrative rates.</p></div>
   </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="2 of 8: Architecture">
-    <a class="m m-img m-diagram" href="media/04/architecture.svg" target="_blank" rel="noopener">
-      <img src="media/04/architecture.svg" alt="Architecture diagram from TMS events through Power Automate and Azure Function to Dataverse, Teams, Copilot Studio and Power BI" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">02</span>Architecture</h4><p class="cap">A scheduled flow pulls tracking events, an Azure Function scores them, Dataverse stores scores and reasons, Teams, Copilot Studio and Power BI use them.</p></div>
-  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="3 of 8: Every point is explainable">
-    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>python</em></div><pre tabindex="0"><code>    return {
-        &quot;lane&quot;: clamp01((f[&quot;lane_delay_rate&quot;] - 0.06) / 0.24),
-        &quot;area&quot;: clamp01((f[&quot;area_loss_rate&quot;] - 0.004) / 0.016),
-        &quot;carrier&quot;: clamp01((0.95 - f[&quot;carrier_on_time&quot;]) / 0.20),
-        &quot;dwell&quot;: clamp01((ratio - 1.0) / 2.0),
-        &quot;customs&quot;: 1.0 if f[&quot;customs_status&quot;] == &quot;held&quot; else 0.5 if f[&quot;customs_status&quot;] == &quot;pending&quot; else 0.0,
-        &quot;slack&quot;: clamp01((1.0 - slack) / 2.0),
-        &quot;calendar&quot;: cal,
-    }</code></pre></div>
-    <div class="shot-txt"><h4><span class="n">03</span>Every point is explainable</h4><p class="cap">Each factor is a straight line between no concern and full concern, times a fixed weight. Weights sum to 100.</p></div>
-  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="4 of 8: Reasons and a Teams alert">
-    <a class="m m-img" href="media/04/02-shipment-card.png" target="_blank" rel="noopener">
-      <img src="media/04/02-shipment-card.png" alt="Shipment detail with ranked reasons, factor bars and a Teams adaptive card preview with Acknowledge, Draft customer update and Escalate buttons" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">04</span>Reasons and a Teams alert</h4><p class="cap">Clicking a shipment shows its top reasons, points per factor, scan history and the Adaptive Card 1.5 posted to the control tower channel.</p></div>
-  </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: Backtest on later shipments">
-    <div class="m m-metric"><div class="metric"><span class="mv">96.9%</span><span class="ml">critical precision</span></div><div class="metric"><span class="mv">49.0%</span><span class="ml">late shipments caught at risk or above</span></div><div class="metric"><span class="mv">2</span><span class="ml">high-loss postcode areas found from history</span></div></div>
-    <div class="shot-txt"><h4><span class="n">05</span>Backtest on later shipments</h4><p class="cap">Rates learned before 1 August 2026, then tested on 1,772 later closed shipments (synthetic) against what actually happened.</p></div>
-  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="6 of 8: Customer update, drafted">
-    <a class="m m-img" href="media/04/03-agent-draft.png" target="_blank" rel="noopener">
-      <img src="media/04/03-agent-draft.png" alt="Agent panel with a drafted customer update email" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">06</span>Customer update, drafted</h4><p class="cap">The agent explains a score and drafts a customer email using only customer-safe causes, for a planner to approve.</p></div>
-  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: GitHub Copilot ready">
-    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Code drafted with AI pair programming and verified by 28 pytest tests and a parity check on all 300 risk scores. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules.</p></div>
-    <div class="shot-txt"><h4><span class="n">07</span>GitHub Copilot ready</h4></div>
+    <a class="m m-img m-diagram" href="media/02/architecture.svg" target="_blank" rel="noopener">
+      <img src="media/02/architecture.svg" alt="Architecture diagram from shipment data and toll rates through Dataverse to Power Apps, Power Automate, Teams and Power BI" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">02</span>Architecture</h3><p class="cap">Dataverse holds customers, shipments, lanes, toll rates and proposals. A Python model writes toll per shipment; Power Apps, Power Automate, Teams and Power BI do the rest.</p></div>
+  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="3 of 8: The toll formula">
+    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>python</em></div><pre tabindex="0"><code>def allocation_share(pallets: float, weight_kg: float, basis: str) -&gt; float:
+    &quot;&quot;&quot;Share of the truck used by a shipment, capped at 1.&quot;&quot;&quot;
+    if basis == &quot;pallet&quot;:
+        share = pallets / TRUCK_PALLET_PLACES
+    elif basis == &quot;weight&quot;:
+        share = weight_kg / TRUCK_PAYLOAD_KG
+    else:
+        raise ValueError(f&quot;Unknown allocation basis: {basis}&quot;)
+    return min(max(share, 0.0), 1.0)
+
+
+def shipment_toll(tolled_km: float, co2_class: int, weight_class: str,
+                  pallets: float, weight_kg: float, basis: str) -&gt; float:
+    &quot;&quot;&quot;Toll (EUR) allocated to one shipment. Unrounded; round totals for display.&quot;&quot;&quot;
+    return tolled_km * rate(co2_class, weight_class) * allocation_share(pallets, weight_kg, basis)</code></pre></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">03</span>The toll formula</h3><p class="cap">Toll per shipment is tolled km x rate by CO2 and weight class x share of the truck. Excerpt from src/toll.py.</p></div>
+  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="4 of 8: Tier logic in Power Fx">
+    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>powerfx</em></div><pre tabindex="0"><code>ApprovalTier(incPct: Number, eur: Number): Text =
+    If(incPct &lt;= TierAutoMaxPct &amp;&amp; eur &lt;= TierAutoMaxEur, &quot;Auto-approved&quot;,
+       incPct &lt;= TierCmMaxPct &amp;&amp; eur &lt;= TierCmMaxEur, &quot;Commercial manager&quot;,
+       &quot;Steering committee&quot;);</code></pre></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">04</span>Tier logic in Power Fx</h3><p class="cap">The same thresholds drive the app, the approval flow and the Copilot answer. Excerpt from power-apps/formulas.md.</p></div>
+  </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: On the synthetic dataset">
+    <div class="m m-metric"><div class="metric"><span class="mv">4.4%</span><span class="ml">toll as share of freight</span></div><div class="metric"><span class="mv">8.7% to 4.3%</span><span class="ml">margin if toll absorbed</span></div><div class="metric"><span class="mv">8.4%</span><span class="ml">margin with 100% recovery</span></div><div class="metric"><span class="mv">3 / 23 / 14</span><span class="ml">auto / manager / steering</span></div></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">05</span>On the synthetic dataset</h3><p class="cap">2,000 shipments, 40 customers, illustrative rates. Computed by toll.py and matched to the cent by the JS demo.</p></div>
+  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="6 of 8: Steering dashboard">
+    <a class="m m-img" href="media/02/dashboard.png" target="_blank" rel="noopener">
+      <img src="media/02/dashboard.png" alt="Dashboard tab with KPI tiles and a bar chart of the top 10 customers by toll impact" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">06</span>Steering dashboard</h3><p class="cap">KPI tiles, a hand-built SVG chart of the top 10 customers by toll impact and proposals by tier, mirroring the Power BI report.</p></div>
+  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: Built with Claude Code">
+    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Built with Claude Code and verified by 20 pytest tests and a Python to JavaScript parity check. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">07</span>Built with Claude Code</h3></div>
   </li><li class="shot shot-demo" aria-roledescription="slide" aria-label="8 of 8: Try it">
     <div class="m m-demo"><img src="assets/brand/hampy-agent-icon.png" alt="" width="72" height="72">
-      <a class="btn" href="demos/04-inbound-risk-agent.html">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
-    <div class="shot-txt"><h4><span class="n">08</span>Try it</h4><p class="cap">Sort and filter the list, open a critical shipment and click through the agent suggestions in under a minute.</p></div>
+      <a class="btn" href="demos/02-road-toll-surcharge-app.html">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">08</span>Try it</h3><p class="cap">Open the simulated app: pick a customer, change the recovery method, submit for approval and ask the Copilot panel to explain the impact.</p></div>
   </li></ul>
       <div class="roll-ctl">
         <button class="rb prev" type="button" aria-label="Previous snippet">&larr;</button>
@@ -340,66 +572,59 @@ def shipment_toll(tolled_km: float, co2_class: int, weight_class: str,
   </div>
 </section>
 
-<section class="panel project" id="p05" data-title="Executive KPI Briefing Copilot" aria-labelledby="t05">
+<section class="panel project" id="p08" data-title="Private Photo Platform" aria-labelledby="t08">
   <div class="panel-in">
     <header class="ph">
-      <div class="ph-num" aria-hidden="true">05</div>
+      <div class="ph-num" aria-hidden="true">08</div>
       <div class="ph-main">
-        <p class="kicker">Project 5 of 8</p>
-        <h2 id="t05">Executive KPI Briefing Copilot</h2>
-        <p class="outcome">Monday account brief drafted from one governed dataset, every sentence traced to a number.</p>
-        <ul class="stack" aria-label="Stack"><li class="chip">Power BI</li><li class="chip">Power Automate</li><li class="chip">Copilot Studio</li><li class="chip">Microsoft 365 Copilot</li><li class="chip">Dataverse</li><li class="chip">Teams</li><li class="chip ghost">GitHub Copilot</li></ul>
+        <p class="kicker">Project 8 of 9</p>
+        <h2 id="t08">Private Photo Platform</h2>
+        <p class="outcome">Live in production: guests see only the photos a manager links them to; selfie matches never grant access.</p>
+        <ul class="stack" aria-label="Stack"><li class="chip">Astro</li><li class="chip">Fastify</li><li class="chip">PostgreSQL + pgvector</li><li class="chip">Immich (InsightFace)</li><li class="chip">Twilio Verify</li><li class="chip">Docker</li><li class="chip">Cloudflare Tunnel</li><li class="chip ghost">Claude Code</li></ul>
       </div>
       <div class="ph-side">
-        <p class="summary">Leadership had dashboards but not the story, and analysts wrote the weekly account brief by hand. Built a variance engine with materiality ranking over a Power BI semantic model and an agent that drafts the brief, slide outline and Teams post for analyst approval.</p>
-        <p class="cv">Inspired by: executive Power BI dashboards consolidating the top six global customers into a single KPI view, and governed single-source datasets replacing fragmented reporting.</p>
-        <div class="links"><a class="btn" href="demos/05-kpi-briefing-copilot.html">Try the demo</a><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/05-kpi-briefing-copilot" target="_blank" rel="noopener">Source</a></div>
+        <p class="summary">Wedding guests had no private, easy way to find the photos they appear in. A live wedding website, now in production, combines SMS sign-in, guest uploads, manager moderation and an AI photo album that groups faces into people for the couple to link to guests. Face recognition is designed as an explicit opt-in.</p>
+        <p class="cv">Side project outside the CV roles: a production web platform, self-hosted end to end.</p>
+        <div class="links"><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/08-wedding-photo-album" target="_blank" rel="noopener">Source</a></div>
       </div>
     </header>
-    <div class="roll" data-roll>
-      <ul class="roll-track" tabindex="0" aria-label="Executive KPI Briefing Copilot snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: Dashboard to story">
-    <a class="m m-img" href="media/05/01-weekly-view.png" target="_blank" rel="noopener">
-      <img src="media/05/01-weekly-view.png" alt="Weekly view with portfolio KPI tiles and customer sparklines for week 2026-W39" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">01</span>Dashboard to story</h4><p class="cap">Six fictional top customers over 26 weeks: KPI tiles, hand-built sparklines with the eight-week baseline window, and only the variances that pass both threshold and z-score gates.</p></div>
-  </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="2 of 8: Architecture">
-    <a class="m m-img m-diagram" href="media/05/architecture.svg" target="_blank" rel="noopener">
-      <img src="media/05/architecture.svg" alt="Architecture from Power BI semantic model through Power Automate, Dataverse and Copilot Studio to Word, PowerPoint and an approved Teams post" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">02</span>Architecture</h4><p class="cap">A certified Power BI semantic model feeds a Monday Power Automate flow. Copilot Studio and Microsoft 365 Copilot draft in Word, PowerPoint and Teams; an analyst approves before release.</p></div>
-  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="3 of 8: Why did margin move?">
-    <a class="m m-img" href="media/05/02-margin-question.png" target="_blank" rel="noopener">
-      <img src="media/05/02-margin-question.png" alt="Variance table, Word-style brief and the agent explaining a margin drop for Fabrikam Steel in 2026-W32" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">03</span>Why did margin move?</h4><p class="cap">The agent splits a margin change into a rate effect and a cost effect from pooled revenue and cost per shipment. For the seeded Fabrikam Steel dip it points to cost to serve.</p></div>
-  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="4 of 8: No claim without data">
-    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>python</em></div><pre tabindex="0"><code>    for s in sentences:
-        if not s[&quot;refs&quot;]:
-            problems.append(f&quot;no refs: {s['text']}&quot;)
-            continue
-        missing = [r for r in s[&quot;refs&quot;] if r not in book.facts]
-        if missing:
-            problems.append(f&quot;unknown refs {missing}: {s['text']}&quot;)
-            continue
-        allowed = set()
-        for r in s[&quot;refs&quot;]:
-            for d in book.displays(r):
-                allowed |= number_tokens(d)
-        stray = number_tokens(s[&quot;text&quot;]) - allowed
-        if stray:
-            problems.append(f&quot;unsupported numbers {sorted(stray)}: {s['text']}&quot;)</code></pre></div>
-    <div class="shot-txt"><h4><span class="n">04</span>No claim without data</h4><p class="cap">Every sentence carries fact refs. The validator rejects a sentence with no source, an unknown source, or any number that is not in its referenced facts.</p></div>
-  </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: Result on synthetic data">
-    <div class="m m-metric"><div class="metric"><span class="mv">756</span><span class="ml">customer x KPI checks</span></div><div class="metric"><span class="mv">20</span><span class="ml">flagged variances</span></div><div class="metric"><span class="mv">420</span><span class="ml">sentences, all traced</span></div><div class="metric"><span class="mv">17</span><span class="ml">pytest tests passing</span></div></div>
-    <div class="shot-txt"><h4><span class="n">05</span>Result on synthetic data</h4><p class="cap">Computed by src/briefing.py over 18 briefed weeks. All three seeded events ranked first in their weeks; no quiet week raised a High flag.</p></div>
-  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="6 of 8: Slides and approval">
-    <a class="m m-img" href="media/05/03-slides-teams.png" target="_blank" rel="noopener">
-      <img src="media/05/03-slides-teams.png" alt="Five-slide outline cards and the agent confirming analyst approval for 2026-W35" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">06</span>Slides and approval</h4><p class="cap">The same facts produce a five-slide outline for PowerPoint and a Teams post that is only released after an analyst approves.</p></div>
-  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: GitHub Copilot ready">
-    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Code drafted with AI pair programming and verified by 17 pytest tests, including a check that every sentence in the brief traces to a number. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules.</p></div>
-    <div class="shot-txt"><h4><span class="n">07</span>GitHub Copilot ready</h4></div>
-  </li><li class="shot shot-demo" aria-roledescription="slide" aria-label="8 of 8: Try it">
+    <div class="roll" data-roll role="region" aria-roledescription="carousel" aria-label="Private Photo Platform snippets">
+      <ul class="roll-track" tabindex="0" aria-label="Private Photo Platform snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: Each guest sees only their photos">
+    <a class="m m-img" href="media/08/02-gallery.jpg" target="_blank" rel="noopener">
+      <img src="media/08/02-gallery.jpg" alt="Guest photo gallery of a sample wedding with a caption bar explaining visibility" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">01</span>Each guest sees only their photos</h3><p class="cap">Guests sign in with an SMS code, then browse a gallery filtered to what their access allows. Photos: Wikimedia Commons, CC0 / CC BY, see credits.</p></div>
+  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="2 of 8: AI faces: &quot;Who is this?&quot;">
+    <a class="m m-img" href="media/08/06-faces.jpg" target="_blank" rel="noopener">
+      <img src="media/08/06-faces.jpg" alt="Face review dialog listing guests with similarity percentages for an unnamed person" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">02</span>AI faces: &quot;Who is this?&quot;</h3><p class="cap">Faces detected by InsightFace are clustered into people in pgvector. A manager links each person to a guest, ranked by similarity, or hides bystanders. Photos: Wikimedia Commons, CC0 / CC BY, see credits.</p></div>
+  </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="3 of 8: Architecture">
+    <a class="m m-img m-diagram" href="media/08/architecture.svg" target="_blank" rel="noopener">
+      <img src="media/08/architecture.svg" alt="Architecture diagram: guest and manager, Cloudflare Tunnel, Astro web, Fastify API, Postgres, Immich, Twilio, and a six-step face pipeline" loading="lazy" decoding="async"></a>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">03</span>Architecture</h3><p class="cap">Astro SSR web and a Fastify API over Postgres with pgvector, a headless Immich backend for storage and face detection, and Twilio Verify for sign-in, self-hosted behind a Cloudflare Tunnel.</p></div>
+  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="4 of 8: One access rule, in SQL">
+    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>ts</em></div><pre tabindex="0"><code>  const taggedIn = sql`EXISTS (
+    SELECT 1 FROM asset_faces af
+    JOIN face_clusters fc ON fc.id = af.cluster_id
+    WHERE af.immich_asset_id = ${t}.immich_asset_id
+      AND af.wedding_id = ${weddingId}
+      AND fc.guest_id = ${viewer.guestId}
+      AND fc.guest_link_source = 'manager'
+  )`;
+  return sql`(${base} AND (${taggedIn} OR ${inTickedCategory}))`;</code></pre></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">04</span>One access rule, in SQL</h3><p class="cap">The single visibility predicate: a guest sees a photo only if a manager linked them to a face in it, or granted them its category. Selfie matches never grant access.</p></div>
+  </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: Engineering discipline">
+    <div class="m m-metric"><div class="metric"><span class="mv">9</span><span class="ml">architecture decision records</span></div><div class="metric"><span class="mv">12</span><span class="ml">design specs</span></div><div class="metric"><span class="mv">142</span><span class="ml">test files</span></div><div class="metric"><span class="mv">14</span><span class="ml">API modules</span></div></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">05</span>Engineering discipline</h3><p class="cap">Counted from the repository: decision records, design specs, test files and API modules. CI checks format, lint ratchet, types, tests and build on every push.</p></div>
+  </li><li class="shot shot-video" aria-roledescription="slide" aria-label="6 of 8: Walkthrough">
+    <div class="m m-video"><video src="media/08/clip.mp4" poster="media/08/poster.jpg" muted playsinline loop controls preload="none" aria-label="Walkthrough" aria-describedby="v08-desc"></video></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">06</span>Walkthrough</h3><p class="cap">28 seconds of the real web build: gallery, people pages and face review. Sample photos from Wikimedia Commons, fictional names.</p><details class="vdesc"><summary>Text description of the video</summary><p id="v08-desc">Silent, 28 seconds, with an on-screen caption bar. 0:00 The wedding site for Alex and Jordan shows a photo gallery. Caption: "Guests sign in with their phone" (Twilio Verify one-time code, then a secure session cookie). 0:05 The gallery scrolls through photos. Caption: "The gallery shows only what this guest may see": all-guest photos, photos they are in, and categories they were granted. 0:10 The People page shows round face thumbnails with names. Caption: "People: face clusters linked to guests". Guests can browse everyone, and their own cluster shows as "Me". 0:15 A person page for Jordan Morgan lists their photos. 0:18 The admin Manage wedding screen opens the face review. Caption: "Faces: Who is this?" The admin links a face cluster to a guest, merges look-alikes and hides bystanders.</p></details></div>
+  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: Built with Claude Code">
+    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Built spec first with Claude Code: 12 specs, agent instructions kept in the repo, test-first house rules and CI gates. Privacy rules were recorded as decision records. The same instruction files work with GitHub Copilot agent mode.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">07</span>Built with Claude Code</h3></div>
+  </li><li class="shot shot-demo" aria-roledescription="slide" aria-label="8 of 8: Watch the full flow">
     <div class="m m-demo"><img src="assets/brand/hampy-agent-icon.png" alt="" width="72" height="72">
-      <a class="btn" href="demos/05-kpi-briefing-copilot.html">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
-    <div class="shot-txt"><h4><span class="n">08</span>Try it</h4><p class="cap">Pick a week, click a source tag to see its DAX measure, ask why margin moved, build the slide outline and approve the Teams post.</p></div>
+      <a class="btn" href="media/08/clip.mp4">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">08</span>Watch the full flow</h3><p class="cap">Gallery, lightbox, people pages and face review in one clip; the screenshots cover sign-in, upload and moderation. Source code is in a private repository.</p></div>
   </li></ul>
       <div class="roll-ctl">
         <button class="rb prev" type="button" aria-label="Previous snippet">&larr;</button>
@@ -411,15 +636,16 @@ def shipment_toll(tolled_km: float, co2_class: int, weight_class: str,
   </div>
 </section>
 
-<section class="panel project" id="p06" data-title="AI Brand Theme Systems" aria-labelledby="t06">
+<section class="panel project" id="p09" data-title="AI Brand Theme Systems" aria-labelledby="t09">
   <div class="panel-in">
     <header class="ph">
-      <div class="ph-num" aria-hidden="true">06</div>
+      <div class="ph-num" aria-hidden="true">09</div>
       <div class="ph-main">
-        <p class="kicker">Project 6 of 8</p>
-        <h2 id="t06">AI Brand Theme Systems</h2>
+        <p class="kicker">Project 9 of 9</p>
+        <h2 id="t09">AI Brand Theme Systems</h2>
+        <ul class="impact" aria-label="Impact"><li class="imp i-time">Time</li></ul>
         <p class="outcome">One tokens file per brand generates web, Power Apps and Office themes, contrast-checked.</p>
-        <ul class="stack" aria-label="Stack"><li class="chip ghost">GitHub Copilot</li><li class="chip">Microsoft 365 Copilot</li><li class="chip">Power Apps</li><li class="chip">Copilot Studio</li><li class="chip">SharePoint</li><li class="chip ghost">GitHub Actions</li><li class="chip">Node.js</li></ul>
+        <ul class="stack" aria-label="Stack"><li class="chip ghost">Claude Code</li><li class="chip ghost">GitHub Copilot</li><li class="chip">Power Apps</li><li class="chip">Copilot Studio</li><li class="chip">SharePoint</li><li class="chip ghost">GitHub Actions</li><li class="chip">Node.js</li></ul>
       </div>
       <div class="ph-side">
         <p class="summary">Brand colours drift when they are copied by hand into apps, decks and Copilot Studio agents. I built a token pipeline that generates CSS, Tailwind, Power Apps and Office themes plus a WCAG report, used for my hampy brand and a DP World corporate theme in DPark.</p>
@@ -427,19 +653,19 @@ def shipment_toll(tolled_km: float, co2_class: int, weight_class: str,
         <div class="links"><a class="btn" href="demos/06-brand-theme-systems.html">Try the demo</a><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/06-brand-theme-systems" target="_blank" rel="noopener">Source</a></div>
       </div>
     </header>
-    <div class="roll" data-roll>
+    <div class="roll" data-roll role="region" aria-roledescription="carousel" aria-label="AI Brand Theme Systems snippets">
       <ul class="roll-track" tabindex="0" aria-label="AI Brand Theme Systems snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: hampy brand kit, drawn in code">
     <a class="m m-img" href="media/06/logo-grid.png" target="_blank" rel="noopener">
       <img src="media/06/logo-grid.png" alt="hampy pixel wordmark on light and green tiles, mark tile and agent icon, with palette swatches" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">01</span>hampy brand kit, drawn in code</h4><p class="cap">Wordmark, mark tile and the 512px Copilot Studio agent icon are rectangles on a unit grid, generated by one script. Same palette everywhere.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">01</span>hampy brand kit, drawn in code</h3><p class="cap">Wordmark, mark tile and the 512px Copilot Studio agent icon are rectangles on a unit grid, generated by one script. Same palette everywhere.</p></div>
   </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="2 of 8: Architecture">
     <a class="m m-img m-diagram" href="media/06/architecture.svg" target="_blank" rel="noopener">
       <img src="media/06/architecture.svg" alt="Pipeline from tokens.json through build_themes.mjs to CSS, Tailwind, Power Apps, Office theme, contrast report and agent icon" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">02</span>Architecture</h4><p class="cap">Tokens in Git, a Node build with tests and a contrast gate, and five generated files that land in web apps, Power Apps, Office templates and Copilot Studio.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">02</span>Architecture</h3><p class="cap">Tokens in Git, a Node build with tests and a contrast gate, and five generated files that land in web apps, Power Apps, Office templates and Copilot Studio.</p></div>
   </li><li class="shot shot-image" aria-roledescription="slide" aria-label="3 of 8: Token specimen">
     <a class="m m-img" href="media/06/token-specimen.png" target="_blank" rel="noopener">
       <img src="media/06/token-specimen.png" alt="Two-column specimen of hampy and corporate palettes with contrast pair rows" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">03</span>Token specimen</h4><p class="cap">Generated from both tokens files: palette, roles and every tested text pair with its WCAG grade.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">03</span>Token specimen</h3><p class="cap">Generated from both tokens files: palette, roles and every tested text pair with its WCAG grade.</p></div>
   </li><li class="shot shot-code" aria-roledescription="slide" aria-label="4 of 8: WCAG contrast in the build">
     <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>javascript</em></div><pre tabindex="0"><code>export function relativeLuminance(hex) {
   const [r, g, b] = hexToRgb(hex).map((c) =&gt; {
@@ -453,152 +679,21 @@ export function contrastRatio(fg, bg) {
   const a = relativeLuminance(fg), b = relativeLuminance(bg);
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 }</code></pre></div>
-    <div class="shot-txt"><h4><span class="n">04</span>WCAG contrast in the build</h4><p class="cap">The same formula runs in the build, the tests and the live checker on the demo page.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">04</span>WCAG contrast in the build</h3><p class="cap">The same formula runs in the build, the tests and the live checker on the demo page.</p></div>
   </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: Contrast results">
     <div class="m m-metric"><div class="metric"><span class="mv">21</span><span class="ml">text pairs checked</span></div><div class="metric"><span class="mv">0</span><span class="ml">hampy fails</span></div><div class="metric"><span class="mv">4</span><span class="ml">corporate pairs flagged</span></div><div class="metric"><span class="mv">5</span><span class="ml">files per brand</span></div></div>
-    <div class="shot-txt"><h4><span class="n">05</span>Contrast results</h4><p class="cap">Computed by the build. hampy passes every allowed pair; the corporate report flags white on the pink accent (3.71:1) as large text only.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">05</span>Contrast results</h3><p class="cap">Computed by the build. hampy passes every allowed pair; the corporate report flags white on the pink accent (3.71:1) as large text only.</p></div>
   </li><li class="shot shot-image" aria-roledescription="slide" aria-label="6 of 8: DPark in the corporate theme">
     <a class="m m-img" href="media/06/dpark-themed.png" target="_blank" rel="noopener">
       <img src="media/06/dpark-themed.png" alt="DPark indigo side navigation and bay booking dialog with a pink confirm button, next to the generated token values" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">06</span>DPark in the corporate theme</h4><p class="cap">The staff parking booking app (React, Tailwind, Netlify Functions) uses the same token values. Crops show no logo; the person search is covered.</p></div>
-  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: GitHub Copilot ready">
-    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Code drafted with AI pair programming and verified by 7 node tests covering the contrast maths and every generated file. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules.</p></div>
-    <div class="shot-txt"><h4><span class="n">07</span>GitHub Copilot ready</h4></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">06</span>DPark in the corporate theme</h3><p class="cap">The staff parking booking app (React, Tailwind, Netlify Functions) uses the same token values. Crops show no logo; the person search is covered.</p></div>
+  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: Built with Claude Code">
+    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Built with Claude Code and verified by 7 node tests covering the contrast maths and every generated file. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">07</span>Built with Claude Code</h3></div>
   </li><li class="shot shot-demo" aria-roledescription="slide" aria-label="8 of 8: Try it">
     <div class="m m-demo"><img src="assets/brand/hampy-agent-icon.png" alt="" width="72" height="72">
       <a class="btn" href="demos/06-brand-theme-systems.html">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
-    <div class="shot-txt"><h4><span class="n">08</span>Try it</h4><p class="cap">Switch between hampy and the corporate theme, watch the sample UI restyle, test any colour pair and read the generated JSON and XML.</p></div>
-  </li></ul>
-      <div class="roll-ctl">
-        <button class="rb prev" type="button" aria-label="Previous snippet">&larr;</button>
-        <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <span class="count" aria-live="polite">1 / 8</span>
-        <button class="rb next" type="button" aria-label="Next snippet">&rarr;</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="panel project" id="p07" data-title="Document Data-Extraction Models" aria-labelledby="t07">
-  <div class="panel-in">
-    <header class="ph">
-      <div class="ph-num" aria-hidden="true">07</div>
-      <div class="ph-main">
-        <p class="kicker">Project 7 of 8</p>
-        <h2 id="t07">Document Data-Extraction Models</h2>
-        <p class="outcome">50 invoices checked in 1.4 s: 8 of 8 seeded errors caught, 0 false approvals.</p>
-        <ul class="stack" aria-label="Stack"><li class="chip">Python</li><li class="chip">Anthropic SDK</li><li class="chip">pdfplumber</li><li class="chip">SQLite</li><li class="chip">Streamlit</li><li class="chip">AI Builder</li><li class="chip">Power Automate</li><li class="chip">Dataverse</li><li class="chip">Copilot Studio</li></ul>
-      </div>
-      <div class="ph-side">
-        <p class="summary">Accounts payable teams key supplier invoices by hand at about three minutes each. I built a Python agent that reads PDF invoices, checks them against vendor and PO master data, and only sends exceptions to a person, then mapped it to AI Builder, Power Automate, Dataverse and Copilot Studio.</p>
-        <p class="cv">Inspired by: P&amp;O integration analytics into governed single-source datasets.</p>
-        <div class="links"><a class="btn" href="demos/07-document-extraction.html">Try the demo</a><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/07-document-extraction" target="_blank" rel="noopener">Source</a></div>
-      </div>
-    </header>
-    <div class="roll" data-roll>
-      <ul class="roll-track" tabindex="0" aria-label="Document Data-Extraction Models snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: One click, 50 invoices">
-    <a class="m m-img" href="media/07/run-intake.png" target="_blank" rel="noopener">
-      <img src="media/07/run-intake.png" alt="Invoice intake app showing 50 processed invoices, outcome chart and reasons chart" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">01</span>One click, 50 invoices</h4><p class="cap">The built Streamlit app after a run: 42 auto-approved, 8 sent for review, and why each one needed a person.</p></div>
-  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="2 of 8: Exception queue with reasons">
-    <a class="m m-img" href="media/07/exception-queue.png" target="_blank" rel="noopener">
-      <img src="media/07/exception-queue.png" alt="Exception queue listing an unknown vendor, a PO that does not exist and an amount that differs from the PO" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">02</span>Exception queue with reasons</h4><p class="cap">Reviewers only see exceptions, each with the reason in plain words and approve or reject with a comment.</p></div>
-  </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="3 of 8: Architecture">
-    <a class="m m-img m-diagram" href="media/07/architecture.svg" target="_blank" rel="noopener">
-      <img src="media/07/architecture.svg" alt="Architecture diagram of the Python invoice intake pipeline and its Power Platform mapping" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">03</span>Architecture</h4><p class="cap">Top: the built Python pipeline. Bottom: the same steps mapped to SharePoint, AI Builder, Power Automate, Dataverse, Teams and Copilot Studio (design, not deployed).</p></div>
-  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="4 of 8: Deterministic PO controls">
-    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>python</em></div><pre tabindex="0"><code>    if not f.po_number:
-        reasons.append((&quot;MISSING_PO&quot;, &quot;No purchase order reference on the invoice&quot;))
-    elif f.po_number not in md.pos:
-        reasons.append((&quot;PO_NOT_FOUND&quot;, f&quot;{f.po_number} does not exist&quot;))
-    else:
-        po = md.pos[f.po_number]
-        if vid and po[&quot;vendor_id&quot;] != vid:
-            reasons.append((&quot;PO_VENDOR_MISMATCH&quot;, f&quot;{f.po_number} belongs to vendor {po['vendor_id']}, not {vid}&quot;))
-        if f.net_amount is not None:
-            diff = (f.net_amount - po[&quot;net_amount&quot;]) / po[&quot;net_amount&quot;]
-            if abs(diff) &gt; rules.amount_tolerance:
-                reasons.append((&quot;AMOUNT_MISMATCH&quot;, f&quot;Net {f.net_amount:,.2f} vs PO {po['net_amount']:,.2f} ({diff:+.1%})&quot;))</code></pre></div>
-    <div class="shot-txt"><h4><span class="n">04</span>Deterministic PO controls</h4><p class="cap">Real excerpt from intake/validate.py. Extraction can use AI; approval decisions stay rule-based and explainable.</p></div>
-  </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: Benchmark on 50 synthetic invoices">
-    <div class="m m-metric"><div class="metric"><span class="mv">8/8</span><span class="ml">seeded errors caught</span></div><div class="metric"><span class="mv">0</span><span class="ml">false approvals</span></div><div class="metric"><span class="mv">50/50</span><span class="ml">key fields exact</span></div><div class="metric"><span class="mv">142 min</span><span class="ml">keying saved of 150</span></div></div>
-    <div class="shot-txt"><h4><span class="n">05</span>Benchmark on 50 synthetic invoices</h4><p class="cap">Re-run offline with the rule-based reader across three layouts. Synthetic data; real supplier documents will differ.</p></div>
-  </li><li class="shot shot-video" aria-roledescription="slide" aria-label="6 of 8: Watch the run">
-    <div class="m m-video"><video src="media/07/clip.mp4" poster="media/07/clip-poster.jpg" muted playsinline loop controls preload="none" aria-label="Watch the run"></video></div>
-    <div class="shot-txt"><h4><span class="n">06</span>Watch the run</h4><p class="cap">28 seconds from the demo video: the inbox, one click, and the results with reasons.</p></div>
-  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: AI pair programming">
-    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Developed with AI pair programming, not GitHub Copilot. The benchmark figures come from a fresh run of the original build. The Power Platform version is a written design and has not been deployed.</p></div>
-    <div class="shot-txt"><h4><span class="n">07</span>AI pair programming</h4></div>
-  </li><li class="shot shot-demo" aria-roledescription="slide" aria-label="8 of 8: Try it">
-    <div class="m m-demo"><img src="assets/brand/hampy-agent-icon.png" alt="" width="72" height="72">
-      <a class="btn" href="demos/07-document-extraction.html">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
-    <div class="shot-txt"><h4><span class="n">08</span>Try it</h4><p class="cap">Run a simulated intake on 12 of the app's invoices, see field confidence and every check, release an exception through the assistant and watch the audit trail.</p></div>
-  </li></ul>
-      <div class="roll-ctl">
-        <button class="rb prev" type="button" aria-label="Previous snippet">&larr;</button>
-        <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <span class="count" aria-live="polite">1 / 8</span>
-        <button class="rb next" type="button" aria-label="Next snippet">&rarr;</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="panel project" id="p08" data-title="Live Wedding Website with AI Photo Album" aria-labelledby="t08">
-  <div class="panel-in">
-    <header class="ph">
-      <div class="ph-num" aria-hidden="true">08</div>
-      <div class="ph-main">
-        <p class="kicker">Project 8 of 8</p>
-        <h2 id="t08">Live Wedding Website with AI Photo Album</h2>
-        <p class="outcome">Guests sign in by phone and see the wedding photos face recognition finds them in.</p>
-        <ul class="stack" aria-label="Stack"><li class="chip">Astro</li><li class="chip">Fastify</li><li class="chip">PostgreSQL + pgvector</li><li class="chip">Immich (InsightFace)</li><li class="chip">Twilio Verify</li><li class="chip">Docker</li><li class="chip">Cloudflare Tunnel</li></ul>
-      </div>
-      <div class="ph-side">
-        <p class="summary">Wedding guests had no private, easy way to find the photos they appear in. A live wedding website, now in production, combines SMS sign-in, guest uploads, manager moderation and an AI photo album that groups faces into people for the couple to link to guests.</p>
-        <p class="cv">Side project outside the CV roles: a production web platform, self-hosted end to end.</p>
-        <div class="links"><a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/08-wedding-photo-album" target="_blank" rel="noopener">Source</a></div>
-      </div>
-    </header>
-    <div class="roll" data-roll>
-      <ul class="roll-track" tabindex="0" aria-label="Live Wedding Website with AI Photo Album snippets, swipe or use arrow keys"><li class="shot shot-image" aria-roledescription="slide" aria-label="1 of 8: Each guest sees only their photos">
-    <a class="m m-img" href="media/08/02-gallery.jpg" target="_blank" rel="noopener">
-      <img src="media/08/02-gallery.jpg" alt="Guest photo gallery of a sample wedding with a caption bar explaining visibility" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">01</span>Each guest sees only their photos</h4><p class="cap">Guests sign in with an SMS code, then browse a gallery filtered to what their access allows. Photos: Wikimedia Commons, CC0 / CC BY, see credits.</p></div>
-  </li><li class="shot shot-image" aria-roledescription="slide" aria-label="2 of 8: AI faces: &quot;Who is this?&quot;">
-    <a class="m m-img" href="media/08/06-faces.jpg" target="_blank" rel="noopener">
-      <img src="media/08/06-faces.jpg" alt="Face review dialog listing guests with similarity percentages for an unnamed person" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">02</span>AI faces: &quot;Who is this?&quot;</h4><p class="cap">Faces detected by InsightFace are clustered into people in pgvector. A manager links each person to a guest, ranked by similarity, or hides bystanders. Photos: Wikimedia Commons, CC0 / CC BY, see credits.</p></div>
-  </li><li class="shot shot-diagram" aria-roledescription="slide" aria-label="3 of 8: Architecture">
-    <a class="m m-img m-diagram" href="media/08/architecture.svg" target="_blank" rel="noopener">
-      <img src="media/08/architecture.svg" alt="Architecture diagram: guest and manager, Cloudflare Tunnel, Astro web, Fastify API, Postgres, Immich, Twilio, and a six-step face pipeline" loading="lazy" decoding="async"></a>
-    <div class="shot-txt"><h4><span class="n">03</span>Architecture</h4><p class="cap">Astro SSR web and a Fastify API over Postgres with pgvector, a headless Immich backend for storage and face detection, and Twilio Verify for sign-in, self-hosted behind a Cloudflare Tunnel.</p></div>
-  </li><li class="shot shot-code" aria-roledescription="slide" aria-label="4 of 8: One access rule, in SQL">
-    <div class="m m-code"><div class="code-bar"><span></span><span></span><span></span><em>ts</em></div><pre tabindex="0"><code>  const taggedIn = sql`EXISTS (
-    SELECT 1 FROM asset_faces af
-    JOIN face_clusters fc ON fc.id = af.cluster_id
-    WHERE af.immich_asset_id = ${t}.immich_asset_id
-      AND af.wedding_id = ${weddingId}
-      AND fc.guest_id = ${viewer.guestId}
-      AND fc.guest_link_source = 'manager'
-  )`;
-  return sql`(${base} AND (${taggedIn} OR ${inTickedCategory}))`;</code></pre></div>
-    <div class="shot-txt"><h4><span class="n">04</span>One access rule, in SQL</h4><p class="cap">The single visibility predicate: a guest sees a photo only if a manager linked them to a face in it, or granted them its category. Selfie matches never grant access.</p></div>
-  </li><li class="shot shot-metric" aria-roledescription="slide" aria-label="5 of 8: Engineering discipline">
-    <div class="m m-metric"><div class="metric"><span class="mv">9</span><span class="ml">architecture decision records</span></div><div class="metric"><span class="mv">12</span><span class="ml">design specs</span></div><div class="metric"><span class="mv">142</span><span class="ml">test files</span></div><div class="metric"><span class="mv">14</span><span class="ml">API modules</span></div></div>
-    <div class="shot-txt"><h4><span class="n">05</span>Engineering discipline</h4><p class="cap">Counted from the repository: decision records, design specs, test files and API modules. CI checks format, lint ratchet, types, tests and build on every push.</p></div>
-  </li><li class="shot shot-video" aria-roledescription="slide" aria-label="6 of 8: Walkthrough">
-    <div class="m m-video"><video src="media/08/clip.mp4" poster="media/08/poster.jpg" muted playsinline loop controls preload="none" aria-label="Walkthrough"></video></div>
-    <div class="shot-txt"><h4><span class="n">06</span>Walkthrough</h4><p class="cap">28 seconds of the real web build: gallery, people pages and face review. Sample photos from Wikimedia Commons, fictional names.</p></div>
-  </li><li class="shot shot-text" aria-roledescription="slide" aria-label="7 of 8: AI pair programming">
-    <div class="m m-text"><span class="q" aria-hidden="true">&gt;_</span><p>Built spec first with an AI coding agent: 12 specs, agent instructions kept in the repo, test-first house rules and CI gates. Privacy rules were recorded as decision records. The same instruction files work with GitHub Copilot agent mode.</p></div>
-    <div class="shot-txt"><h4><span class="n">07</span>AI pair programming</h4></div>
-  </li><li class="shot shot-demo" aria-roledescription="slide" aria-label="8 of 8: Watch the full flow">
-    <div class="m m-demo"><img src="assets/brand/hampy-agent-icon.png" alt="" width="72" height="72">
-      <a class="btn" href="media/08/clip.mp4">Open the demo <span aria-hidden="true">&rarr;</span></a></div>
-    <div class="shot-txt"><h4><span class="n">08</span>Watch the full flow</h4><p class="cap">Gallery, lightbox, people pages and face review in one clip; the screenshots cover sign-in, upload and moderation. Source code is in a private repository.</p></div>
+    <div class="shot-txt"><h3 class="shot-h"><span class="n">08</span>Try it</h3><p class="cap">Switch between hampy and the corporate theme, watch the sample UI restyle, test any colour pair and read the generated JSON and XML.</p></div>
   </li></ul>
       <div class="roll-ctl">
         <button class="rb prev" type="button" aria-label="Previous snippet">&larr;</button>
@@ -612,19 +707,20 @@ export function contrastRatio(fg, bg) {
 <section class="panel contact" id="contact" data-title="Contact" aria-labelledby="c-h">
   <div class="panel-in">
     <img class="mark" src="assets/brand/hampy-agent-icon.png" alt="" width="96" height="96">
-    <h2 id="c-h">Have a process that eats your team's week?</h2>
-    <p class="lede">I am Hampy Terzian, a solutions design manager in logistics with an industrial engineering background and an MIT MicroMasters in Supply Chain Management. I find the manual work worth automating, build it on the tools you already license, and say plainly when something is not worth automating.</p>
+    <h2 id="c-h">Open to AI agentic engineering roles.</h2>
+    <p class="lede">Based in Amsterdam. I build AI agents that raise accuracy, save time and cut cost, with people in control. Have a process that eats your team's week? Let's talk.</p>
     <div class="links">
       <a class="btn" href="mailto:HampyTerzian3@gmail.com">Email me</a>
+      <a class="btn secondary" href="mailto:HampyTerzian3@gmail.com?subject=CV%20request">Request my CV</a>
       <a class="btn secondary" href="https://www.linkedin.com/in/hampy-terzian-58322ba6" target="_blank" rel="noopener">LinkedIn</a>
       <a class="btn secondary" href="https://github.com/Hampyterzian3/copilot-logistics-portfolio" target="_blank" rel="noopener">All source on GitHub</a>
     </div>
-    <p class="fine">Bonus: <a href="bonus/process-intake-agent.html">Process Intake Agent</a>, a Copilot Studio agent that interviews a business user about a manual process and recommends the right automation route.</p>
-    <p class="fine">Projects 1 to 5 use a fictional company and synthetic data. Demos simulate the agents in the browser; each project folder holds the Copilot Studio, Power Automate and Dataverse artefacts to build them in a tenant.</p>
+    <p class="fine">The Contoso projects (Early-Warning Risk, Executive Briefing, Tender Gap-Check, Network Scenario and Pricing Approval) use fictional companies and synthetic data. Demos simulate the agents in the browser; each project folder holds the Copilot Studio, Power Automate and Dataverse artefacts to build them in a tenant.</p>
     <p class="fine">&copy; 2026 Hampy Terzian</p>
   </div>
 </section>
 </main>
-<script src="assets/js/site.js?v=mvh4uumz" defer></script>
+<script src="assets/js/site.js?v=th20261021m" defer></script>
+<script src="assets/js/lightbox.js?v=th20261021m" defer></script>
 </body>
 </html>

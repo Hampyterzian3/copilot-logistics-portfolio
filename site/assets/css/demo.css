@@ -2,20 +2,19 @@
 .demo-top {
   position: sticky; top: 0; z-index: 10;
   display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  padding: 12px 16px; background: var(--green); border-bottom: 1px solid var(--line);
+  padding: 12px 16px; background: var(--bg); border-bottom: 1px solid var(--line);
 }
 .demo-top img { height: 22px; }
-.demo-top .back { color: var(--offwhite); text-decoration: none; font: 500 14px var(--font-heading); }
-.demo-top .back:hover { color: var(--orange); }
+.demo-top .back { color: var(--fg); text-decoration: none; font: 500 14px var(--font-heading); }
+.demo-top .back:hover { color: var(--accent); }
 .demo-top .title { font: 600 15px var(--font-heading); margin-left: auto; }
-.demo-badge { background: var(--yellow); color: var(--green); padding: 2px 8px; border-radius: var(--r-xl); font: 600 11px var(--font-heading); text-transform: uppercase; letter-spacing: .04em; }
+.demo-badge { background: var(--yellow); color: var(--green); padding: 2px 8px; border-radius: var(--r-xl); font: 600 12px var(--font-heading); text-transform: uppercase; letter-spacing: .04em; }
 
 .demo-wrap { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; }
 .demo-intro { max-width: 760px; margin-bottom: 20px; color: var(--muted); }
-.demo-intro h1 { color: var(--offwhite); font-size: clamp(24px, 4vw, 34px); }
+.demo-intro h1 { color: var(--fg); font-size: clamp(24px, 4vw, 34px); }
 
-.demo-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; }
-@media (max-width: 860px) { .demo-grid { grid-template-columns: 1fr; } }
+.demo-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
 
 /* Light "app" surface: mimics a Power Apps / Microsoft 365 canvas, in hampy colours */
 .app {
@@ -30,7 +29,7 @@
 .app-body { padding: 16px; }
 .app label { display: block; font: 600 12px var(--font-heading); margin: 10px 0 4px; }
 .app input, .app select, .app textarea {
-  width: 100%; padding: 8px 10px; border: 1px solid rgba(12,44,35,.3); border-radius: var(--r-sm);
+  width: 100%; padding: 8px 10px; border: 1px solid rgba(12,44,35,.6); border-radius: var(--r-sm);
   font: 14px var(--font-body); background: #fff; color: var(--green);
 }
 .app table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -50,14 +49,14 @@
 .msg ul { margin: 6px 0 0; padding-left: 18px; }
 .msg .cite { display: block; margin-top: 6px; font-size: 12px; color: var(--muted); }
 .copilot-input { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); flex-wrap: wrap; }
-.copilot-input input { flex: 1; min-width: 0; padding: 9px 10px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--green); color: var(--offwhite); font: 14px var(--font-body); }
+.copilot-input input { flex: 1; min-width: 0; padding: 9px 10px; border-radius: var(--r-sm); border: 1px solid var(--field-border); background: var(--bg); color: var(--fg); font: 14px var(--font-body); }
 .suggest { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 12px; }
-.suggest button { background: transparent; color: var(--offwhite); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 5px 10px; font: 500 12px var(--font-heading); cursor: pointer; }
+.suggest button { background: transparent; color: var(--fg); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 5px 10px; font: 500 12px var(--font-heading); cursor: pointer; }
 .suggest button:hover { border-color: var(--orange); }
 
 /* Adaptive-card style block */
 .card-ac { background: var(--offwhite); color: var(--green); border-radius: var(--r-xl); padding: 12px; font-size: 13px; }
-.card-ac h4 { margin: 0 0 6px; font-size: 14px; }
+.card-ac h2, .card-ac h3, .card-ac h4 { margin: 0 0 6px; font-size: 14px; }
 
 /* KPI tiles */
 .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
@@ -65,8 +64,33 @@
 .kpi .v { font: 700 24px var(--font-heading); color: var(--green); font-variant-numeric: tabular-nums; }
 .kpi .l { font-size: 12px; opacity: .8; }
 
-.tag { display: inline-block; padding: 2px 8px; border-radius: var(--r-xl); font: 600 11px var(--font-heading); color: var(--green); }
+.tag { display: inline-block; padding: 2px 8px; border-radius: var(--r-xl); font: 600 12px var(--font-heading); color: var(--green); }
 .tag.ok { background: var(--lime); } .tag.warn { background: var(--yellow); } .tag.bad { background: var(--pink); } .tag.info { background: var(--blue); }
 
 .stack-note { margin-top: 24px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r-xl); color: var(--muted); font-size: 14px; }
-.stack-note strong { color: var(--offwhite); }
+.stack-note strong { color: var(--fg); }
+
+/* Accessibility (WCAG 1.4.11): green focus ring inside light app surfaces; orange halo keeps the brand accent */
+.app :focus-visible, .card-ac :focus-visible {
+  outline: 2px solid var(--green); outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--orange);
+}
+/* Accessibility (WCAG 2.4.11): keep focused items clear of the sticky header; unstick it on short viewports */
+html { scroll-padding-top: 120px; }
+@media (max-height: 500px) { .demo-top { position: static; } html { scroll-padding-top: 0; } }
+/* Accessibility (WCAG 4.1.2): selectable table rows use a native toggle button in the first cell */
+.row-btn { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; border-radius: 2px; }
+/* Light theme: keep the light app panels and cards distinct from the light page */
+:root[data-theme="light"] .app, :root[data-theme="light"] .card-ac { box-shadow: 0 0 0 1px var(--line), 0 6px 18px rgba(12,44,35,.06); }
+
+/* Touch screens: controls at least 24x24px (WCAG 2.2), back link 44px tall */
+@media (pointer: coarse), (max-width: 860px) {
+  .demo-top .back { display: inline-flex; align-items: center; min-height: 44px; }
+  .row-btn { min-height: 28px; padding: 4px 0; }
+  input[type=range] { min-height: 28px; }
+}
+
+/* 4K and larger at 100% OS scaling: scale content so text stays readable */
+@media (min-width: 3000px) and (min-height: 1600px) {
+  .demo-top, .demo-wrap { zoom: 1.6; }
+}

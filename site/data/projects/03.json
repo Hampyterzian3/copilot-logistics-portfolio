@@ -1,9 +1,13 @@
 {
   "id": "03",
   "slug": "network-scenario-agent",
+  "order": 6,
   "title": "Network Scenario Agent",
+  "kickerNote": "proven in logistics",
+  "impact": [
+    "cost"
+  ],
   "outcome": "Per-supplier mix of direct, milk-run and cross-dock: 7.1% below the best single design.",
-  "summary": "An automotive plant's 60 inbound suppliers can ship direct, by regional milk-run or via a cross-dock, and the best choice moves with diesel, handling and stop limits. A Copilot Studio agent calls a Python network engine through a custom connector, compares cost, CO2 and truck movements, and explains the recommended mix.",
   "stack": [
     "Copilot Studio",
     "Azure Functions",
@@ -11,18 +15,32 @@
     "Power Automate",
     "Dataverse",
     "Power BI",
-    "GitHub Copilot"
+    {
+      "label": "GitHub Copilot",
+      "ghost": true
+    }
   ],
+  "summary": "An automotive plant's 60 inbound suppliers can ship direct, by regional milk-run or via a cross-dock, and the best choice moves with diesel, handling and stop limits. A Copilot Studio agent calls a Python network engine through a custom connector, compares cost, CO2 and truck movements, and explains the recommended mix.",
   "cv": "Inspired by: designed a pan-European inbound network for an automotive OEM plant, comparing direct full-load, regional milk-run and cross-dock designs across 180+ supplier lanes on cost, CO2 and vehicle movements; built an optimisation engine (KNIME and Log-Hub) that routes 40,000 orders across six facilities in around two hours.",
-  "demo": "demos/03-network-scenario-agent.html",
-  "repo": "projects/03-network-scenario-agent",
+  "links": [
+    {
+      "label": "Try the demo",
+      "href": "demos/03-network-scenario-agent.html"
+    },
+    {
+      "label": "Source",
+      "href": "https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/03-network-scenario-agent",
+      "secondary": true,
+      "external": true
+    }
+  ],
   "cards": [
     {
       "type": "image",
       "title": "Four designs, one answer",
-      "caption": "Sliders for diesel, CO2 price, handling and milk-run stops drive the engine; the agent explains why the best mix wins.",
+      "caption": "Sliders for diesel, CO2 price, handling and milk-run stops drive the engine; the results table and the map show why the best mix wins.",
       "src": "media/03/03-result.png",
-      "alt": "Demo showing results per design, a flow map and the agent explaining the recommendation"
+      "alt": "Demo with scenario sliders, KPI tiles, results per design and a flow map"
     },
     {
       "type": "diagram",
@@ -78,13 +96,14 @@
     {
       "type": "text",
       "title": "GitHub Copilot ready",
-      "caption": "Code drafted with AI pair programming and verified by 22 pytest tests and a Python to JavaScript parity check on 80 values. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
+      "body": "Code drafted with AI pair programming and verified by 22 pytest tests and a Python to JavaScript parity check on 80 values. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
     },
     {
       "type": "demo",
       "title": "Try it",
       "caption": "Move the sliders, switch designs on the map and click through the agent's four topics in under a minute.",
-      "href": "demos/03-network-scenario-agent.html"
+      "href": "demos/03-network-scenario-agent.html",
+      "cta": "Open the demo"
     }
   ]
 }

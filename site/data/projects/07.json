@@ -1,24 +1,38 @@
 {
   "id": "07",
   "slug": "document-extraction",
-  "title": "Document Data-Extraction Models",
-  "outcome": "50 invoices checked in 1.4 s: 8 of 8 seeded errors caught, 0 false approvals.",
-  "summary": "Accounts payable teams key supplier invoices by hand at about three minutes each. I built a Python agent that reads PDF invoices, checks them against vendor and PO master data, and only sends exceptions to a person, then mapped it to AI Builder, Power Automate, Dataverse and Copilot Studio.",
+  "order": 1,
+  "title": "Invoice Intake Agent",
+  "impact": [
+    "acc",
+    "time",
+    "cost"
+  ],
+  "outcome": "50 synthetic invoices checked in 1.4 s: all 8 planted errors stopped, none wrongly approved, 142 of 150 keying minutes removed.",
   "stack": [
     "Python",
     "Anthropic SDK",
     "pdfplumber",
     "SQLite",
     "Streamlit",
-    "AI Builder",
     "Power Automate",
     "Dataverse",
     "Copilot Studio"
   ],
+  "summary": "Accounts payable teams key supplier invoices by hand at about three minutes each. I built a Python agent that reads PDF invoices, checks them against vendor and PO master data, and only sends exceptions to a person, then mapped it to AI Builder, Power Automate, Dataverse and Copilot Studio. The benchmark uses the rule-based reader; the Claude extraction path was not part of that run.",
   "cv": "Inspired by: P&O integration analytics into governed single-source datasets.",
-  "demo": "demos/07-document-extraction.html",
-  "repo": "projects/07-document-extraction",
-  "source": "Source available on request.",
+  "links": [
+    {
+      "label": "Try the demo",
+      "href": "demos/07-document-extraction.html"
+    },
+    {
+      "label": "Source",
+      "href": "https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/07-document-extraction",
+      "secondary": true,
+      "external": true
+    }
+  ],
   "cards": [
     {
       "type": "image",
@@ -75,19 +89,27 @@
       "type": "video",
       "title": "Watch the run",
       "caption": "28 seconds from the demo video: the inbox, one click, and the results with reasons.",
+      "description": {
+        "summary": "Text description of the video",
+        "id": "v07-desc",
+        "text": "Silent, 28 seconds, with on-screen captions. 0:00 The Invoice intake agent app shows an empty run: 0 invoices processed. Caption: \"Here is the inbox: fifty synthetic invoices in three different layouts, with a few deliberate errors hidden inside.\" 0:08 The user clicks Run intake. Caption: \"One click.\" 0:09 The tiles fill in: 50 processed, 84% auto-approved, 8 waiting for review, 2.4 hours saved, with a bar chart of outcomes and of why invoices need a person. Caption: \"Fifty invoices are read and checked in under two seconds. By hand, that is about two and a half hours of keying.\" 0:16 Caption: \"Forty two passed every control and were approved automatically.\" 0:20 The exception queue is shown. Caption: \"Eight need a person, and the agent says why: an amount that differs from the purchase order, an unknown vendor, a duplicate, or wrong VAT.\""
+      },
       "src": "media/07/clip.mp4",
-      "poster": "media/07/clip-poster.jpg"
+      "poster": "media/07/clip-poster.jpg",
+      "alt": "Watch the run"
     },
     {
       "type": "text",
       "title": "AI pair programming",
-      "caption": "Developed with AI pair programming, not GitHub Copilot. The benchmark figures come from a fresh run of the original build. The Power Platform version is a written design and has not been deployed."
+      "body": "Developed with AI pair programming, not GitHub Copilot. The benchmark figures come from a fresh run of the original build. The Power Platform version is a written design and has not been deployed."
     },
     {
       "type": "demo",
       "title": "Try it",
       "caption": "Run a simulated intake on 12 of the app's invoices, see field confidence and every check, release an exception through the assistant and watch the audit trail.",
-      "href": "demos/07-document-extraction.html"
+      "href": "demos/07-document-extraction.html",
+      "cta": "Open the demo"
     }
-  ]
+  ],
+  "source": "Source available on request."
 }

@@ -1,21 +1,44 @@
 {
   "id": "06",
   "slug": "brand-theme-systems",
+  "order": 9,
   "title": "AI Brand Theme Systems",
+  "impact": [
+    "time"
+  ],
   "outcome": "One tokens file per brand generates web, Power Apps and Office themes, contrast-checked.",
-  "summary": "Brand colours drift when they are copied by hand into apps, decks and Copilot Studio agents. I built a token pipeline that generates CSS, Tailwind, Power Apps and Office themes plus a WCAG report, used for my hampy brand and a DP World corporate theme in DPark.",
   "stack": [
-    "GitHub Copilot",
-    "Microsoft 365 Copilot",
+    {
+      "label": "Claude Code",
+      "ghost": true
+    },
+    {
+      "label": "GitHub Copilot",
+      "ghost": true
+    },
     "Power Apps",
     "Copilot Studio",
     "SharePoint",
-    "GitHub Actions",
+    {
+      "label": "GitHub Actions",
+      "ghost": true
+    },
     "Node.js"
   ],
+  "summary": "Brand colours drift when they are copied by hand into apps, decks and Copilot Studio agents. I built a token pipeline that generates CSS, Tailwind, Power Apps and Office themes plus a WCAG report, used for my hampy brand and a DP World corporate theme in DPark.",
   "cv": "Inspired by: Build my own analytical tools and automations to speed up day-to-day work.",
-  "demo": "demos/06-brand-theme-systems.html",
-  "repo": "projects/06-brand-theme-systems",
+  "links": [
+    {
+      "label": "Try the demo",
+      "href": "demos/06-brand-theme-systems.html"
+    },
+    {
+      "label": "Source",
+      "href": "https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/06-brand-theme-systems",
+      "secondary": true,
+      "external": true
+    }
+  ],
   "cards": [
     {
       "type": "image",
@@ -77,14 +100,15 @@
     },
     {
       "type": "text",
-      "title": "GitHub Copilot ready",
-      "caption": "Code drafted with AI pair programming and verified by 7 node tests covering the contrast maths and every generated file. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
+      "title": "Built with Claude Code",
+      "body": "Built with Claude Code and verified by 7 node tests covering the contrast maths and every generated file. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
     },
     {
       "type": "demo",
       "title": "Try it",
       "caption": "Switch between hampy and the corporate theme, watch the sample UI restyle, test any colour pair and read the generated JSON and XML.",
-      "href": "demos/06-brand-theme-systems.html"
+      "href": "demos/06-brand-theme-systems.html",
+      "cta": "Open the demo"
     }
   ]
 }

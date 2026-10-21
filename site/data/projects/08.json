@@ -1,9 +1,9 @@
 {
   "id": "08",
   "slug": "wedding-photo-album",
-  "title": "Live Wedding Website with AI Photo Album",
-  "outcome": "Guests sign in by phone and see the wedding photos face recognition finds them in.",
-  "summary": "Wedding guests had no private, easy way to find the photos they appear in. A live wedding website, now in production, combines SMS sign-in, guest uploads, manager moderation and an AI photo album that groups faces into people for the couple to link to guests.",
+  "order": 8,
+  "title": "Private Photo Platform",
+  "outcome": "Live in production: guests see only the photos a manager links them to; selfie matches never grant access.",
   "stack": [
     "Astro",
     "Fastify",
@@ -11,27 +11,36 @@
     "Immich (InsightFace)",
     "Twilio Verify",
     "Docker",
-    "Cloudflare Tunnel"
+    "Cloudflare Tunnel",
+    {
+      "label": "Claude Code",
+      "ghost": true
+    }
   ],
+  "summary": "Wedding guests had no private, easy way to find the photos they appear in. A live wedding website, now in production, combines SMS sign-in, guest uploads, manager moderation and an AI photo album that groups faces into people for the couple to link to guests. Face recognition is designed as an explicit opt-in.",
   "cv": "Side project outside the CV roles: a production web platform, self-hosted end to end.",
-  "demo": null,
-  "repo": "projects/08-wedding-photo-album",
+  "links": [
+    {
+      "label": "Source",
+      "href": "https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/08-wedding-photo-album",
+      "secondary": true,
+      "external": true
+    }
+  ],
   "cards": [
     {
       "type": "image",
       "title": "Each guest sees only their photos",
       "caption": "Guests sign in with an SMS code, then browse a gallery filtered to what their access allows. Photos: Wikimedia Commons, CC0 / CC BY, see credits.",
       "src": "media/08/02-gallery.jpg",
-      "alt": "Guest photo gallery of a sample wedding with a caption bar explaining visibility",
-      "href": "projects/08-wedding-photo-album/README.md#photo-credits"
+      "alt": "Guest photo gallery of a sample wedding with a caption bar explaining visibility"
     },
     {
       "type": "image",
       "title": "AI faces: \"Who is this?\"",
       "caption": "Faces detected by InsightFace are clustered into people in pgvector. A manager links each person to a guest, ranked by similarity, or hides bystanders. Photos: Wikimedia Commons, CC0 / CC BY, see credits.",
       "src": "media/08/06-faces.jpg",
-      "alt": "Face review dialog listing guests with similarity percentages for an unnamed person",
-      "href": "projects/08-wedding-photo-album/README.md#photo-credits"
+      "alt": "Face review dialog listing guests with similarity percentages for an unnamed person"
     },
     {
       "type": "diagram",
@@ -74,19 +83,26 @@
       "type": "video",
       "title": "Walkthrough",
       "caption": "28 seconds of the real web build: gallery, people pages and face review. Sample photos from Wikimedia Commons, fictional names.",
+      "description": {
+        "summary": "Text description of the video",
+        "id": "v08-desc",
+        "text": "Silent, 28 seconds, with an on-screen caption bar. 0:00 The wedding site for Alex and Jordan shows a photo gallery. Caption: \"Guests sign in with their phone\" (Twilio Verify one-time code, then a secure session cookie). 0:05 The gallery scrolls through photos. Caption: \"The gallery shows only what this guest may see\": all-guest photos, photos they are in, and categories they were granted. 0:10 The People page shows round face thumbnails with names. Caption: \"People: face clusters linked to guests\". Guests can browse everyone, and their own cluster shows as \"Me\". 0:15 A person page for Jordan Morgan lists their photos. 0:18 The admin Manage wedding screen opens the face review. Caption: \"Faces: Who is this?\" The admin links a face cluster to a guest, merges look-alikes and hides bystanders."
+      },
       "src": "media/08/clip.mp4",
-      "poster": "media/08/poster.jpg"
+      "poster": "media/08/poster.jpg",
+      "alt": "Walkthrough"
     },
     {
       "type": "text",
-      "title": "AI pair programming",
-      "caption": "Built spec first with an AI coding agent: 12 specs, agent instructions kept in the repo, test-first house rules and CI gates. Privacy rules were recorded as decision records. The same instruction files work with GitHub Copilot agent mode."
+      "title": "Built with Claude Code",
+      "body": "Built spec first with Claude Code: 12 specs, agent instructions kept in the repo, test-first house rules and CI gates. Privacy rules were recorded as decision records. The same instruction files work with GitHub Copilot agent mode."
     },
     {
       "type": "demo",
       "title": "Watch the full flow",
       "caption": "Gallery, lightbox, people pages and face review in one clip; the screenshots cover sign-in, upload and moderation. Source code is in a private repository.",
-      "href": "media/08/clip.mp4"
+      "href": "media/08/clip.mp4",
+      "cta": "Open the demo"
     }
   ]
 }

@@ -1,13 +1,14 @@
 <!doctype html>
-<html lang="en-GB">
+<html lang="en-GB" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tender Desk Copilot</title>
-<meta name="description" content="Simulated demo: an RFQ checker and Copilot Studio agent that finds gaps in a lane spreadsheet and requirements document, drafts clarification questions and suggests a mode per lane.">
+<meta name="description" content="Simulated demo: an RFQ checker that finds gaps in a lane spreadsheet and requirements document, drafts clarification questions and suggests a mode per lane.">
 <link rel="icon" type="image/png" href="../assets/brand/hampy-favicon-64.png">
-<link rel="stylesheet" href="../assets/css/tokens.css">
-<link rel="stylesheet" href="../assets/css/demo.css">
+<link rel="stylesheet" href="../assets/css/tokens.css?v=th20261021m">
+<link rel="stylesheet" href="../assets/css/demo.css?v=th20261021m">
+<script src="../assets/js/theme.js?v=th20261021m"></script>
 <style>
   .picker { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
   .picker > div { flex: 1 1 220px; min-width: 0; }
@@ -33,13 +34,12 @@
   .app tr.sev-low td:first-child { box-shadow: inset 4px 0 0 var(--blue); }
   .app tr.hl td { background: rgba(255,107,53,.12); }
   .gaplist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-  .gaplist li { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: start; padding: 8px 10px; border-radius: var(--r-sm); background: rgba(12,44,35,.04); font-size: 13px; }
+  .gaplist li { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: start; padding: 8px 10px; border-radius: var(--r-sm); background: rgba(12,44,35,.04); font-size: 13px; }
   .gaplist .who { font: 600 12px var(--font-heading); }
-  .gaplist button { border: 1px solid rgba(12,44,35,.25); background: transparent; color: var(--green); border-radius: var(--r-xl); padding: 3px 9px; font: 600 11px var(--font-heading); cursor: pointer; }
   .bands { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; }
   .band { border-radius: var(--r-xl); padding: 10px 12px; color: var(--green); }
   .band.b0 { background: var(--lime); } .band.b1 { background: var(--blue-soft); } .band.b2 { background: var(--yellow); } .band.b3 { background: rgba(12,44,35,.08); }
-  .band h4 { margin: 0 0 4px; font-size: 14px; }
+  .band h2 { margin: 0 0 4px; font-size: 14px; }
   .band .v { font: 700 22px var(--font-heading); }
   .band p { margin: 4px 0 0; font-size: 12px; }
   .word { border: 1px solid rgba(12,44,35,.2); border-radius: var(--r-xl); overflow: hidden; }
@@ -47,28 +47,27 @@
   .word-bar .chip { margin-left: auto; }
   .word-canvas { background: rgba(12,44,35,.06); padding: 16px; }
   .word-page { background: #fff; color: var(--green); max-width: 680px; margin: 0 auto; padding: 28px 30px; font-size: 13.5px; line-height: 1.55; box-shadow: 0 1px 4px rgba(12,44,35,.15); }
-  .word-page h3 { font-size: 16px; margin-bottom: 10px; }
-  .word-page h4 { font-size: 13.5px; margin: 14px 0 4px; }
+  .word-page h2 { font-size: 16px; margin-bottom: 10px; }
+  .word-page h3 { font-size: 13.5px; margin: 14px 0 4px; }
   .word-page ol { margin: 0; padding-left: 20px; }
   .word-page .meta { font-size: 12px; opacity: .75; margin-bottom: 14px; }
   .muted { opacity: .75; font-size: 13px; }
-  .copilot form { display: contents; }
-  @media (min-width: 861px) { .copilot { position: sticky; top: 64px; align-self: start; } }
-  @media (max-width: 480px) { .word-page { padding: 18px 16px; } .word-canvas { padding: 8px; } .gaplist li { grid-template-columns: auto 1fr; } .gaplist li button { grid-column: 2; justify-self: start; } }
+  @media (max-width: 480px) { .word-page { padding: 18px 16px; } .word-canvas { padding: 8px; } }
 </style>
 </head>
 <body>
 <header class="demo-top">
-  <a class="back" href="../index.html#p01">&larr; Portfolio</a>
-  <img src="../assets/brand/hampy-logo-offwhite.svg" alt="hampy">
+  <a class="back" href="../index.html#p04">&larr; Portfolio</a>
+  <img class="logo-dark" src="../assets/brand/hampy-logo-offwhite.svg" alt="hampy"><img class="logo-light" src="../assets/brand/hampy-logo.svg" alt="hampy">
   <span class="demo-badge">Simulated demo</span>
   <span class="title">Tender Desk Copilot</span>
+  <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false" aria-label="Dark mode" title="Switch to dark mode"><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
 </header>
 
 <main class="demo-wrap">
   <section class="demo-intro">
     <h1>Tender Desk Copilot</h1>
-    <p>Solution designers at Contoso Logistics receive RFQ packs as a lane spreadsheet plus a requirements document, and lose days finding gaps before pricing can start. Pick a synthetic RFQ from the fictional shipper Northwind Components, run the check, then ask the agent what is missing, draft the clarification letter and get a mode per lane. The rules run in your browser and give the same results as the Python checker.</p>
+    <p>Solution designers at Contoso Logistics receive RFQ packs as a lane spreadsheet plus a requirements document, and lose days finding gaps before pricing can start. Pick a synthetic RFQ from the fictional shipper Northwind Components, run the check, then review what is missing, the draft clarification letter and the suggested mode per lane. The rules run in your browser and give the same results as the Python checker.</p>
   </section>
 
   <div class="demo-grid">
@@ -114,7 +113,7 @@
 
           <div class="panel" id="p-outline" role="tabpanel" aria-labelledby="tab-outline" hidden>
             <div class="bands" id="bands"></div>
-            <h4>Next steps</h4>
+            <h2 style="font-size:1em">Next steps</h2>
             <ol id="steps"></ol>
             <p class="muted">In production, Microsoft 365 Copilot in PowerPoint builds the customer solution outline from this summary file.</p>
           </div>
@@ -128,25 +127,6 @@
         </div>
       </div>
     </section>
-
-    <aside class="copilot" aria-label="Tender Desk agent">
-      <div class="copilot-head"><img src="../assets/brand/hampy-agent-icon.png" alt=""><span>Tender Desk agent</span><span class="chip yellow" style="margin-left:auto">Simulation</span></div>
-      <div class="copilot-log" id="log" aria-live="polite"></div>
-      <div class="suggest" id="suggest">
-        <button type="button" data-q="What is missing?">What is missing?</button>
-        <button type="button" data-q="Draft clarification email">Draft clarification email</button>
-        <button type="button" data-q="Suggest mode per lane">Suggest mode per lane</button>
-        <button type="button" data-q="Summarise scope">Summarise scope</button>
-        <button type="button" data-q="Explain a gap">Explain a gap</button>
-      </div>
-      <form id="ask" class="copilot-input-form">
-        <div class="copilot-input">
-          <label class="sr-only" for="q">Ask the agent</label>
-          <input id="q" autocomplete="off" placeholder="Ask, e.g. explain NW-006">
-          <button class="btn" type="submit">Send</button>
-        </div>
-      </form>
-    </aside>
   </div>
 
   <section class="stack-note">
@@ -155,7 +135,6 @@
       <li><strong>Sample RFQ folder</strong>: a document library in SharePoint, one folder per RFQ with <code>lanes.csv</code> and <code>requirements.md</code>.</li>
       <li><strong>Run check</strong>: a Power Automate flow triggered when a new RFQ folder is created calls the Python checker (Azure Function behind a custom connector), stores lanes and gaps in Dataverse and posts an adaptive card to the Tender Desk channel in Teams.</li>
       <li><strong>Lanes, gaps and outline tabs</strong>: the checker output. In this page the same nine rules run in JavaScript and are tested for identical results against the Python version.</li>
-      <li><strong>Agent panel</strong>: a Copilot Studio agent with the RFQ library as knowledge and topics "Check new RFQ", "Explain a gap", "Draft clarification questions" and "Summarise scope". Here it is simulated with keyword intents.</li>
       <li><strong>Draft letter and solution outline</strong>: Microsoft 365 Copilot in Word and PowerPoint, prompted with the generated summary file.</li>
     </ul>
   </section>
@@ -396,7 +375,6 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const fmt = (n) => n == null ? "&ndash;" : Number(n).toLocaleString("en-GB");
 const SEV_TAG = { high: "bad", medium: "warn", low: "info" };
-const CITE = "Source: lanes.csv and requirements.md, SharePoint RFQ library (simulated)";
 let current = null; // { pack, result }
 
 function pack() { return PACKS[$("pack").selectedIndex]; }
@@ -425,8 +403,8 @@ function run() {
     [sm.readiness_pct + "%", "lanes ready to price"],
   ].map(([v, l]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
   renderLanes();
-  $("gaps").innerHTML = r.gaps.map((g, i) => `<li><span class="tag ${SEV_TAG[g.severity]}">${g.severity}</span><span><span class="who">${g.rule_id} &middot; ${esc(g.lane_id || "requirements.md")}</span><br>${esc(g.message)}</span><button type="button" data-gap="${i}">Explain</button></li>`).join("");
-  $("bands").innerHTML = r.outline.bands.map((b, i) => `<div class="band b${i}"><h4>${esc(b.band)}</h4><div class="v">${b.lane_count} lanes</div><p>${fmt(b.annual_pallets)} pallets a year</p><p>${esc(b.rationale)}</p></div>`).join("");
+  $("gaps").innerHTML = r.gaps.map((g, i) => `<li><span class="tag ${SEV_TAG[g.severity]}">${g.severity}</span><span><span class="who">${g.rule_id} &middot; ${esc(g.lane_id || "requirements.md")}</span><br>${esc(g.message)}</span></li>`).join("");
+  $("bands").innerHTML = r.outline.bands.map((b, i) => `<div class="band b${i}"><h2>${esc(b.band)}</h2><div class="v">${b.lane_count} lanes</div><p>${fmt(b.annual_pallets)} pallets a year</p><p>${esc(b.rationale)}</p></div>`).join("");
   $("steps").innerHTML = r.outline.next_steps.map((x) => `<li>${esc(x)}</li>`).join("");
   renderLetter();
   return r;
@@ -450,10 +428,10 @@ function renderLetter() {
   const n = r.questions.reduce((t, q) => t + q.questions.length, 0);
   $("letter").innerHTML = `
     <div class="meta">To: ${esc(p.meta.shipper)}, Procurement &middot; From: Contoso Logistics, Solution Design &middot; DRAFT</div>
-    <h3>Clarification questions: ${esc(p.meta.title)}</h3>
+    <h2>Clarification questions: ${esc(p.meta.title)}</h2>
     <p>Dear ${esc(p.meta.shipper)} procurement team,</p>
     <p>Thank you for inviting Contoso Logistics to tender for the ${esc(p.meta.title)} contract. We have reviewed the ${r.scope.lane_count} lanes and the requirements document. To price accurately, we would be grateful for answers to the ${n} questions below by ${esc(p.meta.response_due)} or earlier, so we can keep to the response date.</p>
-    ${r.questions.map((t) => `<h4>${esc(t.theme)}</h4><ol>${t.questions.map((q) => `<li>${esc(q)}</li>`).join("")}</ol>`).join("")}
+    ${r.questions.map((t) => `<h3>${esc(t.theme)}</h3><ol>${t.questions.map((q) => `<li>${esc(q)}</li>`).join("")}</ol>`).join("")}
     <p style="margin-top:14px">We are happy to walk through these on a short call.</p>
     <p>Kind regards,<br>Solution Design team<br>Contoso Logistics</p>`;
 }
@@ -463,99 +441,12 @@ function showTab(name) {
   ["lanes", "gaps", "outline", "letter"].forEach((t) => { $("p-" + t).hidden = t !== name; });
 }
 
-// ---------- Simulated agent ----------
-function say(cls, html) {
-  const d = document.createElement("div");
-  d.className = "msg " + cls;
-  d.innerHTML = html;
-  $("log").appendChild(d);
-  $("log").scrollTop = $("log").scrollHeight;
-}
-
-function intent(q) {
-  const t = q.toLowerCase();
-  const lane = q.match(/\b(NW|SP)-\d{3}\b/i);
-  if (lane) return ["lane", lane[0].toUpperCase()];
-  const rule = q.match(/\bR0\d\b/i);
-  if (rule) return ["rule", rule[0].toUpperCase()];
-  if (/explain/.test(t)) return ["explain"];
-  if (/email|letter|clarif|question|draft/.test(t)) return ["letter"];
-  if (/mode|ftl|ltl|groupage|rail|multimodal|solution|outline/.test(t)) return ["mode"];
-  if (/scope|summar|countr|volume|pallet|corridor/.test(t)) return ["scope"];
-  if (/miss|gap|wrong|issue|problem|check/.test(t)) return ["gaps"];
-  return ["help"];
-}
-
-function explainGap(g) {
-  const where = g.lane_id ? `lane ${esc(g.lane_id)}` : "the requirements document";
-  const why = {
-    R01: "Without shipments and pallets per shipment the lane cannot be banded or priced.",
-    R02: "Pallet dimensions drive loading metres, stackability and the truck count.",
-    R03: "The Incoterm decides who pays for which leg and where risk passes.",
-    R04: "FOB, CFR, CIF and FAS apply to sea and inland waterway; road lanes normally use FCA, DAP or DDP.",
-    R05: "Carriers need the UN number to apply ADR rules, choose equipment and quote correctly.",
-    R06: `Road planning assumes about ${ROAD_KM_PER_DAY} km a day for a single driver under EU driving-time rules.`,
-    R07: "Duplicate lanes double-count volume and confuse the rate card.",
-    R08: "Missing sections become assumptions in the offer, which is a commercial risk.",
-    R09: "Open items marked TBC must be closed before the offer is final.",
-  }[g.rule_id];
-  return `<strong>${g.rule_id} ${esc(g.rule)}</strong> (${g.severity}) on ${where}.<br>${esc(g.message)}<br>${why}<span class="cite">Topic: Explain a gap. ${CITE}</span>`;
-}
-
-function answer(q) {
-  say("user", esc(q));
-  if (!current) { run(); say("bot", `I ran the check on <strong>${esc(current.pack.meta.title)}</strong> first.`); }
-  const r = current.result, s = r.scope, sm = r.summary;
-  const [kind, arg] = intent(q);
-  if (kind === "gaps") {
-    showTab("gaps");
-    const high = r.gaps.filter((g) => g.severity === "high");
-    renderLanes(high.map((g) => g.lane_id));
-    say("bot", `I found <strong>${sm.gaps_total} gaps</strong>: ${sm.gaps_by_severity.high} high, ${sm.gaps_by_severity.medium} medium, ${sm.gaps_by_severity.low} low. ${sm.lanes_with_gaps} of ${s.lane_count} lanes are affected and ${sm.document_gaps} gaps are in the requirements document.${high.length ? " Fix these first:" : ""}<ul>${high.slice(0, 6).map((g) => `<li>${esc(g.lane_id)}: ${esc(g.rule)}</li>`).join("")}</ul><span class="cite">Topic: Check new RFQ. ${CITE}</span>`);
-  } else if (kind === "letter") {
-    showTab("letter");
-    const n = r.questions.reduce((t, x) => t + x.questions.length, 0);
-    say("bot", `I drafted a clarification letter with <strong>${n} questions</strong> in ${r.questions.length} themes: ${r.questions.map((t) => esc(t.theme)).join(", ")}. It is open in Word for you to edit before sending.<span class="cite">Topic: Draft clarification questions. Microsoft 365 Copilot in Word refines the tone.</span>`);
-  } else if (kind === "mode") {
-    showTab("outline");
-    say("bot", `Suggested mode per lane band:<ul>${r.outline.bands.filter((b) => b.lane_count).map((b) => `<li><strong>${esc(b.band)}</strong>: ${b.lane_count} lanes, ${fmt(b.annual_pallets)} pallets a year</li>`).join("")}</ul>Rule of thumb: ${FTL_MIN_PALLETS}+ pallets per shipment is FTL; over ${MULTIMODAL_MIN_KM} km and weekly or more, test road-rail.<span class="cite">Microsoft 365 Copilot in PowerPoint turns this into the solution outline.</span>`);
-  } else if (kind === "scope") {
-    say("bot", `<strong>${esc(current.pack.meta.shipper)}, ${esc(current.pack.meta.title)}</strong>: ${s.lane_count} lanes from ${s.origin_countries.join(", ")} to ${s.destination_countries.length} destination countries, ${fmt(s.distance_km_min)} to ${fmt(s.distance_km_max)} km. Known volume ${fmt(s.annual_pallets_known)} pallets in ${fmt(s.annual_shipments_known)} shipments a year (${s.lanes_with_volume} lanes with volume). ${s.hazardous_lanes} lanes carry hazardous goods.<br>Top corridors:<ul>${s.top_corridors.map((c) => `<li>${esc(c.corridor)}: ${fmt(c.annual_pallets)} pallets</li>`).join("")}</ul><span class="cite">Topic: Summarise scope. ${CITE}</span>`);
-  } else if (kind === "lane") {
-    const lg = r.gaps.filter((g) => g.lane_id === arg);
-    const lane = r.lanes.find((l) => l.lane_id === arg);
-    showTab("lanes"); renderLanes([arg]);
-    if (!lane) say("bot", `I cannot find lane ${esc(arg)} in this RFQ.`);
-    else if (!lg.length) say("bot", `Lane ${esc(arg)} (${esc(lane.origin)} to ${esc(lane.destination)}) has no gaps. Suggested mode: ${esc(lane.mode_suggested)}.`);
-    else lg.forEach((g) => say("bot", explainGap(g)));
-  } else if (kind === "rule") {
-    const rg = r.gaps.filter((g) => g.rule_id === arg);
-    say("bot", RULES[arg] ? `<strong>${arg} ${esc(RULES[arg][0])}</strong> (${RULES[arg][1]}): ${rg.length} hit(s)${rg.length ? ": " + rg.map((g) => esc(g.lane_id || "requirements.md")).join(", ") : ""}.` : `There is no rule ${esc(arg)}; rules run from R01 to R09.`);
-  } else if (kind === "explain") {
-    const g = r.gaps.find((x) => x.severity === "high") || r.gaps[0];
-    if (!g) say("bot", "There are no gaps to explain in this RFQ.");
-    else { if (g.lane_id) { showTab("lanes"); renderLanes([g.lane_id]); } say("bot", explainGap(g)); }
-  } else {
-    say("bot", `I can check the RFQ, explain a gap (try a lane ID such as ${esc(r.lanes[0].lane_id)}), draft clarification questions, suggest a mode per lane or summarise the scope.`);
-  }
-}
-
 // ---------- Wiring ----------
 renderPicker();
-say("bot", "Hello, I am the Tender Desk agent (simulated). Pick an RFQ folder and run the check, or use a suggestion below.");
 $("pack").addEventListener("change", () => { renderFiles(); current = null; $("results").hidden = true; $("empty").hidden = false; });
-$("run").addEventListener("click", () => {
-  const r = run(); showTab("lanes");
-  say("bot", `Check complete for <strong>${esc(current.pack.meta.title)}</strong>: ${r.summary.gaps_total} gaps across ${r.summary.lanes_with_gaps} lanes, ${r.summary.readiness_pct}% of lanes ready to price. A summary card was posted to the Tender Desk channel in Teams.<span class="cite">Flow: When a new RFQ folder is created</span>`);
-});
+$("run").addEventListener("click", () => { run(); showTab("lanes"); });
 $("only-gaps").addEventListener("change", () => renderLanes());
 document.querySelector(".tabs").addEventListener("click", (e) => { if (e.target.dataset.tab) showTab(e.target.dataset.tab); });
-$("suggest").addEventListener("click", (e) => { if (e.target.dataset.q) answer(e.target.dataset.q); });
-$("gaps").addEventListener("click", (e) => {
-  const i = e.target.dataset.gap;
-  if (i !== undefined) { const g = current.result.gaps[+i]; say("user", `Explain ${esc(g.lane_id || g.rule_id)}`); say("bot", explainGap(g)); }
-});
-$("ask").addEventListener("submit", (e) => { e.preventDefault(); const q = $("q").value.trim(); if (q) { answer(q); $("q").value = ""; } });
 
 // Deep links for screenshots, e.g. #state=result, #state=letter, #state=mode, #state=gaps&pack=1&shot=1 (shot hides the intro for screenshots)
 (function fromHash() {
@@ -566,9 +457,10 @@ $("ask").addEventListener("submit", (e) => { e.preventDefault(); const q = $("q"
   const idx = +(h.get("pack") || 0);
   if (PACKS[idx]) { $("pack").selectedIndex = idx; renderFiles(); }
   $("run").click();
-  const q = { gaps: "What is missing?", letter: "Draft clarification email", mode: "Suggest mode per lane", scope: "Summarise scope", explain: "Explain a gap" }[state];
-  if (q) answer(q);
+  const tab = { gaps: "gaps", letter: "letter", mode: "outline" }[state];
+  if (tab) showTab(tab);
 })();
 </script>
+<script src="../assets/js/tabs.js"></script>
 </body>
 </html>

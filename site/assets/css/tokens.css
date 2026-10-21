@@ -28,20 +28,45 @@
 
   --r-sm: 4px;
   --r-xl: 12px;
+
+  /* Theme roles: page background and text, small accent text, kicker text, focus ring, dark-field borders */
+  --bg: var(--green);
+  --fg: var(--offwhite);
+  --accent: var(--orange);
+  --accent-large: var(--orange); /* bold text >= 18.7px only */
+  --kicker: var(--lime);
+  --focus: var(--orange);
+  --field-border: rgba(255, 253, 248, 0.55);
+  color-scheme: dark;
+}
+/* Light theme (set by assets/js/theme.js). Contrast on #fffdf8 / #f2efe6 / #e6e2d6: fg 14.8/13.0/11.6, muted 7.4/6.8/6.3, accent 6.6/5.8/5.2, kicker 6.3/5.6/4.9 */
+:root[data-theme="light"] {
+  --bg: #fffdf8;
+  --fg: #0c2c23;
+  --surface: #f2efe6;
+  --surface-2: #e6e2d6;
+  --muted: rgba(12, 44, 35, 0.78);
+  --line: rgba(12, 44, 35, 0.18);
+  --accent: #a3380f;
+  --accent-large: #d94f1a; /* 4.1 / 3.6 / 3.2 : large text */
+  --kicker: #1f6b52;
+  --focus: #0c2c23;
+  --field-border: rgba(12, 44, 35, 0.6);
+  color-scheme: light;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  background: var(--green);
-  color: var(--offwhite);
+  background: var(--bg);
+  color: var(--fg);
   font: 400 16px/1.55 var(--font-body);
 }
 h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; line-height: 1.2; margin: 0 0 .5em; }
-a { color: var(--orange); }
+a { color: var(--accent); }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
-  outline: 2px solid var(--orange); outline-offset: 2px;
+  outline: 2px solid var(--focus); outline-offset: 2px;
 }
 code, pre { font-family: var(--font-mono); font-size: 13px; }
 img { max-width: 100%; height: auto; }
@@ -55,7 +80,7 @@ img { max-width: 100%; height: auto; }
 .chip.blue { background: var(--blue); }
 .chip.yellow { background: var(--yellow); }
 .chip.pink { background: var(--pink); }
-.chip.ghost { background: transparent; color: var(--offwhite); border: 1px solid var(--line); }
+.chip.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
 
 .btn {
   display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
@@ -63,8 +88,18 @@ img { max-width: 100%; height: auto; }
   background: var(--orange); color: var(--green);
   font: 600 14px/1 var(--font-heading); text-decoration: none;
 }
-.btn.secondary { background: transparent; color: var(--offwhite); border: 1px solid var(--line); }
+.btn.secondary { background: transparent; color: var(--fg); border: 1px solid var(--line); }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Theme toggle (top right on every page) and theme-specific logos */
+.theme-toggle {
+  display: inline-grid; place-items: center; flex: none; width: 38px; height: 38px; padding: 0;
+  border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--fg); cursor: pointer;
+}
+.theme-toggle:hover { border-color: var(--orange); }
+.theme-toggle svg { width: 18px; height: 18px; }
+:root:not([data-theme="light"]) .i-moon, :root[data-theme="light"] .i-sun,
+:root:not([data-theme="light"]) .logo-light, :root[data-theme="light"] .logo-dark { display: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }

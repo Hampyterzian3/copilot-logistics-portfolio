@@ -1,9 +1,14 @@
 {
   "id": "04",
   "slug": "inbound-risk-agent",
-  "title": "Inbound Risk Early-Warning Agent",
-  "outcome": "Flags late inbound shipments in transit; critical band 97% precise in backtest.",
-  "summary": "Delayed or lost inbound shipments were noticed too late, often by the customer. A transparent 0-100 risk score with plain-word reasons, Teams alerts and a Copilot Studio agent warns the control tower while there is still time to act.",
+  "order": 3,
+  "title": "Early-Warning Risk Agent",
+  "kickerNote": "proven in logistics",
+  "impact": [
+    "acc",
+    "time"
+  ],
+  "outcome": "Critical alerts 97% precise; at-risk-or-above alerts catch 49% of late shipments (backtest, synthetic data).",
   "stack": [
     "Copilot Studio",
     "Power Automate",
@@ -11,11 +16,25 @@
     "Dataverse",
     "Microsoft Teams",
     "Power BI",
-    "GitHub Copilot"
+    {
+      "label": "GitHub Copilot",
+      "ghost": true
+    }
   ],
+  "summary": "Delayed or lost inbound shipments were noticed too late, often by the customer. A transparent 0-100 risk score with plain-word reasons, Teams alerts and a Copilot Studio agent warns the control tower while there is still time to act.",
   "cv": "Inspired by: inbound-risk dashboard sustaining 99% on-time through COVID-19; lost-shipment postcode analysis cutting lost shipments 64%.",
-  "demo": "demos/04-inbound-risk-agent.html",
-  "repo": "projects/04-inbound-risk-agent",
+  "links": [
+    {
+      "label": "Try the demo",
+      "href": "demos/04-inbound-risk-agent.html"
+    },
+    {
+      "label": "Source",
+      "href": "https://github.com/Hampyterzian3/copilot-logistics-portfolio/tree/main/projects/04-inbound-risk-agent",
+      "secondary": true,
+      "external": true
+    }
+  ],
   "cards": [
     {
       "type": "image",
@@ -66,21 +85,22 @@
     },
     {
       "type": "image",
-      "title": "Customer update, drafted",
-      "caption": "The agent explains a score and drafts a customer email using only customer-safe causes, for a planner to approve.",
-      "src": "media/04/03-agent-draft.png",
-      "alt": "Agent panel with a drafted customer update email"
+      "title": "Critical shipments first",
+      "caption": "One filter shows the control tower only the critical shipments, each with its score and the top reason in plain words, ready to act on.",
+      "src": "media/04/03-critical-filter.png",
+      "alt": "Inbound risk monitor filtered to critical shipments, each with its score, customer, carrier, lane and top reason"
     },
     {
       "type": "text",
       "title": "GitHub Copilot ready",
-      "caption": "Code drafted with AI pair programming and verified by 28 pytest tests and a parity check on all 300 risk scores. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
+      "body": "Code drafted with AI pair programming and verified by 28 pytest tests and a parity check on all 300 risk scores. The repo ships GitHub Copilot custom instructions (brand, British English, synthetic data only, tests first), so every follow-up change in Copilot Chat or agent mode works to the same rules."
     },
     {
       "type": "demo",
       "title": "Try it",
       "caption": "Sort and filter the list, open a critical shipment and click through the agent suggestions in under a minute.",
-      "href": "demos/04-inbound-risk-agent.html"
+      "href": "demos/04-inbound-risk-agent.html",
+      "cta": "Open the demo"
     }
   ]
 }

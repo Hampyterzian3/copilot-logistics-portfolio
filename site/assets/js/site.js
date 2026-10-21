@@ -25,11 +25,27 @@
       if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 4) best = shots.length - 1;
       return best;
     };
+    const pos = s => s.offsetLeft - track.offsetLeft;
     const go = i => {
       i = Math.max(0, Math.min(shots.length - 1, i));
-      track.scrollTo({ left: shots[i].offsetLeft - track.offsetLeft, behavior: "smooth" });
+      track.scrollTo({ left: pos(shots[i]), behavior: "smooth" });
+    };
+    // At the end of the track several shots share the max scroll offset, so
+    // index() - 1 may not move at all. Skip to the nearest shot that does, and
+    // step from the pending target while a smooth scroll is still running.
+    let target = null, targetAt = 0;
+    const step = d => {
+      const max = track.scrollWidth - track.clientWidth;
+      const at = k => Math.min(pos(shots[k]), max);
+      const base = target !== null && Date.now() - targetAt < 700 ? target : index();
+      let i = base + d;
+      while (i > 0 && i < shots.length - 1 && Math.abs(at(i) - at(base)) <= 4) i += d;
+      if (i < 0 || i >= shots.length || Math.abs(at(i) - at(base)) <= 4) return;
+      target = i; targetAt = Date.now();
+      go(i);
     };
     const update = () => {
+      target = null;
       const i = index();
       dots.forEach((d, k) => d.classList.toggle("on", k === i));
       count.textContent = (i + 1) + " / " + shots.length;
@@ -42,13 +58,13 @@
     };
     let t;
     track.addEventListener("scroll", () => { clearTimeout(t); t = setTimeout(update, 60); }, { passive: true });
-    prev.addEventListener("click", () => go(index() - 1));
-    next.addEventListener("click", () => go(index() + 1));
+    prev.addEventListener("click", () => step(-1));
+    next.addEventListener("click", () => step(1));
     track.addEventListener("keydown", e => {
-      if (e.key === "ArrowRight") { e.preventDefault(); go(index() + 1); }
-      if (e.key === "ArrowLeft") { e.preventDefault(); go(index() - 1); }
+      if (e.key === "ArrowRight") { e.preventDefault(); step(1); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); step(-1); }
     });
-    roll._go = d => go(index() + d);
+    roll._go = step;
     update();
   });
 

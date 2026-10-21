@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="t d">
+  <title id="t">Baynook architecture</title>
+  <desc id="d">Top: staff, admins and reception use a React single-page app that calls Netlify Functions over one origin, backed by Postgres on Neon. Bottom: the rules the database and functions guarantee, and what the app produces.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#fffdf8"/></marker>
+    <style>
+      .h{font:600 26px 'Space Grotesk',Arial,sans-serif;fill:#fffdf8}
+      .s{font:600 15px 'Space Grotesk',Arial,sans-serif;fill:#81cfb3;letter-spacing:.06em}
+      .s2{font:600 15px 'Space Grotesk',Arial,sans-serif;fill:#b0c6e8;letter-spacing:.06em}
+      .bt{font:600 17px 'Space Grotesk',Arial,sans-serif;fill:#fffdf8}
+      .b{font:400 13.5px Inter,Arial,sans-serif;fill:rgba(255,253,248,.85)}
+      .bx{fill:#244139;stroke:rgba(255,253,248,.18)}
+      .ms{fill:#b0c6e8}
+      .mt{font:600 15px 'Space Grotesk',Arial,sans-serif;fill:#0c2c23}
+      .mb{font:400 12.5px Inter,Arial,sans-serif;fill:#0c2c23}
+      .ln{stroke:#fffdf8;stroke-width:2;fill:none}
+      .map{stroke:rgba(255,253,248,.35);stroke-width:1.5;stroke-dasharray:4 5;fill:none}
+    </style>
+  </defs>
+  <rect width="1200" height="675" fill="#0c2c23"/>
+  <text x="40" y="52" class="h">Baynook: parking bay booking on one origin</text>
+
+  <text x="40" y="96" class="s">LIVE: BROWSER, NETLIFY FUNCTIONS, POSTGRES ON NEON</text>
+  <g>
+    <rect class="bx" x="40" y="112" width="200" height="150" rx="12"/>
+    <text x="58" y="142" class="bt">Three roles</text>
+    <text x="58" y="166" class="b">Staff: book a bay,</text>
+    <text x="58" y="186" class="b">week view, map</text>
+    <text x="58" y="206" class="b">Admin: bays, people, rules</text>
+    <text x="58" y="226" class="b">Reception: the day board</text>
+
+    <rect class="bx" x="285" y="112" width="250" height="150" rx="12"/>
+    <text x="303" y="142" class="bt">React SPA</text>
+    <text x="303" y="166" class="b">React 18, TypeScript, Vite</text>
+    <text x="303" y="186" class="b">Tailwind, React Router</text>
+    <text x="303" y="206" class="b">role-gated routes</text>
+    <text x="303" y="226" class="b">GETs retried on cold start</text>
+    <text x="303" y="246" class="b">zero off-origin requests</text>
+
+    <rect class="bx" x="580" y="112" width="270" height="150" rx="12"/>
+    <text x="598" y="142" class="bt">Netlify Functions /api/*</text>
+    <text x="598" y="166" class="b">12 functions, TypeScript</text>
+    <text x="598" y="186" class="b">zod validation on every body</text>
+    <text x="598" y="206" class="b">JWT in httpOnly, SameSite cookie</text>
+    <text x="598" y="226" class="b">bcrypt, token version check</text>
+    <text x="598" y="246" class="b">nightly demo reset, daily purge</text>
+
+    <rect class="bx" x="895" y="112" width="265" height="150" rx="12"/>
+    <text x="913" y="142" class="bt">Postgres on Neon</text>
+    <text x="913" y="166" class="b">6 SQL migrations</text>
+    <text x="913" y="186" class="b">partial unique indexes</text>
+    <text x="913" y="206" class="b">advisory lock per user and day</text>
+    <text x="913" y="226" class="b">dates as plain YYYY-MM-DD</text>
+    <text x="913" y="246" class="b">six-month retention</text>
+
+    <path class="ln" d="M240 187H281" marker-end="url(#a)"/>
+    <path class="ln" d="M535 187H576" marker-end="url(#a)"/>
+    <path class="ln" d="M850 187H891" marker-end="url(#a)"/>
+  </g>
+
+  <text x="40" y="320" class="s2">GUARANTEED BY DESIGN</text>
+  <g>
+    <rect class="ms" x="40" y="336" width="265" height="118" rx="12"/>
+    <text x="58" y="366" class="mt">One booking per bay per day</text>
+    <text x="58" y="390" class="mb">Enforced by a unique index,</text>
+    <text x="58" y="408" class="mb">not just the UI. Concurrent</text>
+    <text x="58" y="426" class="mb">clicks cannot double-book.</text>
+
+    <rect class="ms" x="325" y="336" width="265" height="118" rx="12"/>
+    <text x="343" y="366" class="mt">One own bay per person</text>
+    <text x="343" y="390" class="mb">Second unique index on user</text>
+    <text x="343" y="408" class="mb">and date; visitor bays are</text>
+    <text x="343" y="426" class="mb">capped under a lock instead.</text>
+
+    <rect class="ms" x="610" y="336" width="265" height="118" rx="12"/>
+    <text x="628" y="366" class="mt">No timezone drift</text>
+    <text x="628" y="390" class="mb">Calendar days never pass</text>
+    <text x="628" y="408" class="mb">through a JS Date; today is</text>
+    <text x="628" y="426" class="mb">computed in Europe/Amsterdam.</text>
+
+    <rect class="ms" x="895" y="336" width="265" height="118" rx="12"/>
+    <text x="913" y="366" class="mt">Safe public demo</text>
+    <text x="913" y="390" class="mb">Try as Staff, Admin or</text>
+    <text x="913" y="408" class="mb">Reception; demo accounts are</text>
+    <text x="913" y="426" class="mb">locked and reseeded nightly.</text>
+  </g>
+
+  <text x="40" y="512" class="s">OUTPUTS</text>
+  <g>
+    <rect class="bx" x="40" y="528" width="265" height="96" rx="12"/>
+    <text x="58" y="558" class="bt">Calendar invite</text>
+    <text x="58" y="582" class="b">hand-built RFC 5545 .ics</text>
+    <text x="58" y="602" class="b">for every confirmed booking</text>
+
+    <rect class="bx" x="325" y="528" width="265" height="96" rx="12"/>
+    <text x="343" y="558" class="bt">Reception email</text>
+    <text x="343" y="582" class="b">drafted list of who parks</text>
+    <text x="343" y="602" class="b">where, sent by the admin</text>
+
+    <rect class="bx" x="610" y="528" width="265" height="96" rx="12"/>
+    <text x="628" y="558" class="bt">CSV export</text>
+    <text x="628" y="582" class="b">booking log for any period</text>
+    <text x="628" y="602" class="b">downloaded by an admin</text>
+
+    <rect class="bx" x="895" y="528" width="265" height="96" rx="12"/>
+    <text x="913" y="558" class="bt">Occupancy overview</text>
+    <text x="913" y="582" class="b">free today, week peak,</text>
+    <text x="913" y="602" class="b">30-day occupancy by weekday</text>
+  </g>
+</svg>
